@@ -1,6 +1,7 @@
 library(shiny)
 library(lattice)
-load("AQ.RData")
+load("AQ_delay.RData")
+#AQ_delay is a subset with variables Month, DayOfWeek, AirTime, ArrDelay and DepDelay.
 
 ui <- fluidPage(
   radioButtons(inputId = "month", label = "Choose a Month (of 2001)",
@@ -20,8 +21,8 @@ ui <- fluidPage(
 
 server <- function(input, output) {
   output$parallelPlot <- renderPlot({
-    parallelplot(AQ[AQ$Month == input$month, 14:16],
-                 groups = AQ$DayOfWeek,
+    parallelplot(AQ_delay[AQ_delay$Month == input$month, 3:5],
+                 groups = AQ_delay$DayOfWeek,
                  auto.key = list(space = "right"),
                  main = "AQ Carrier flights in 2001")
   })
