@@ -1,0 +1,30 @@
+Strengths and Weaknesses of Graphics Tools
+* Consider easy of learning, installing and coverage of desired techniques (e.g. interactivity, large data sets).
+
+Shiny: http://shiny.rstudio.com/reference/shiny/latest/
+ + Easy to learn and set up.
+ + Aesthetically appealing and user friendly interface.
+ - Limitation on interaction options (?) since only a limited number of input and output options.
+ ? Doesn’t allow for low-level control, customisation
+ ? Loading large data files onto the R server
+ ? Brushing interaction (see link above)
+
+R Base Graphics
+ - Possible, but difficult to locate interaction (ie. click location).
+ - Relatively slow at drawing graphics compared to a browser platform.
+
+Plotly: https://plot.ly/r/reference/
+ * ‘Interaction’ functions: plot_ly() or ggplotly().
+ + Easy to use with ggplot2 (and automatically loads ggplot2).
+ + Can be used with Shiny.
+ - When data points > 5000 (eg. AQ delay data):
+    - Delay in updating image after zoom in selection on plot.
+    - Difficulty keeping up with tooltip display.
+ ? Tooltip default doesn’t seem to work for bar plot, even though it seems trivial (but works for scatterplot).
+ 
+Highcharts
+ + Purely Javascript, so easy to embed in web pages.
+
+rCharts
+ + Supports multiple javascript charting libraries, incl. Highchairs.
+	

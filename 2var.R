@@ -82,6 +82,15 @@ xyplot(NetDelay ~ AirTime | factor(Month), data = AQ,
        
 # Interactivity: Identification
 # Select a single point and identify length of delay, Carrier, etc.
-
+library(plotly)
+AQ$Month <- as.factor(AQ$Month)
+ggplot(AQ) +
+  geom_point(aes(x=AirTime, y=NetDelay, color=Month)) +
+  labs(title="Flight delays for AQ Carrier in 2001", 
+       x="Air time (mins)",
+       y="Net delay (mins)",
+       color="Month")
+# Add interaction:
+ggplotly()
 # Interactivity: Brushing and linking
 # Linking a mosaic graph (with Day of week and month) and scatterplot of delay.
