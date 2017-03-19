@@ -1,0 +1,22 @@
+* The aim of my research is to…
+	summarise
+	identify
+	analyse (?)
+open source, code based, data visualisation tools, with a focus on:
+	interactive techniques
+	large data sets (maybe).
+
+* I would like my reader to know about…
+	what makes data visualisation and interaction effective.
+ 	the “key” tools that are currently available and there advantages and disadvantages (ease of learning and use, interconnectedness with other tools, flexibility for customisation, coverage of interaction techniques, potential to be scaled to large data sets).
+
+* My research should identify tools that are ‘here to stay’, with a vibrant community, support available, ‘tried and true’ but also allows for the creation of ‘original’ products.
+
+* ggobi may set the benchmark of interactive techniques possible and help identify gaps.
+
+* A ‘Grammar of Graphics’ equivalent paradigm for interactive graphics?
+
+* Is this ‘the GAP’: Lots of choice now with open source tools, but which ones to focus on learning and using for a novice?
+
+* Motivation: Domain knowledge is difficult to acquire compared to a functional level of programming skills. 
+Potential target audience:  Those with domain knowledge, up-skilling them with the programming skills required to create interactive graphics that are useful to domain experts (and accessible for the general public?).

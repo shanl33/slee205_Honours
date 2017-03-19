@@ -1,0 +1,21 @@
+Large data notes:
+
++ Don’t need to plot all the data.
+ - Summary (proportions, averages)
+ - Binning techniques, R Base: smoothScatter(), statbinhex().
+ - Density plots 
+
++ Exporting and viewing graphics:	
+ - Vector based formats: (eg. PDF, SVG, XML, Javascript)
+  + Takes a long time to create as well as to open later, but a sharp image.
+  + Large files since info for each object is retained (object-orientated).
+  + ggobi and ggvis are faster at updating images than Shiny since no ‘middleman’ involved (and they interact directly with the plot?)
+ - Raster formats: (eg. PNG, JPEG)
+  + Fixed number of pixels, so the file will remain small regardless of complexity of plot.
+  + Fast to view plot but no information on objects stored (only interested in the ‘shading’/image of each pixel).
+  + Exporting as a PNG in R is relatively faster than PDF, but can still take some time when the graph is complex.  Once stored as PNG, image is fast to view.
+  + Images are grainy when enlarged.
+
+Course on Web Scraping using R:
+http://blog.rolffredheim.com/
+
