@@ -24,10 +24,17 @@ Plotly: https://plot.ly/r/reference/
  - When data points > 50 000 (eg. AQ delay data):
     - Delay in creating ‘zoom in’ selection of plot.
     - Difficulty keeping up with tooltip display.
- ? Tooltip default doesn’t seem to work for bar plot, even though it seems trivial (but works for scatterplot).
+ - Tooltip default for comparing values can only compare a maximum of 4 obs.
  + Allows for brushing (by lasso) and hence most likely linking.
  ? Can only ‘call up’ variables used in the aesthetics of the plot (?), but combined with Shiny might be able to select the vars to use in aesthetics as inputs.
+ ? How to access ggplot() + geom_mosaic():  
+https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html
+
+Plotly and Shiny:  https://plot.ly/r/shinyapp-linked-click/#shiny-app
  
 Highcharts (via highchartr and htmlwidgets)
  + Purely Javascript, so easy to embed in web pages.
+
+* “On the plot” interaction is better than having controls outside the plot region.
+* ggobi may set the benchmark of interactive techniques possible and help identify gaps.
 	
