@@ -31,6 +31,8 @@ Plotly: https://plot.ly/r/reference/
 https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html
 
 Plotly and Shiny:  https://plot.ly/r/shinyapp-linked-click/#shiny-app
+ + Linking two Plotly graphs is possible.
+ ? Cannot use Shiny widgets with more than one graph.
  
 Highcharts (via highchartr and htmlwidgets)
  + Purely Javascript, so easy to embed in web pages.
