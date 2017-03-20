@@ -92,5 +92,22 @@ ggplot(AQ) +
        color="Month")
 # Add interaction:
 ggplotly()
+# scale_x_continous(): Transforming the axes
+# Produces NaNs for log of negative values and will plot NaNs in static plots.
+# Interaction: NaNs disappear from web browser plot and default tooltips display log values.
+ggplot(AQ) +
+  geom_point(aes(x=DepDelay, y=ArrDelay)) +
+  scale_x_continuous(trans = "log10") +
+  scale_y_continuous(trans = "log10") +
+  geom_vline(aes(xintercept=1))
+ggplotly()
+# coord_trans(): Transforming the coordinates
+# Results in log scales axes but with different ticks labeled.
+# Data set must be all positive values.
+# Interaction: Plot completely changed and tooltip is again log values.
+ggplot(pos_AQ) +
+  geom_point(aes(x=DepDelay, y=ArrDelay)) +
+  coord_trans(x="log10", y="log10")
+ggplotly()
 # Interactivity: Brushing and linking
 # Linking a mosaic graph (with Day of week and month) and scatterplot of delay.
