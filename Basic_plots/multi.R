@@ -1,4 +1,4 @@
-load("flights.RData")
+load("flights.RData") #Dataset NOT on Github
 
 # Proportion of flights cancelled by month and carrier:
 cancel <- aggregate(flights$Cancelled,
@@ -39,7 +39,7 @@ parallelplot(~flights[12:16], data = flights,
              groups = Month,
              auto.key = list(space = "right"))
 # AQ carrier subset:
-load("AQ.RData")
+load("~/Desktop/Project/slee205_Honours/Datasets/AQ.RData")
 parallelplot(~AQ[12:16], data = AQ,
              groups = Month,
              auto.key = list(space = "right"),

@@ -1,6 +1,9 @@
 # Read in data for Month, DayofWeek, Scheduled Departure and Arrival Times (CRSDepTime, CRSArrTime), 
 # UniqueCarrier, ArrDelay, DepDelay, AirTime:
-load("delay.RData")
+load("~/Desktop/Project/slee205_Honours/Datasets/delay.RData")
+AQ$NetDelay <- AQ$ArrDelay-AQ$DepDelay
+# NetDelay (mins) created to measure if a flight 'made up' for its departure delay.
+# NetDelay>0 means flight was delayed further, NetDelay<0 flight overcompensated for delay.
 
 # Scatterplot of DepDelay vs ArrDelay for all airlines takes a long time.
 # Early flights are not plotted since using log scales (see Warnings).
@@ -31,7 +34,7 @@ smoothScatter(pos_delay$DepDelay, pos_delay$ArrDelay,
 
 
 # Subset smallest carrier, AQ:
-load("AQ.RData")
+load("~/Desktop/Project/slee205_Honours/Datasets/AQ.RData")
 # Compare the delay times (on arrival and departure):
 plot(AQ$DepDelay,AQ$ArrDelay, main = "Flight delay times for AQ Carrier", 
      xlab = "Departure delay (mins)",
@@ -64,11 +67,6 @@ smoothScatter(pos_AQ$DepDelay, pos_AQ$ArrDelay,
 library(lattice)
 # Grid graphics, lattice package: Multipanel plot of flight delay by Month.
 # Plot takes a long time if using all Carriers and too much overplotting to be of use.
-# NetDelay (mins) created to measure if a flight 'made up' for its departure delay.
-# NetDelay>0 means flight was delayed further, NetDelay<0 flight overcompensated for delay.
-NetDelay <- AQ$ArrDelay-AQ$DepDelay
-AQ$NetDelay <- NetDelay
-summary(AQ$NetDelay)
 xyplot(NetDelay ~ AirTime | factor(Month), data = AQ, 
        main = "Flight delay by Month for AQ Carrier",
        xlab = "Air time (mins)",

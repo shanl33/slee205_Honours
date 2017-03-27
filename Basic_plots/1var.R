@@ -1,5 +1,5 @@
 # Read in subset of flights 2001 data.
-load("cancel.RData") 
+load("~/Desktop/Project/slee205_Honours/Datasets/cancel.RData")
 str(cancel)
 # day_cancel is a summary of the proportion of cancel cancelled by day.
 day_cancel <- tapply(cancel$Cancelled, cancel$DayOfWeek, mean)
@@ -43,3 +43,9 @@ ggplot(df_cancel) +
 ggplotly()
 # Maybe the values in the aes variables have too many digits?
 # Tried ggplotly(tooltip = "x") but also does not work.
+load("~/Desktop/Project/slee205_Honours/Datasets/AQ.RData")
+AQ$SchedDepTime <- strptime(AQ$CRSDepTime, format = "%H%M")
+ggplot(AQ) +
+  geom_histogram(aes(x=SchedDepTime), binwidth = 1800) +
+  labs(x="Scheduled departure time (hh:mm)")
+ggplotly()

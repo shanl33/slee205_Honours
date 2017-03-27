@@ -32,7 +32,9 @@ https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html
 
 Plotly and Shiny:  https://plot.ly/r/shinyapp-linked-click/#shiny-app
  + Linking two Plotly graphs is possible.
- ? Cannot use Shiny widgets with more than one graph.
+ - Link must be via a variable that is common in both graphs.
+Example with selecting by brushing and click:
+https://plot.ly/r/shiny-coupled-events/
  
 Highcharts (via highchartr and htmlwidgets)
  + Purely Javascript, so easy to embed in web pages.
