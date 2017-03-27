@@ -24,6 +24,7 @@ Plotly: https://plot.ly/r/reference/
  - When data points > 50 000 (eg. AQ delay data):
     - Delay in creating ‘zoom in’ selection of plot.
     - Difficulty keeping up with tooltip display.
+    - Lasso/click drag selection very slow and hard to control, difficult to use for exploration.
  - Tooltip default for comparing values can only compare a maximum of 4 obs.
  + Allows for brushing (by lasso) and hence most likely linking.
  ? Can only ‘call up’ variables used in the aesthetics of the plot (?), but combined with Shiny might be able to select the vars to use in aesthetics as inputs.
@@ -33,12 +34,18 @@ https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html
 Plotly and Shiny:  https://plot.ly/r/shinyapp-linked-click/#shiny-app
  + Linking two Plotly graphs is possible.
  - Link must be via a variable that is common in both graphs.
-Example with selecting by brushing and click:
+ - Linked plots can only use variables that were in previous plots or called on by Shiny inputs (unable to use a diff var for colour in output plot of Brush_input).
+Example with selecting by brushing and click (used for Brush_input):
 https://plot.ly/r/shiny-coupled-events/
  
 Highcharts (via highchartr and htmlwidgets)
  + Purely Javascript, so easy to embed in web pages.
 
-* “On the plot” interaction is better than having controls outside the plot region.
+“On-plot” vs “off-plot” interactions
+ * Shiny has introduced more of a focus on “off-plot” interactions.
+ * “Traditionally” interaction has been more focused on “on-plot” interactions (see tools described by Cook and Swayne).
+ * Plotly allows for “on-plot” interactions, but limited in flexibility of linking different variables. Considerable delay for n>50000. 
+ * Smooth “On-plot” interaction is hard to achieve.
+
 * ggobi may set the benchmark of interactive techniques possible and help identify gaps.
 	
