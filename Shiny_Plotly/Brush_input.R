@@ -24,10 +24,11 @@ server <- function(input, output) {
     brushed <- event_data("plotly_selected", 
                           source = "subset")
     if(is.null(brushed)==T) return(NULL)
-    # Get number of DayOfWeek or any factor I want?
+    # Creates a subset based on the lasso selection.
+    # Need the two intial subsets to capture 'ends' of lasso.
     wkend <- subset(AQ, AQ$DayOfWeek<=5)[subset(brushed, curveNumber==0)$pointNumber + 1,]
     wkday <- subset(AQ, AQ$DayOfWeek>5)[subset(brushed, curveNumber==1)$pointNumber + 1,]
-    # Combine
+    # Combine to complete lasso subset.
     plot.subset <- rbind(wkend, wkday)
     # Summarise
     plot.sum <- plot.subset %>%
@@ -35,8 +36,8 @@ server <- function(input, output) {
       summarize(Mean = mean(NetDelay))
     # Assign to parent frame
     plot.sum <<- plot.sum
-    # Plot with mean net delay.  Not sure why bars are up and down.
-    # Colour of bars could not be set to a "new" variable, not previously used.
+    # Plot with mean net delay.  Not sure if that is really being calculated (?)
+    # Colour of bars cannot be set to a "new" variable, not previously used (ie. Month).
     plot_ly(plot.sum, x = plot.sum$DayOfWeek, y=plot.sum$Mean, 
             type="bar", source = "select", color = plot.sum$DayOfWeek) %>%
       layout(xaxis=list(title="Day of Week"), yaxis=list(title="Mean net delay (mins)"))

@@ -2,6 +2,10 @@ Strengths and Weaknesses of Graphics Tools
 * Consider ease of learning, installing and coverage of desired techniques.  
 See summaryTable.csv.
 
+Tue 4 Apr
+Plotly and Shiny:
+- Cannot apply same interaction techniques to large data sets: compare Brush_tableMtcars and Brush_tableFlights.
+
 Shiny: http://shiny.rstudio.com/reference/shiny/latest/
  + Easy to learn and set up.
  + Aesthetically appealing output (publish-ready).
@@ -35,17 +39,15 @@ Plotly and Shiny:  https://plot.ly/r/shinyapp-linked-click/#shiny-app
  + Linking two Plotly graphs is possible.
  - Link must be via a variable that is common in both graphs.
  - Linked plots can only use variables that were in previous plots or called on by Shiny inputs (unable to use a diff var for colour in output plot of Brush_input).
-Example with selecting by brushing and click (used for Brush_input):
-https://plot.ly/r/shiny-coupled-events/
  
 Highcharts (via highchartr and htmlwidgets)
  + Purely Javascript, so easy to embed in web pages.
 
 “On-plot” vs “off-plot” interactions
- * Shiny has introduced more of a focus on “off-plot” interactions.
+ * Shiny makes “off-plot” interactions easy (was there anything prior to Shiny?).
  * “Traditionally” interaction has been more focused on “on-plot” interactions (see tools described by Cook and Swayne).
  * Plotly allows for “on-plot” interactions, but limited in flexibility of linking different variables. Considerable delay for n>50000. 
- * Smooth “On-plot” interaction is hard to achieve.
+ * Smooth “on-plot” interaction is hard to achieve.
 
 * ggobi may set the benchmark of interactive techniques possible and help identify gaps.
 	
