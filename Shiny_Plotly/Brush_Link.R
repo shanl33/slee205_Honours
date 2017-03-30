@@ -24,8 +24,9 @@ server <- function(input, output, session) {
     # Diff of 1 between point# and obs# index is common when using diff languages
     if (length(s)) {
       # Subset mtcars using (point#+1)
-      ggplot(mtcars[s$pointNumber+1, ]) +
-        geom_point(aes(x=mpg, y=disp))
+      ggplot() +
+        geom_point(data=mtcars, aes(x=mpg, y=disp)) +
+        geom_point(data = mtcars[s$pointNumber+1, ], aes(x=mpg, y=disp), colour="red")
     } else {
         ggplot(mtcars) +
         geom_point(aes(x=mpg, y=disp))

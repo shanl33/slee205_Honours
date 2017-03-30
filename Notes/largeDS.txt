@@ -16,6 +16,17 @@ Large data notes:
   + Exporting as a PNG in R is relatively faster than PDF, but can still take some time when the graph is complex.  Once stored as PNG, image is fast to view.
   + Images are grainy when enlarged.
 
++ Genevera Allen (22 March 2017 Ihaka Series)
+https://www.stat.auckland.ac.nz/en/about/news-and-events-5/events/events-2017/03/ihaka-genevera-allen.html
+ - Clustering (and bi-clustering) are examples of exploratory data analysis. Uses dendrograms and k-means visuals.
+ - Interactive Clustering Visualisation. Goal: Build tools to be able to interactively and dynamically see how the data groups together, “visually see how elements of the data are linked together” via dendrograms.  Visualise the solution path.
+ - They had to modify the algorithm so that it found a reliable approximate clustering path in order for it to be realistic to visualise the process in real time. (The existing algorithm took over a week with only 50 data points).
+ ? Maybe similar “approximating” modifications may need to be made to the way we visualise data in order for it to be extended to large data sets.
+
++ Ross Ihaka’s talk (29 March 2017 Ihaka Series)
+ - Making R more ‘static’ and less dynamic, so that it can be more efficient and hence reduce run-time.  A more ‘static’ R will allow better use with large data sets.  Also allow advances in on-plot interactions within R?
+ - Need for statisticians to be involved in the building of tools and not to just to have programmers do it.  My thoughts on implications for interactive tools: there is general audience where the interaction is more for presentation, animation and engagement, as opposed to the purposes of exploratory analysis, model and solution checking required for statisticians. There is overlap but maybe recent developments in interactive tools have been more focused on the former rather than the latter?
+
 Course on Web Scraping using R:
 http://blog.rolffredheim.com/
 

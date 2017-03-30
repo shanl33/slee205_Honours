@@ -3,22 +3,33 @@ Strengths and Weaknesses of Graphics Tools
 See summaryTable.csv.
 
 Tue 4 Apr
-Plotly and Shiny:
-- Cannot apply same interaction techniques to large data sets: compare Brush_tableMtcars and Brush_tableFlights.
+Shiny
+ - brushedPoints() seems to use a mapping from the pixels in the PNG to observation numbers in the data frame to link the brushing (based on Yu Han’s experience).  This will be ineffective (impossible?) for large data sets due to over-plotting. Seems to be inferior compared to SVG.
 
-Shiny: http://shiny.rstudio.com/reference/shiny/latest/
+Crosstalk and Shiny
+https://rstudio.github.io/crosstalk/
+ - Achieves similar linked brushing as Plotly but requires familiarity with htmlwidgets and more programming skills (modify R binding, JavaScript binding).
+ - Not appropriate for large data sets (see link).
+ - Currently has specific requirements in terms of which htmlwidgets Crosstalk is appropriate for (see https://rstudio.github.io/crosstalk/authoring.html)
+ - Currently not possible to select and link plots showing aggregate data (can we do this with Plotly?).
+
+* Why does R or Rstudio not use SVGs for its graphics? Too expensive?
+
+
+Shiny: 
+http://shiny.rstudio.com/reference/shiny/latest/
  + Easy to learn and set up.
  + Aesthetically appealing output (publish-ready).
  - Limitation on interaction options (?) since only a limited number of input and output options.
- ? Doesn’t allow for low-level control, customisation
+ + Good for off-plot interactions (but on-plot?)
  ? Loading large data files onto the R server
- ? Brushing interaction possible (see link above)
 
 R Base Graphics
  - Possible, but difficult to locate interaction (ie. click location).
  - Relatively slow at drawing graphics compared to a browser platform.
 
-Plotly: https://plot.ly/r/reference/
+Plotly: 
+https://plot.ly/r/reference/
  * ‘Interaction’ functions: plot_ly() or ggplotly().
  + Easy to use with ggplot2 (and automatically loads ggplot2).
    + With ggplot2 brings the flexibility of creating a wide range of plots.
@@ -35,7 +46,8 @@ Plotly: https://plot.ly/r/reference/
  ? How to access ggplot() + geom_mosaic():  
 https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html
 
-Plotly and Shiny:  https://plot.ly/r/shinyapp-linked-click/#shiny-app
+Plotly and Shiny:  
+https://plot.ly/r/shinyapp-linked-click/#shiny-app
  + Linking two Plotly graphs is possible.
  - Link must be via a variable that is common in both graphs.
  - Linked plots can only use variables that were in previous plots or called on by Shiny inputs (unable to use a diff var for colour in output plot of Brush_input).
@@ -45,7 +57,7 @@ Highcharts (via highchartr and htmlwidgets)
 
 “On-plot” vs “off-plot” interactions
  * Shiny makes “off-plot” interactions easy (was there anything prior to Shiny?).
- * “Traditionally” interaction has been more focused on “on-plot” interactions (see tools described by Cook and Swayne).
+ * “Classical” interaction has been more focused on “on-plot” interactions (see tools described by Cook and Swayne).
  * Plotly allows for “on-plot” interactions, but limited in flexibility of linking different variables. Considerable delay for n>50000. 
  * Smooth “on-plot” interaction is hard to achieve.
 
