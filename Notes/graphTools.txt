@@ -11,7 +11,13 @@ https://rstudio.github.io/crosstalk/
  - Achieves similar linked brushing as Plotly but requires familiarity with htmlwidgets and more programming skills (modify R binding, JavaScript binding).
  - Not appropriate for large data sets (see link).
  - Currently has specific requirements in terms of which htmlwidgets Crosstalk is appropriate for (see https://rstudio.github.io/crosstalk/authoring.html)
- - Currently not possible to select and link plots showing aggregate data (can we do this with Plotly?).
+ - Currently not possible to select and link plots showing aggregate data (can we do this with Plotly? See: points under Plotly and Shiny).  Could be useful for large ds if difficult to brush with over plotting.
+
+Plotly and Shiny
+ - Brush and link does not work for large data sets. Not all members of the brushed subset are plotted on the linked plot.  Number of obs plotted seems fewer than those showing in the R output for the subset.  See: Brush_Link_large.R 
+ - For geom_hexbin: “plotly_click” only records curveNumber and “plotly_selected” not possible (NULL subset).
+ - geom_histogram() will be possible to select but will need to group ds in bins. Compare Brush_histogram.R and Brush_bar.R (works fine).
+ 
 
 * Why does R or Rstudio not use SVGs for its graphics? Too expensive?
 
@@ -47,7 +53,7 @@ https://plot.ly/r/reference/
 https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html
 
 Plotly and Shiny:  
-https://plot.ly/r/shinyapp-linked-click/#shiny-app
+https://plot.ly/r/shiny-gallery/
  + Linking two Plotly graphs is possible.
  - Link must be via a variable that is common in both graphs.
  - Linked plots can only use variables that were in previous plots or called on by Shiny inputs (unable to use a diff var for colour in output plot of Brush_input).
@@ -62,4 +68,9 @@ Highcharts (via highchartr and htmlwidgets)
  * Smooth “on-plot” interaction is hard to achieve.
 
 * ggobi may set the benchmark of interactive techniques possible and help identify gaps.
+
+* Tips
+- Testing: Assign variable to interaction fn and print() the output.
+- Colour #RRGGBB__: http://sape.inf.usi.ch/quick-reference/ggplot2/colour
+
 	
