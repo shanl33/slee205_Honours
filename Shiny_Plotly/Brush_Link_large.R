@@ -15,7 +15,7 @@ server <- function(input, output, session) {
   output$scatterplot1 <- renderPlotly({
     ggplot(AQ) +
       geom_point(aes(x=AirTime, y=NetDelay), colour="#0000FF30")
-    ggplotly(source="sp1")
+    ggplotly(source="sp1") %>% layout(dragmode="select")
   })
   # Scatterplot2 will display brushed subset from sp1.
   output$scatterplot2 <- renderPlotly({

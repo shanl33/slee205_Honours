@@ -1,26 +1,41 @@
-Strengths and Weaknesses of Graphics Tools
-* Consider ease of learning, installing and coverage of desired techniques.  
-See summaryTable.csv.
+04-04-2017
 
-Tue 4 Apr
 Shiny
  - brushedPoints() seems to use a mapping from the pixels in the PNG to observation numbers in the data frame to link the brushing (based on Yu Han’s experience).  This will be ineffective (impossible?) for large data sets due to over-plotting. Seems to be inferior compared to SVG.
 
-Crosstalk and Shiny
-https://rstudio.github.io/crosstalk/
- - Achieves similar linked brushing as Plotly but requires familiarity with htmlwidgets and more programming skills (modify R binding, JavaScript binding).
- - Not appropriate for large data sets (see link).
- - Currently has specific requirements in terms of which htmlwidgets Crosstalk is appropriate for (see https://rstudio.github.io/crosstalk/authoring.html)
- - Currently not possible to select and link plots showing aggregate data (can we do this with Plotly? See: points under Plotly and Shiny).  Could be useful for large ds if difficult to brush with over plotting.
+Crosstalk
+https://rstudio.github.io/crosstalk/using.html
+Crosstalk and Shiny and Plotly (if using Crosstalk w ggplot2 need Shiny, since not html widget)
+https://beta.rstudioconnect.com/jcheng/shiny-crosstalk/
+ + Achieves similar linked brushing as Plotly by creating a common data set automatically (via ShareData) rather than the user having to manually subset (as with Plotly).  
+ + Much easier to link plots ‘both ways’. Also possible in Plotly but requires more code. Crosstalk seems to be created specifically for linked brushing, while Plotly more generally for identification (that can then be manipulated for linked brushing).
+ - No equivalent “plotly_click” type of interaction.  Not necessary for scatterplots since can brush just one point, but this may limit Crosstalk interactions (e.g. not possible to create the Plotly correlation heat map type of interaction, https://plot.ly/r/shinyapp-linked-click/).
+ + Has its only ‘Shiny-like’ filter inputs that can work in static HTML documents (eg. can use with R markdown)
+ - Not appropriate for large data sets (see link).  (ShareData creates a copy of ds to use for interaction, so may be expensive?)
+ - Has the potential to connect with html widgets of your own choice, but currently has specific requirements in terms of which htmlwidgets Crosstalk is appropriate for (see https://rstudio.github.io/crosstalk/authoring.html)
+ - Currently not possible to select and link plots showing aggregate data (can we do this with Plotly? See: points under Plotly and Shiny).  Brushing or “click selecting” on plots using bins would be useful for large ds, since difficult to brush with over plotting.
 
 Plotly and Shiny
  - Brush and link does not work for large data sets. Not all members of the brushed subset are plotted on the linked plot.  Number of obs plotted seems fewer than those showing in the R output for the subset.  See: Brush_Link_large.R 
- - For geom_hexbin: “plotly_click” only records curveNumber and “plotly_selected” not possible (NULL subset).
- - geom_histogram() will be possible to select but will need to group ds in bins. Compare Brush_histogram.R and Brush_bar.R (works fine).
- 
+ - For geom_hexbin: ‘plotly_selected’ doesn’t work, returns ‘list()’ for event.
+ - For geom_hexbin: ‘plotly_click’ records ‘curveNumber'=rank of frequency (ie. all bins with count=1 has curveNumber=0). This could not be used as to group data as it may be possible with using plotly_click with a histogram (see below).
+# All the bins with frequency = 1 has curveNumber=0.
+# The highest frequency (count=11302) bin has curveNumber=75.
+ which refeand “plotly_selected” not possible (NULL subset).
+ + geom_histogram() will be possible to select but will need to group ds in bins. Compare Brush_histogram.R and Brush_bar.R (works fine).
+ - ‘plotly_hover’ and ‘plotly_relayout’ do not provide meaningful interactions. (Output for plotly_relayout is x and y window dimensions of zoom).
 
-* Why does R or Rstudio not use SVGs for its graphics? Too expensive?
+Large ds
+* Current interaction tools can help when there is a large number of variables, through filtering inputs, but when there is a large number of observations, problems with over plotting and time taken to create plots, get in the way of using these tools for meaningful interactions.
 
+General comments
+? Painting might be possible with crosstalk() See:https://rpubs.com/cpsievert/206878
+? Which allows for more flexible interaction or manipulation? Crosstalk uses ShareData to create an ‘environment’ while Plotly uses event_data() to capture default “identifiers” in a list. The Methods in the documentation of ShareData suggests it captures more info than event_data().
++ Interactive tools that build off base plots and/or ggplot2 are easier because don’t need to recode when moving between static and interactive environment. Also easier to focus on learning the interactive part (rather than trouble shooting plotting too).
+____________
+Strengths and Weaknesses of Graphics Tools
+* Consider ease of learning, installing and coverage of desired techniques.  
+See summaryTable.csv.
 
 Shiny: 
 http://shiny.rstudio.com/reference/shiny/latest/
@@ -61,6 +76,7 @@ https://plot.ly/r/shiny-gallery/
 Highcharts (via highchartr and htmlwidgets)
  + Purely Javascript, so easy to embed in web pages.
 
+General comments
 “On-plot” vs “off-plot” interactions
  * Shiny makes “off-plot” interactions easy (was there anything prior to Shiny?).
  * “Classical” interaction has been more focused on “on-plot” interactions (see tools described by Cook and Swayne).

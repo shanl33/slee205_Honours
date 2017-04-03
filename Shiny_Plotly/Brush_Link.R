@@ -13,7 +13,7 @@ server <- function(input, output, session) {
   output$scatterplot1 <- renderPlotly({
     ggplot(mtcars) +
       geom_point(aes(x=hp, y=qsec))
-    ggplotly(source="sp1")
+    ggplotly(source="sp1") %>% layout(dragmode = "select")
   })
   # Scatterplot2 will display brushed subset from sp1.
   output$scatterplot2 <- renderPlotly({

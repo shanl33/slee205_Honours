@@ -1,4 +1,4 @@
-# Select groups by lasso or dragging and outputs data of vars.
+# Brush to select working but subFreq not working.
 library(plotly)
 library(shiny)
 library(dplyr)
@@ -16,13 +16,14 @@ server <- function(input, output) {
   output$scatterplot <- renderPlotly({
     plot_ly(data=AQ, x=AQ$DayofMonth, y=AQ$NetDelay, 
             color=AQ$DayOfWeek, source = "subset", mode = "markers", mode = "scatter") %>%
-      layout(xaxis=list(title="Day of Month"), yaxis=list(title="Net Delay"))
+      layout(xaxis=list(title="Day of Month"), yaxis=list(title="Net Delay"), dragmode="select")
   })
   
   output$subFreq <- renderPlotly({
     # Get subset from brushing
     brushed <- event_data("plotly_selected", 
                           source = "subset")
+    print(brushed)
     if(is.null(brushed)==T) return(NULL)
     # Creates a subset based on the lasso selection.
     # Need the two intial subsets to capture 'ends' of lasso.
