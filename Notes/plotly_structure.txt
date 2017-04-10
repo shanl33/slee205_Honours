@@ -1,0 +1,34 @@
+Structure for ‘getting under the hood’ of plotly object created via ggplotly()
+
+1). Let p be the ggplot2 plot.
+
+2). ggplotly(p) with arguments:
+ layerData = # order of geom to ‘bring in’ stats output from.
+ originalData = FALSE so that the stats are included.
+
+3). Trouble shooting/viewing behind the scenes
+plotly_data(*) 
+*ggplotly object needs to be piped to this
+ - To view the data transferred from ggplot2.
+ - Check stats output also in transferred data frame.
+plotly_json(p)
+ - View the traces transferred (more than just the data, as with above)
+ - style() used to modify traces if needed.
+ ? Persistent brushing can be controlled here. ?Dynamic
+
+4). Visualisation tools
+* add_fun()
+ - Add functions to transform data and layer onto plot as visual objects.
+
+Plotly with other platforms:
+* Linking requires either (plotly+shiny) or (plotly+crosstalk)
+* (plotly+shiny): eventData()
+* (plotly+crosstalk): SharedData$new(df=, key=~) 
+- Under construction, changes in code likely, must use dev version of crosstalk: devtools::install_github("ropensci/crosstalk")
+
+plotly+crosstalk structure:
+a). Create sd using SharedData$new(df=, key=~) 
+b). Plots of sd  and full data set (in ggplot2 or plot_ly() directly).
+c). Change to a plotly object (if using ggplot2).
+d). subplot() to arrange and print plots in the same viewer.
+ and utilise plotly interactive fns like highlight() (highlight=brushing in Plotly language).

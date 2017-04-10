@@ -1,7 +1,32 @@
-04-04-2017
+2017-04-10
+
+Plotly
+https://cpsievert.github.io/plotly_book/
+ + plotly objects can have more than aes mapping data attached to them, such as statistical output that was generated in R when creating the plot (eg. with goem_smooth())  
+  
+ - BUT cannot re-execute statistical procedures in response to user event since can’t talk back to R (currently loses the inverse function required to get from the graphic back to the data object when the results are pushed to a web browser). (plotly+shiny) can resolve this, but not (plotly+shiny).
+
+ + plot_ly() interacts more directly with plotly.js and hence generally not as ‘expensive’ as ggplot2. Maybe faster with large ds?
+
+ - ggplotly() translates each layer of ggplot2 into one or more plotly.js traces. Assumptions about trace attributes not always appropriate, can modify. See: https://cpsievert.github.io/plotly_book/extending-ggplotly.html (Extending ggplotly).
+
+* Linking requires either (plotly+shiny) or (plotly+crosstalk)
+ - (plotly+shiny) re-draws whole plot after selection, inefficient if large ds or many graphical elements. eg. For brushed linking of scatterplots (plotly+shiny) re-draws full plot and the layer for the selected points. While (plotly+crosstalk) changes the colour attributes of the selected points (or dimming unselected). (Possibly only leaflet R package doesn’t redraw).
+ - Large ds interaction (plotly+crosstalk) feels even slower than (plotly+shiny). Slowed down by crosstalk (?) which is self-claimed to be inappropriate for large DS. Compare Brush_Large (50 000 points). BUT (plotly+crosstalk) can brush both ways.
+
+ - (plotly+crosstalk) cannot use for aggregate values (eg. cannot ‘dim’ unselected values in a box plot), but with (plotly+shiny) can re-draw with selected points.
+
+ + Persistent brushing: pipe plotly object to a ‘highlight()’ layer with ‘persistent=F/T’ and ‘dynamic=F/T’ arguments. Limitations to ‘memorising selections’ and currently a limited number of modes to choose from (cannot support AND), rewinding selections? (see Hofmann and Theus (1998)
+
+Crosstalk
++ Link views between two independent graphing systems (eg. plotly and leaflet maps)
+
+_____________
+
+2017-04-04
 
 Shiny
- - brushedPoints() seems to use a mapping from the pixels in the PNG to observation numbers in the data frame to link the brushing (based on Yu Han’s experience).  This will be ineffective (impossible?) for large data sets due to over-plotting. Seems to be inferior compared to SVG.
+ - brushedPoints() seems to use a mapping from the pixels in a raster image to observation numbers in the data frame to link the brushing (based on Yu Han’s experience).  This will be ineffective (impossible?) for large data sets due to over-plotting. Seems inefficient compared to interacting ‘directly’ with a SVG.
 
 Crosstalk
 https://rstudio.github.io/crosstalk/using.html
@@ -12,7 +37,7 @@ https://beta.rstudioconnect.com/jcheng/shiny-crosstalk/
  - No equivalent “plotly_click” type of interaction.  Not necessary for scatterplots since can brush just one point, but this may limit Crosstalk interactions (e.g. not possible to create the Plotly correlation heat map type of interaction, https://plot.ly/r/shinyapp-linked-click/).
  + Has its only ‘Shiny-like’ filter inputs that can work in static HTML documents (eg. can use with R markdown)
  - Not appropriate for large data sets (see link).  (ShareData creates a copy of ds to use for interaction, so may be expensive?)
- - Has the potential to connect with html widgets of your own choice, but currently has specific requirements in terms of which htmlwidgets Crosstalk is appropriate for (see https://rstudio.github.io/crosstalk/authoring.html)
+ - Has the potential to connect with html widgets of your own choice, but currently has specific requirements in terms of which htmlwidgets Crosstalk is appropriate for.
  - Currently not possible to select and link plots showing aggregate data (can we do this with Plotly? See: points under Plotly and Shiny).  Brushing or “click selecting” on plots using bins would be useful for large ds, since difficult to brush with over plotting.
 
 Plotly and Shiny
@@ -78,10 +103,16 @@ Highcharts (via highchartr and htmlwidgets)
 
 General comments
 “On-plot” vs “off-plot” interactions
+ * Cook and Swayne (2007) calls “direct manipulation” (“on-plot”). “Indirect manipulation” = “off-plot”. Indirect manipulation = queries made via drop down menu selection, tick boxes, sliders etc… (ie. via interactive widgets).
  * Shiny makes “off-plot” interactions easy (was there anything prior to Shiny?).
  * “Classical” interaction has been more focused on “on-plot” interactions (see tools described by Cook and Swayne).
  * Plotly allows for “on-plot” interactions, but limited in flexibility of linking different variables. Considerable delay for n>50000. 
  * Smooth “on-plot” interaction is hard to achieve.
+ * cpsigvert book: 
+  - Indirect manipulation useful when the ‘unit(s) of interest’ cannot be easily located on the graphical space. 
+  - Powerful to use both indirect and direct manipulation if they are synced. 
+  eg. Select city from drop down menu to highlight plot (indirect) AND click on plot to have city appear in selection box (direct). See https://cpsievert.github.io/plotly_book/linking-views-without-shiny.html#linking-views-without-shiny
+
 
 * ggobi may set the benchmark of interactive techniques possible and help identify gaps.
 
@@ -89,4 +120,6 @@ General comments
 - Testing: Assign variable to interaction fn and print() the output.
 - Colour #RRGGBB__: http://sape.inf.usi.ch/quick-reference/ggplot2/colour
 
+Possible reading:
+Wickham, Hadley, Michael Lawrence, Dianne Cook, Andreas Buja, Heike Hofmann, and Deborah F Swayne. 2010. “The Plumbing of Interactive Graphics.” Computational Statistics, April, 1–7.
 	

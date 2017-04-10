@@ -5,11 +5,9 @@ library(crosstalk)
 library(shiny)
 library(plotly)
 library(htmltools)
-library(dplyr)
 
 # Prepare mtcars
 mtcars$cyl <- factor(mtcars$cyl)
-mtcars$gear <- factor(mtcars$gear)
 # Create the variable 'rownames' to use as the 'key' for ShareData.
 mtcars$rowname <- rownames(mtcars)
 

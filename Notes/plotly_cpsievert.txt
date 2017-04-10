@@ -1,0 +1,30 @@
+Tooltips
+* Default is to show all of the aesthetic mapping. Can be restricted by tooltip argument. Also ‘relevant “intermediate” variables generated in the process’ are also available to the tooltip.  Eg. The ‘count’ from using a geom_hex().
+
+ggplotly() vs plot_ly()
+* Most things ggplot2 can do can be converted by ggplotly() but not all.
+* plot_ly() interacts more directly with plotly.js and hence generally not as ‘expensive’ as ggplot2.  
+ - ggplotly() translates each layer of ggplot2 into one or more plotly.js traces. Assumptions about trace attributes not always appropriate, can modify. See: Extending ggplotly.
+ - So some interactions that may be relatively easy to achieve with plot_ly() may take more code to achieve with ggplotly(). 
+* plot_ly() can visualise matrices, but data frames still recommended esp for layered plots.
+* The graphics of ggplot2 are more comprehensive. Plotly’s focus is on interactive techniques rather than replicate the graphics ggplot2 can already produce.
+
+Extending ggplotly (get under the hood)
+https://cpsievert.github.io/plotly_book/extending-ggplotly.html
+“Getting under the hood” of ggplotly() objects
+* plotly_json(): interactive list of traces for layers of ggplot2.
+* style(): modifies trace attribute values.
+* ggplotly() arguments:
+ - layerData=#: specify which geom layer’s data frame you want to access (# is the position it was called up in in ggplot2). 
+ - originalData=T/F: access to the statistical summary or model output of a geom layer (eg. the model used in geom_smooth()). Data can be attached to plotly objects either before or after statistical procedures have been applied. Default: (originalData=T) attaches data from ggplot2 layer BEFORE statistical procedures. So (originalData=F) transfers the stats.  
+
+plot_ly()
+* plot_ly() recognises and keeps groupings created by dplyr.
+* plot_ly() has similar semantics as dplyr and tidyr, with plotly’s own ‘special plotly methods for generic functions’.
+* plot_ly’s “add_*()” is similar to ggplot2’s “geom_*()”.
+* Data-plot-pipeline using %>% from magrittr package.
+
+plotly objects (plots from ggplotly() and plot_ly)
+* plotly objects CAN have data attached to them.
+* The data frame underlying a plotly object can be directly manipulated. plotly_data() returns the data associated with a plotly object for use in data manipulation.
+* add_fun() “add_function” isolates data transformations within the plot-pipeline. Accepts a plot object as input and can transform the data then map it to visual objects.
