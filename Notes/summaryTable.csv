@@ -1,6 +1,15 @@
-,Talks back to R,,Tooltips/Identification,Scaling,Select (and linking),Brushing (and linking),,Dragging points,Filtering,Persistent brushing,Large DS interaction
-Shiny,1,,,,,1-,brushedPoints(),,1,,Re-draws everything
-Plotly,0,Data can be attached to plotly objects,1,1,,1,,,1,highlight(),Need to use with something other than Shiny and Crosstalk
-Crosstalk/htmlwidgets,0,,,,,1+,Easiest to use for linked brushing,,,,not appropriate (Cheng)
-ggobi,1,,,,,,,,,,
-iplots,1,,,,,,,,,,
+,,Indirect manipulation,,,,,,
+,Talks back to R,,Tooltips/Identification,Scaling,Dragging points,Filtering,Brush (see below),Large DS interaction
+Shiny,1,,0,0,0,1,0,Re-draws everything
+Plotly,0,Data can be attached to plotly objects,1,1,,1,1,Need to use with something other than Shiny and Crosstalk
+Crosstalk/htmlwidgets,0,Crosstalk allows coordination of widgets so needs to be used w others,,,,,0,not appropriate (Cheng)
+ggobi,1,,,,,,,
+iplots,1,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+Direct manipulation,,,,,,,,
+,Aggregate brush (and link),Brush 1-to-1 (and link),,,Persistent brushing,,,
+Plotly+Shiny,1,1,,,1,Plotly arg,,
+Plotly+Crosstalk,0,1+,Easiest to use for linked brushing,,1,Plotly arg,,
+Shiny,,1-,brushedPoints(),,,,,

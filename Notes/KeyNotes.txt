@@ -1,12 +1,23 @@
+2017-04-??
+
+Fostering Undergraduate Data Science
+* Project based, focus on large ds, interdisciplinary. Students given videos and code (flipped classroom). Specific learning targets and open-ended data exploration. One-to-one, hands on interaction during lectures. No pre-req assumed.
+* Projects: approx 2 weeks in length, groups of 3 students.
+* Start with data sets rather than “introducing a tool without motivation”. Motivation to solve a certain problem with the data set.
+* Established skills in extracting, querying, wrangling large ds, laying the foundations for further work with large ds. Mentions visualisation in some parts.
+
+__________
+
 2017-04-10
 
 Plotly
 https://cpsievert.github.io/plotly_book/
  + plotly objects can have more than aes mapping data attached to them, such as statistical output that was generated in R when creating the plot (eg. with goem_smooth())  
   
- - BUT cannot re-execute statistical procedures in response to user event since can’t talk back to R (currently loses the inverse function required to get from the graphic back to the data object when the results are pushed to a web browser). (plotly+shiny) can resolve this, but not (plotly+shiny).
+ - BUT cannot re-execute statistical procedures in response to user event since can’t talk back to R (currently loses the inverse function required to get from the graphic back to the data object when the results are pushed to a web browser). (plotly+shiny) can resolve this, but not (plotly+crosstalk).
 
- + plot_ly() interacts more directly with plotly.js and hence generally not as ‘expensive’ as ggplot2. Maybe faster with large ds?
+ + plot_ly() interacts more directly with plotly.js and hence generally not as ‘expensive’ as ggploty(). Maybe faster with large ds? Theoretically should be but hard to distinguish if using plotly+crosstalk. See runtime.R comparisons and compare 
+Brush_Large files.
 
  - ggplotly() translates each layer of ggplot2 into one or more plotly.js traces. Assumptions about trace attributes not always appropriate, can modify. See: https://cpsievert.github.io/plotly_book/extending-ggplotly.html (Extending ggplotly).
 

@@ -1,0 +1,43 @@
+---
+title: "Code-based open-source software for Teaching Interactive Data Visualisation"
+subtitle: "Mid Semester 1 Report"
+author: "Shan-I Lee"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Introduction
+This report will outline a possible structure for introducing graduate students to interactive data visualisation techniques. A possible sequence for instruction will be discussed, followed by examples of introducing interaction techniques with certain data sets. Areas in need of further investigation will be identified within the discussion, but also summarised in conclusion.
+
+### A sequence for instruction
+The data analysis process described by Cook and Swayne (2007) provides a structure and context for meaningful interactive visualisation. They describe how visualisation fits into the process of identifying the problem statement, preparing the data, exploratory data analysis (EDA), quantitative analysis and finally the presentation of findings. Graduate students will have encountered the use of static visuals in exploratory data analysis, assumption checks for quantitative analysis and to some extent graphical representations of findings. However the role of visualisation in cleaning data may be less familiar. In particular the use of interactive visuals to identify and explore missing values (see Cook and Swayne 2007, Chapter 3) could provide a meaningful context for students to apply their interactive toolbox to, once they have accumulated various interactive techniques and tools.
+It is proposed that students initially practice interactive tools and techniques with an EDA frame of mind and then with more expertise explore specific applications, such as dealing with missing values or simple cluster analysis. From the onset students need to be aware of how the interactive toolbox they are building can be of use throughout the data analysis process. A worked example demonstrating the use of interactive tools at different stages of the process, could assist in establishing this holistic view of interactive data visualisation. The airlines data from the 2009 ASA Data Expo could be used as a holistic and motivational exemplar before introducing interactive tools and techniques. The data sets used in this report will be outlined, followed by initial work on an introductory exemplar and then examples of how the scope of tools researched so far can be introduced and practiced within the EDA framework.
+
+#### Choice of data sets
+Three data sets will be used for demonstration and practice, mtcars from the R datasets package, a data set of the fatty acid compositions of Italian olive oils and a subset of the airlines data from the 2009 ASA Data Expo. The data sets have been chosen for their size and combination of numeric and categroical variables. The familiarity of the mtcars' context and its small size, allows the learner to focus on experimenting with the interactive tool and technique at hand. Meanwhile the olive oils data set may provide more meaningful interaction as the relationships between variables are not as obvious. Furthermore insight into the Olive Oils data can be gained from interacting with bivariate scatterplots to complex multi-dimensional tours, as described in detail by Cook and Swayne. Lastly the subset of the airlines data comprising of more than 50 000 observations, is relatively small in the context of 'big data' but it will be large enough to demonstrate some of the challenges posed with 'scaling up' interactive tools.
+
+#### An introductory exemplar
+Encoourage that multiple view are impt.
+
+#### Introducing interactive tools for EDA
+Examples of introducing interactive tools within the EDA framework will be 
+
+
+
+Although the focus will be on interactive techniques, a brief introduction to parallel plots will be required since it is less commonly encountered. The inclusion of parallel plots demonstrates how multiple variables can be represented on the same plot, as well as the advantages and disadvantages of retaining the detail of individual observations. 
+
+Also their main experiences with data visualisation will be with static plots used in exploratory analysis and model assumption checking (eg. use of normal QQ-plot for residuals to check normality assumption). If they have created an interactive data visualisation before, of all the tools proposed, graduate students are more likely to have had used Shiny. Hence their experience, if any, will be predominantly with indirect interactions.
+
+Plotly and Shiny example with large number of variables:
+Correlation matrix heatmap
+https://plot.ly/r/shinyapp-linked-click/
+
+## Large data sets
+Plotting time - collate resluts in a graph. No need for code here.
+```{r}
+
+```
+An overview of how interactive visualisation fits into the underlying data analysis process could be demonstrated with 

@@ -1,0 +1,19 @@
+---
+title: "Code-based open-source software for Teaching (Interactive) Data Visualisation"
+subtitle: "Mid Semester 1 Report"
+author: "Shan-I Lee"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Introduction
+This report will outline a possible structure for introducing graduate students to data visualisation, with a focus on interactive techniques.
+This report will outline a possible structure for introducing graduate students to interactive data visualisation techniques.
+
+A scope and sequence for instruction will be discussed, followed by further details and examples for each key concept area. Some challenges and areas/ideas in need of further investigation will also be identified.
+
+If the focus is on interaction only then we assume students already have met graphs like parallel line plots, mosaic plots etc?
+
+Also their main experiences with data visualisation will be with static plots used in exploratory analysis and model assumption checking (eg. use of normal QQ-plot for residuals to check normality assumption). If they have created an interactive data visualisation before, of all the tools proposed, graduate students are more likely to have had used Shiny. Hence their experience, if any, will be predominantly with indirect interactions.
