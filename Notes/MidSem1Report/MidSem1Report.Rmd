@@ -1,5 +1,5 @@
 ---
-title: "Code-based open-source software for Teaching Interactive Data Visualisation"
+title: "Code-based open-source software for teaching interactive data visualisation"
 subtitle: "Mid Semester 1 Report"
 author: "Shan-I Lee"
 runtime: shiny
@@ -29,15 +29,14 @@ It is proposed that students initially practice interactive tools and techniques
 
 
 #### Choice of datasets
-The examples in this report will be mainly drawn from the subset of flights by the A
-Three data sets will be used for demonstration and practice, mtcars from the `R` datasets package, a data set of the fatty acid compositions of Italian olive oils and a subset of the airlines data from the 2009 ASA Data Expo. The data sets have been chosen for their size and combination of numeric and categorical variables. The familiarity of the mtcars' context and its small size, allows the learner to focus on experimenting with the interactive tool and technique at hand. Meanwhile the olive oils data set may provide more meaningful interaction as the relationships between variables are not as obvious. Furthermore insight into the Olive Oils data can be gained from interacting with bivariate scatterplots to complex multi-dimensional tours, as described in detail by Cook and Swayne. Lastly the subset of the airlines data comprising of more than 50 000 observations, is relatively small in the context of 'big data' but it will be large enough to demonstrate some of the challenges posed with 'scaling up' interactive tools.
-Inclusion of a data set with only categorical vars? Interactive mosaic plot with changing nesting.
-Airlines data is not cleaned yet.
-
+As previously mentioned the airlines data from the 2009 ASA Data Expo provides both depth of analysis and motivational value. The subset of flights for Aloha Air (`AQ` airlines) for the year 2001 will be used in the examples of this report. The main reason for subsetting was due to run time problems resulting from plotting a large number of observations. The year 2001 was chosen to investigate the effects of the September 11 terrorist attacks in the United States. The `AQ` dataset was the smallest airline subset since it was only in operation from January to October in 2001. There are 20 variables and 52 308 observations. Eight of the variables are categorical and the remaining real-valued variables. Although the `AQ` dataset is relatively small in the context of 'big data',  it will be large enough to demonstrate the challenges of scaling up interactive tools.
+A smaller dataset may be useful when learning and experimenting with new interactive tools. The `mtcars` dataset in `R` provides a good mixture of categorical and real-valued variables to apply interactive techniques to. However with only 32 observations and its wide use in existing examples, `mtcars` may provide little depth or motivational value for analysis. 
+On the other hand the `Italian Olive Oils` dataset is likely to be unfamiliar to students and leads to interesting findings (see Cook and Swayne, 2007). The analysis can start from univariate and bivariate plots and lead to complex visualisations in multi-dimensions. Insight into the underlying problem statement of differentiating between olive oils from the different parts of Italy, can be gained from interacting with plots in various dimensions. There are 10 variables, 8 of which are explanatory, real-valued variables and 572 observations in the dataset. The size of the `Italian Olive Oils` dataset provides a good balance between being large enough for in-depth and meaningful analysis, but also small enough to avoid the issues with plotting a large number of observations. 
 
 #### An introductory exemplar
-The purpose of the introductory exemplar is to provide students with a holistic view of interactive data visualisation. When learning the specific tools and techniques students can easily lose sight of the wider purpose of the interaction, other than 'making it work'. The context of the airlines data is easy to relate to and hence naturally motivates meaningful questions to investigate with the data. Furthermore the airlines data has enough depth for use as an exemplar, while leaving room for students to use again for further exploration. The suggested exemplar, below, uses the `AQ` subset of the airlines data. 
+The purpose of the introductory exemplar is to provide students with a holistic view of interactive data visualisation. When learning the specific tools and techniques students can easily lose sight of the wider purpose of the interaction, other than 'making it work'. The context of the airlines data is easy to relate to and hence naturally motivates meaningful questions to investigate with the data. Furthermore the airlines data has enough depth for use as an exemplar, while leaving room for students to use again for further exploration. The suggested exemplar, below, uses the `AQ` airlines dataset. 
 
+##### Example 1: Parallel coordinate plot as an exemplar
 ```{r, echo=FALSE}
 radioButtons(inputId = "month", label = "Choose a Month (of 2001)",
                choices = c("January" = 1,
@@ -60,17 +59,18 @@ renderPlot({
 })
 ```
 
-Below is an outline of how the exemplar fits into the data analysis process. 
+Below is an outline of how the exemplar fits into parts of the data analysis process. 
 
-The problem statement: How did the 9/11 terrorist attacks affect the AQ airline carrier?  
+*The problem statement*: How did the 9/11 terrorist attacks affect the AQ airline carrier?  
 Investigating the broader problem statement of "How did the 9/11 terrorist attacks affect airlines?" is currently hindered by challenges with visually representing large datasets. This will be discussed as an area in need of further research.
 
-Preparing data: We can see beyond January that there may have been inconsistencies in recording the day of the week with its respective day of the month. (We can also see a gap in the data in the days following September 11).
+*Preparing data*: We can see beyond January that there may have been inconsistencies in recording the day of the week with its respective day of the month. (We can also see a gap in the data in the days following September 11).
 
-Exploratory data analysis: There appears to be two main structures for relationships between the departure time, air time and distance travelled. January, July and August appear to have a similar structure with shorter flights departing throughout the day. The remaining months have flights departing later in the day, apart from a few outliers. January, July and August correspond with the school holiday seasons in the US and hence suggests in the quantitative analysis, September should only be compared with the non-school-holiday months that are expected to be similar in structure. 
+*Exploratory data analysis*: There appears to be two main structures for relationships between the departure time, air time and distance traveled. January, July and August appear to have a similar structure with shorter flights departing throughout the day. The remaining months have flights departing later in the day, apart from a few outliers. January, July and August correspond with the school holiday seasons in the US and hence suggests in the quantitative analysis, September should only be compared with the non-school-holiday months that are expected to be similar in structure. 
 
-Quantitative analysis: One approach could be to build a model for a measure of airline efficiency such as the length of delays. `Month` could be included as a regressor and hence the adjusted effect of the month being September compared to other months of interest. This type of analysis would require diagnostics checks on multicollinearity. The linking of a correlation heatmap with scatterplots showcased by Sievert (2017) demonstrates how interaction can be used to overcome the difficulties of utilising a scatterplot matrix when there are a large number of variables (see <https://plot.ly/r/shinyapp-linked-click/>).   Hexbin plots have been used in place of scatterplots to reduce the delay in plotting time caused by the large number of observations in the `AQ` dataset.
+*Quantitative analysis*: One approach could be to build a model for a measure of airline efficiency such as the length of delays. `Month` could be included as a regressor and hence the adjusted effect of the month being September compared to other months of interest. This type of analysis would require diagnostics checks on multicollinearity. The linking of a correlation heatmap with scatterplots showcased by Sievert (2017) demonstrates how interaction can be used to overcome the difficulties of utilising a scatterplot matrix when there are a large number of variables (see <https://plot.ly/r/shinyapp-linked-click/>).   Hexbin plots have been used in place of scatterplots to reduce the delay in plotting time caused by the large number of observations in the `AQ` dataset. The correlation heatmap was also useful for choosing and ordering the variables used in the parallel coordinate plot in the EDA. 
 
+##### Example 2: Linked plots as an exemplar
 ```{r, echo=FALSE}
 # Subset numeric vars
 AQnumeric <- AQ[, c("DepTime", "CRSDepTime", "ArrTime", 
@@ -114,12 +114,10 @@ The visualisations shown in the exemplar demonstrate in a meaningful context the
 
 The exemplar needs to be further developed and possibly extended, but the intention is for it to set the stage for applying interactive techniques in a meaningful context.
 
-
 #### Introducing interactive tools 
 The tables below summarise the interactive techniques described by Cook and Swayne (2007) covered by the `R` packages researched so far. Linked brushing is summarised separately since there is a variety of ways to brush and link plots. Further research is needed into other tools like `GGobi` and `ggvis`.  
 
-
-###### Table 1: Interactive techniques for `Shiny`, `Plotly` and `Crosstalk`
+##### Table 1: Interactive techniques for Shiny, Plotly and Crosstalk
 ```{r table1, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 tabl <- "
 | R Package | Talks back to R | Identification | Scaling | Subset selection | Drag points | Brushing |
@@ -132,7 +130,7 @@ cat(tabl)
 ```
 
 
-###### Table 2: Linked brushing techniques
+##### Table 2: Linked brushing techniques
 ```{r table2, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 tabl2 <- "
 | R Packages | Aggregate<br>brushing | Persistent<br>brushing | Brush lines | Brush points<br>(link 1-to-1) | Brush to<br>link n-to-m |
@@ -143,16 +141,17 @@ tabl2 <- "
 cat(tabl2)
 ```
 
-Of all the `R` packages listed above, graduate students are most likely to have had experience with using `Shiny`. Students who have not encountered `Shiny` before can be directed to its self-explanatory tutorials (<https://shiny.rstudio.com/tutorial/>).  In particular *Part 1 - How to build a `Shiny` app* familiarises students with the code structure of `Shiny` apps. The video tutorial for *Part 2 - How to customize reactions*, could be used as part of a 'flipped classroom' approach towards learning more advanced aspects of designing `Shiny` apps.  A hands-on face-to-face tutorial following the viewing of the online material for Part 2, may enable students to pick up the material faster than they would independently. The in-lecture tutorial would also act as a checkpoint for students to be on a par with the level of expertise required to proceed with utilising `Shiny` in combination with other packages. More guidance will be required for less thoroughly resourced packages. The showcase examples aim to 'show off' the capabilities of a package and hence can be more complex than needed for a novice. 
+Of all the `R` packages listed above, graduate students are most likely to have had experience with using `Shiny`. Students who have not encountered `Shiny` before can be directed to its self-explanatory tutorials (<https://shiny.rstudio.com/tutorial/>).  In particular *Part 1 - How to build a `Shiny` app* familiarises students with the code structure of `Shiny` apps. The video tutorial for *Part 2 - How to customize reactions*, could be used as part of a 'flipped classroom' approach towards learning more advanced aspects of designing `Shiny` apps.  A hands-on face-to-face tutorial following the viewing of the online material for Part 2, may enable students to pick up the material faster than they would independently. The in-lecture tutorial would also act as a checkpoint for students to be on a par with the level of expertise required to proceed with utilising `Shiny` in combination with other packages. More guidance may be required for less thoroughly resourced packages. Showcase examples are at times more complex than needed for a novice and hence may hide the core structure of the code. 
 
 The plotly package provides a starting point that leads to a variety of interactive techniques. The default settings for a plotly object allows for tooltip identification and scaling. Students have the option of converting plots in `ggplot2` to plotly objects or directly creating plots using `plot_ly()`. The `plot_ly` function takes a similar layered Grammar of Graphics (Wilkinson 2005) approach as `ggplot2`. Although the graphics of `ggplot2` are more comprehensive, creating plots via `plot_ly()` should also be utilised since it interacts more directly with the `plotly.js` library (Sievert 2017).
 
 The `tooltip` argument for plotly objects allows for customisation of the identification information to display when hovering on a graphical feature. The possibility of including identification information other than those visible in the aesthetics of the plot, can be explored further by examining the `layerData` and `originalData` arguments of plotly objects.
 
-Continuing onto combining `Plotly` with `Crosstalk` introduces the key interactive technique of brushing to link multiple plots. This can also be achieved by using `Plotly` and `Shiny` together, but the `SharedData` environment of the `crosstalk` package directly allows brushing to be initiated in any of the linked plots by default. However the `crosstalk` package is not appropriate for use with large data sets and currently supports only linked brushing and filtering views, for certain HTML widgets where observations are individually displayed (see <https://rstudio.github.io/crosstalk/>).  Further research into how the `htmlwidgets` package can be used with `Crosstalk`, with or without the `reactive` function in `Shiny`, is still required. The use of `D3` graphics will enable the interactive technique of dragging points, but how this is utilised in the data analysis process needs further research.  Linking with `Leaflet` maps would also be of interest, since like many other real-life datasets, the `airlines` data lends itself to a geospatial representation. Examining the use of `Crosstalk` with `htmlwidgets` would provide more varied and in-depth practice of utilising the `SharedData` environment for students.
+Continuing onto combining `Plotly` with `Crosstalk` introduces the key interactive technique of brushing to link multiple plots. This can also be achieved by using `Plotly` and `Shiny` together, but the `SharedData` environment of the `crosstalk` package directly allows brushing to be initiated in any of the linked plots by default. However the `crosstalk` package is not appropriate for use with large data sets and currently supports only linked brushing and filtering views, for certain HTML widgets where observations are individually displayed (see <https://rstudio.github.io/crosstalk/>).  Further research into how the `htmlwidgets` package can be used with `Crosstalk`, with or without the `reactive` function in `Shiny`, is still required. The use of `D3` graphics with `crosstalk` will enable the interactive technique of dragging points.  Linking with `Leaflet` maps would also be of interest, since like many other real-life datasets, the `airlines` data lends itself to a geospatial representation. Examining the use of `Crosstalk` with `htmlwidgets` would provide more varied and in-depth practice of utilising the `SharedData` environment for students.
 
 The following example of using `Plotly` and `Crosstalk` together demonstrates how persistent brushing can be easily incorporated by an argument in the `plotly` function `highlight`.
 
+##### Example 3: Linked persistent brushing with Plotly and Crosstalk
 ```{r, echo=FALSE}
 # Subset AQ data since Crosstalk is not appropriate for large datasets
 Jan <- AQ[AQ$Month=="1",]
@@ -177,9 +176,11 @@ subplot(p1, p2, titleX = TRUE, titleY = TRUE) %>%
 # Note: persistent arguement in highlight()
 ```
 
+In Example 3 the `AQ` dataset was further subsetted in an attempt to speed up the responses to the brushing. The subset of January flights consists of 5321 obseravtions. One of the caveats of using `Crosstalk` is its incompatibility with large datasets (see <https://rstudio.github.io/crosstalk/>)
 
 Utilising the `plotly_click` mode in the `event_data` function for plotly objects in `shiny` apps allows for linked brushing on area plots of categorical variables. 
 
+##### Example 4: Aggregate brushing with Plotly and Shiny
 ```{r, echo=FALSE}
 AQ$Month <- as.factor(AQ$Month)
 
@@ -223,11 +224,7 @@ The number of real-valued variables in the airlines data opens the possibility o
 
 
 ### Areas in need of further research 
-
-
+Finding suitable tools for interactive visualisation with large datasets is one of the main challenges of this research.  Aspects of the tools researched so far need clarification and more tools need to be examined for a thorough survey of the interactive tools currently available. This could lead to enabling some of the interactive techniques yet to be encountered in this research. Further research is also needed into applications of interactive visualisations that are meaningful and achievable for learners to apply their newly acquired interactive techniques to. Implementing the applications described by Cook and Swayne (2007) with the `R` packages examined could be a starting point. 
 
 ## Conclusion
-An overview of how interactive visualisation fits into the underlying data analysis process could be demonstrated with 
-It also provides a way to understand the options that are created by utilising combinations of the packages together. More guidance may be required for becoming familiar with packages that allow for on-plot interactions, while self-directed learning should be encouraged for off-plot interactive tools. 
-Balance between Focus on the techniques and purposes of interaction. The tools used to achieve them are likely to change, but still necessary to pick up in order to engage in data visualisation.
-The challenge of focusing on the uses of interactive visualisation for data analysis rather than producing some thing to showcase a particular software tool.
+Introducing students to interactive data visualisation tools with an underlying focus on the data analysis process aims to emphasise the generality of interactive techniques, over the specifics of the tools currently available. Both the size and motivational value of datasets used are important to consider. The onus of learning the basics of some tools can be placed on the learner, while more guidance may be required to identify a consistent code structure for other tools. Once students have established an interactive toolbox, it is important for them to have exposure to how these techniques are used in different applications. The challenges posed by large data sets may arise from the onset and is one of the areas in need of further research.
