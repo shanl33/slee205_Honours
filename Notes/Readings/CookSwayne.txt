@@ -1,0 +1,58 @@
+Cook and Swayne
+Chapter 2 The Toolbox
+
+p17. Impt to distinguish between real-valued variables and categorical variables since we approach them differently in visualisation and analysis. The different types of vars ‘complement’ each other. A common interaction is to link a bar chart of the categorical var with a scatterplot of a pair of real-valued variables so that the points in the scatterplot can be highlighted as their level in the categorical var is selected in the bar chart.
+-> This can be achieved with indirect interaction thru use of radio buttons etc. (“Brushing as database query” pg 36)
+
+p18. Start with univariate and bivariate plots to look for low-dimensional structure and then look for relationships between several vars in multivariate plots.
+* Common problem statement: Whether the variation in real-valued vars depend on the levels of the categorical vars.
+ie. Statistically: Analysing the joint distn of the real-valued vars conditional on the categorical vars.
+
+p20. “Area plots”: observations are aggregated into groups (eg. histograms). Useful for large data sets when there’s over plotting and speed problems.
+
+p21. ASH=Average shifted histogram. Plots the average bin counts for each data point is calculated from several histograms w the same bin width but different origins. Like a smoothed histogram marked by dots so individual obs are still represented. (So can use for brushed linking).
+
+p21/23. Categorical vars: (Mosaic plots) and Spine plot (like bar chart but all bars are same height and count is represented by proportional area, so width of strips differ). Spine is a 1-var mosaic plot. 2-var spine is better for comparison rather than a stacked bar chart.
+-> Can use mosaic plot with linked brushing for database query.
+
+p24. Parallel coordinate plots: Useful for identifying correlations, clustering in high dimensions. A point on the Cartesian plane transformed into a line in the parallel coordinate plot. Order of arrangement is important because it influences the viewer’s ability to detect structure. Ordering by correlation can be helpful, or by some natural order, such as time or repeated measures. Parallel coordinates plots are the same as “profile plots” and interactions plots. Parallel coordinate plots displays all of the univariate dot plots in a sequential order (i.e. shows the 1D marginal distns) and the lines give more info on the relationships between vars, the joint distn (p34).
+
+p25. Scatterplot matrix: Order of vars also important to highlight comparisons.
+
+p26. Tours for real-valued variables
+
+p34. Trellis plot: plots subsets separately and hence allows examination of the conditional distributions of the data. Subsets determined by levels of a categorical var or a binned real-valued variable.
+-> What is the difference between trellis and facet wrap?
+
+p36. Brushing as database query: “Brushing is a .. efficient and effective way to both pose the query and view the result, allowing easy comparison of the values in the resulting table to the remaining values.” (So we want the plot to show the non-queried obs as well). Limitation: “easy to form disjunctions (unions) of any kind but it may be unintuitive to form conjunctions (intersections) involving many variables”. So a command line SQL query may be better for complicated selections.
+
+p37. Brushing as conditioning
+See scatterplot brushing described in Becker & Cleveland (1988) and how it relates to trellis plots (Becker et al. 1996)
+
+p38. Linking mechanisms: different ‘rules’ for how plots are linked.
+Does not have to be one-to-one. eg. Linking that allows m points in one plot to be linked to n points in another.
+-> Linking by variable/categorical brushing: Brushing one member of a certain level of a categorical var selects all of them -> This has not been tried yet but plotly+crosstalk may do it if colours of glyphs are grouped by that categorical var (but then what’s the point if they are already coloured by that category?) -> with persistent brushing could select Sat and Sun to see diff btw weekend and weekday flights. 
+-> ‘m points to n points’ linking not tried yet. Need to find a meaningful context to do it in (flights data, linking btwn months w diff # of flights for diff airlines. eg. How did Sept 11 affect the airlines)
+-> Brushing on parallel plots is an example of link m points to n edges? (p.39)
+
+p41. Persistent brushing useful when we want to group points and then apply ‘other operations such as the tour to compare groups’.
+
+p41. Identification
+
+p42. Scaling: different scaling can bring out different aspects of the data. Changing the aspect ratio from 1-to-1 or “banking” (Cleveland 1993) or zooming in on crowded parts of a scatterplot. Often multiple aspect ratios are useful and there is not necessarily an optimal one.
+
+p42. Subset selection: Useful when large ds which slows down computations or causes over plotting. If data is reasonably homogenous w no clustering, a random sample can be used for testing and exploration.  
+If data is not homogeneous we may still want to analyse the data according to levels of a categorical var.
+
+p43. Dragging points
+
+p44. Mosaic plots: multiple categorical vars. Repetitive partitioning of a rectangle (see Hofmann 2003). Manipulate by changing the nesting order of variables
+
+p44. Selection sequences: One selected subset can be combined with another.
+-> There’s an example in plotly? This is the default for plotly?
+
+p44. Brushing lines in a parallel coordinate plot: to be able to select lines as well as points.  XmdvTool is good for this.
+
+p44. Maps: Linking plots to maps when data relates to a spatial context.
+
+*”Direct manipulation” vs Indirect?

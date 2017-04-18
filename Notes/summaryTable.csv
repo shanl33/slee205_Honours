@@ -1,15 +1,16 @@
-,,Indirect manipulation,,,,,,
-,Talks back to R,,Tooltips/Identification,Scaling,Dragging points,Filtering,Brush (see below),Large DS interaction
-Shiny,1,,0,0,0,1,0,Re-draws everything
-Plotly,0,Data can be attached to plotly objects,1,1,,1,1,Need to use with something other than Shiny and Crosstalk
-Crosstalk/htmlwidgets,0,Crosstalk allows coordination of widgets so needs to be used w others,,,,,0,not appropriate (Cheng)
-ggobi,1,,,,,,,
-iplots,1,,,,,,,
-,,,,,,,,
-,,,,,,,,
-,,,,,,,,
-Direct manipulation,,,,,,,,
-,Aggregate brush (and link),Brush 1-to-1 (and link),,,Persistent brushing,,,
-Plotly+Shiny,1,1,,,1,Plotly arg,,
-Plotly+Crosstalk,0,1+,Easiest to use for linked brushing,,1,Plotly arg,,
-Shiny,,1-,brushedPoints(),,,,,
+,,,On-plot,,On-plot,On plot,Off plot,,
+,Talks back to R,,Identification,,Scaling,Dragging points,Subset selection/database query,Brush (see below),Large DS interaction
+Shiny,1,,0,"can with another JavaScript lib like d3, Leaflet, Google Charts",0,0,1,0,Re-draws everything
+Plotly,0,Data can be attached to plotly objects,1 (Tooltips),,1,,1,1,Need to use with something other than Shiny and Crosstalk
+Crosstalk/htmlwidgets,0,facilitates interaction of widgets so needs to be used w others,1 (filtering views),,,,,0,not appropriate (Cheng)
+ggobi,1,,,,,,,,
+iplots,1,,,,,,,,
+ggvis (Vega/D3),http://ggvis.rstudio.com/,Pipe to add_tooltip() allows identification,,,,,,,
+"Crosstalk+htmlwidgets (such as Leaflet, D3 graphics)",See: http://www.htmlwidgets.org/showcase_leaflet.html,,,,,,,,
+,,,,,,,,,
+On-plot,,,,,,,,,
+,Aggregate brush (and link),Brush 1-to-1 (and link),,,,Persistent brushing,,,
+Plotly+Shiny,1,1,,,,1,Plotly arg,,
+Plotly+Crosstalk,0,1+,Easiest to use for linked brushing,,,1,Plotly arg,,
+Shiny,,1-,brushedPoints(),,,,,,
+Shiny,,,,,,,,,
