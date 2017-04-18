@@ -1,0 +1,79 @@
+---
+title: "trial"
+runtime: shiny
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This R Markdown document is made interactive using Shiny. Unlike the more traditional workflow of creating static reports, you can now create documents that allow your readers to change the assumptions underlying your analysis and see the results immediately. 
+
+To learn more, see [Interactive Documents](http://rmarkdown.rstudio.com/authoring_shiny.html).
+
+## Inputs and Outputs
+
+You can embed Shiny inputs and outputs in your document. Outputs are automatically updated whenever inputs change.  This demonstrates how a standard R plot can be made interactive by wrapping it in the Shiny `renderPlot` function. The `selectInput` and `sliderInput` functions create the input widgets used to drive the plot.
+
+```{r eruptions, echo=FALSE}
+library(plotly)
+library(shiny)
+library(ggplot2)
+
+load("AQ.RData")
+
+# Subset numeric vars
+AQnumeric <- AQ[, c("DayofMonth", "DepTime", 
+                    "AirTime", "Distance")]
+# Correlation matrix
+correlation <- round(cor(AQnumeric), 3)
+nms <- names(AQnumeric)
+
+renderPlotly({
+  # Interactive correlation matrix as a heatmap w tooltips
+  plot_ly(x = nms, y = nms, z = correlation,
+          key = correlation, type ="heatmap", source = "heatplot") %>%
+    layout(xaxis = list(title = ""),
+           yaxis = list(title = ""))
+})
+
+renderPlotly({
+  s <- event_data("plotly_click", source = "heatplot")
+  print(s)
+  if (length(s)){
+    # Subset AQnumeric
+    d <- AQnumeric[, c(s$x, s$y)]
+    p <- ggplot(d, aes(d[,1],d[,2] )) +
+      geom_hex()
+    ggplotly(p) %>%
+      layout(xaxis = list(title = s[["x"]]),
+             yaxis = list(title = s[["y"]]),
+             showlegend = FALSE)
+  } else {
+    plotly_empty()
+  }
+})
+```
+
+## Embedded Application
+
+It's also possible to embed an entire Shiny application within an R Markdown document using the `shinyAppDir` function. This example embeds a Shiny application located in another directory:
+
+```{r tabsets, echo=FALSE}
+shinyAppDir(
+  system.file("examples/06_tabsets", package = "shiny"),
+  options = list(
+    width = "100%", height = 550
+  )
+)
+```
+
+Note the use of the `height` parameter to determine how much vertical space the embedded application should occupy.
+
+You can also use the `shinyApp` function to define an application inline rather then in an external directory.
+
+In all of R code chunks above the `echo = FALSE` attribute is used. This is to prevent the R code within the chunk from rendering in the document alongside the Shiny components.
+
+
+

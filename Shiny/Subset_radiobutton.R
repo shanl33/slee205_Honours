@@ -24,7 +24,7 @@ ui <- fluidPage(
 server <- function(input, output) {
   output$parallelPlot <- renderPlot({
     parallelplot(AQ[AQ$Month == input$month, 
-                    c("Distance", "AirTime", "DepTime", "TaxiOut")],
+                    c("Distance", "AirTime", "DepTime", "DayofMonth")],
       groups = AQ$DayOfWeek,
       auto.key = list(space = "right"),
       # col = "#0000FF30", #Use of transparent colour not helpful
