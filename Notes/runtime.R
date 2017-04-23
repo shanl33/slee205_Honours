@@ -1,54 +1,41 @@
 # Flight data: 
 load("~/Desktop/Project/slee205_Honours/Datasets/AQ.RData")
 AQ$NetDelay <- AQ$ArrDelay-AQ$DepDelay
+library(microbenchmark) 
 
-# Compare different glyphs for base graphics
+
+# Compare different glyphs for base graphics ----------------------------
 system.time(plot(x=AQ$AirTime, y=AQ$NetDelay, pch=1))
 system.time(plot(x=AQ$AirTime, y=AQ$NetDelay, pch=3))
+# system.time almost halved using pch=3 crosses rather than open circles.
+# system.time not reliable, should measure over repeated times (using a loop, see bottom)
+# microbenchmark takes too long. Maybe use a plot of 50 000 runif() points.
 microbenchmark(plot(x=AQ$AirTime, y=AQ$NetDelay, pch=1))
-microbenchmark(p <- plot(x=AQ$AirTime, y=AQ$NetDelay, pch=3))
-# system.time not reliable, should measure over repeated times (using a loop)
+microbenchmark(plot(x=AQ$AirTime, y=AQ$NetDelay, pch=3))
 
-# Compare different glyphs for grid graphics
+# Compare different glyphs for grid graphics ------------------------------
+# Need to use print() since grid graphics do not print on default inside the function
 library(ggplot2)
-library(microbenchmark) 
-microbenchmark(
-  ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=1),
-  ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=3)
-)
-system.time(ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=1))
-system.time(ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=3))
+system.time(print(ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=1)))
+system.time(print(ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=3)))
+# not as big of a difference as in base plots.
 
-microbenchmark(
-  ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=1),
-  ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=3),
-  plot(x=AQ$AirTime, y=AQ$NetDelay, pch=1),
-  plot(x=AQ$AirTime, y=AQ$NetDelay, pch=3)
-)
 
+# Compare base and grid graphics ------------------------------------------
+system.time(plot(x=AQ$AirTime, y=AQ$NetDelay, pch=3))
+system.time(print(ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=3)))
+# Base plots faster than grid plots (confirmed by Paul too)
+# Diff between plotting symbols seems more pronounced for base plots (?unreliable results).
+# Less pixels reqd for crosses than circles, so should be more time efficient. See ggobiManual ('Large datasets' section)
+
+# Compare plot_ly and ggplotly --------------------------------------------
+# Not sure if need to include print()?
+# Seems obvious that plot_ly should be faster since one less function to go through.
 library(plotly)
-microbenchmark(
-  plot_ly(data=AQ, x=~AirTime, y=~NetDelay, marker=list(symbol=0)),
-  plot_ly(data=AQ, x=~AirTime, y=~NetDelay, marker=list(symbol=3))
-)
-
-microbenchmark(
-  ggplotly(ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=1)),
-  ggplotly(ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=3))
-)
-
-# All together: Takes a couple of mins to run the following.
-# Plot results for report
-runtime <- microbenchmark(
-  plot_ly(data=AQ, x=~AirTime, y=~NetDelay, marker=list(symbol=0)),
-  plot_ly(data=AQ, x=~AirTime, y=~NetDelay, marker=list(symbol=3)),
-  ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=1),
-  ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=3),
-  plot(x=AQ$AirTime, y=AQ$NetDelay, pch=1),
-  plot(x=AQ$AirTime, y=AQ$NetDelay, pch=3),
-  ggplotly(ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=1)),
-  ggplotly(ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=3))
-)
+system.time(print(plot_ly(data=AQ, x=~AirTime, y=~NetDelay, marker=list(symbol=0))))
+system.time(print(plot_ly(data=AQ, x=~AirTime, y=~NetDelay, marker=list(symbol=3))))
+system.time(print(ggplotly(ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=1))))
+system.time(print(ggplotly(ggplot(AQ)+geom_point(aes(AirTime, NetDelay), pch=3))))
 
 # Example from: http://adv-r.had.co.nz/Performance.html
 x <- runif(100)

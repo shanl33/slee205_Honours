@@ -1,0 +1,205 @@
+---
+title: "Key Notes"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## To do's
+* How to access ggplot() + geom_mosaic():  https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html
+* Large ds and applications (look at other data visualisation courses)
+
+## Trelliscope
+* For large ds.
+
+## R Base graphics
+* Some interaction techniques are possible. See example from Paul (email attachment)
+
+### Disadvantages
+* Relatively slow at drawing graphics compared to a browser platform, but base plots will be faster at rendering plots in R than grid plots, like ggplot2 (see runtime.R).
+* Possible, but difficult to locate interaction (ie. click location) since raster images are used.
+
+## Shiny
+* http://shiny.rstudio.com/reference/shiny/latest/
+* reactive({}) ‘reactive conductors’ (See: http://rstudio.github.io/shiny/tutorial/#reactivity-overview)
+    + reactive conductors sit between reactivity source(s) and endpoints (eg. between a sliderInput and the plotOutputs it updates). This allows any objects defined by reactive({}) to be called as a function in the code for the output plots.
+    + reactive({}) has the same effect as defining the object as a function (and calling it up as a function in the code for output plots).
+    + Shiny+Plotly: Using function(){} rather than reactive({}) seems to be better if the object is defined by complicated computations of inputs. Using reactive({}) seems to slow down the tooltip and plotly_click reactivity. (See poisdp.R but need further investigation)
+* plotOutput() interactivity arguments in ui code:
+    + https://shiny.rstudio.com/articles/plot-interaction.html
+    + Four interaction arguments: click = "plot_click", dblclick = "plot_dblclick", hover = "plot_hover", brush = "plot_brush".
+    + "Results" of interaction are displayed off-plot in text form in the examples on the website, but doesn't have to be?
+    + Might not be useful since needs to link up with nearPoints() and brushedPoints() functions in server code which all use pixel approximations (see Disadvantages below)
+    
+### Advantages
+1. Talks back to R.
+2. Easy to learn and set up. Good online tutorials.
+3. Aesthetically appealing output (publish-ready).
+4. It is possible to make any bitmap/raster image interactive using nearPoints() etc, but user will need to transform pixel units to something useful in the data. (This is done for you when the bitmap images are from R base plots or ggplot2). See: https://shiny.rstudio.com/articles/plot-interaction-advanced.html
+
+### Disadvantages
+1. Needs to be combined with another package in order to achieve the 'classical' interaction techniques described by Cook and Swayne. In order to make the plot region interactive.
+2. Encounters problems for plots with a large data file? (AQ flights parallel coordinate plot will no upload on Shiny server *Error: 'AQ' object not found*. Similarly when used in RMarkdown. See: Shiny -> Subset_radiobutton.R and MidSem1Report.Rmd).
+3. Good for "off-plot" interactions but not "on-plot" (see below).
+4. nearPoints() and brushedPoints() uses a mapping from the pixels of the raster/bitmap R plots from base R or ggplot2, to observation numbers in the data frame to link the brushing.  This will be ineffective (impossible?) for large data sets due to over-plotting. Seems inefficient compared to interacting ‘directly’ with a SVG.
+    + See: https://shiny.rstudio.com/articles/selecting-rows-of-data.html
+    + nearPoints() and brushedPoints() has a default of capturing within 5 pixels of the mouse event, but can change to be more or less.
+    + nearPoints() and brushedPoints() are really the same.
+    + Can brush on facet plots in ggplot2.
+5. Cannot use R Console when running a Shiny app.
+
+## Plotly
+* https://plot.ly/r/reference/
+* Book (Phd thesis?) by author of plotly: https://cpsievert.github.io/plotly_book/
+* Create interactive plots using either: plot_ly() or ggplot2 %>% ggplotly().
+* plot_ly() uses ~ before variable names. Otherwise similar to ggplot2: 
+    + 'ggplot() + geom_*()' = 'plot_ly() %>% add_*()'
+* ggplotly() translates each layer of ggplot2 into one or more plotly.js traces. Assumptions about trace attributes not always appropriate, can modify. See: https://cpsievert.github.io/plotly_book/extending-ggplotly.html (Extending ggplotly).
+* plot_ly() interacts more directly with plotly.js and hence generally not as ‘expensive’ as ggplotly(). Maybe faster with large ds?
+  
+### Advantages
+1. Easy to convert ggplot2 plots into plotly objects using ggplotly().
+    + With ggplot2 brings the flexibility of creating a wide range of plots. plot_ly() not as extensive in graphics, but interacts more directly with plotly's javascript library.
+2. Aesthetically appealing output (publish-ready).
+3. Defaults: Tooltip identification of aesthetics, scaling.
+4. Persistent brushing easily achieved by an argument: pipe plotly object to a ‘highlight()’ layer with ‘persistent=F/T’ and ‘dynamic=F/T’ arguments. Limitations to ‘memorising selections’ and currently a limited number of modes to choose from (cannot support AND), rewinding selections? (See Hofmann and Theus (1998))
+5. plotly objects can have more than aes mapping data attached to them, such as statistical output that was generated in R by ggplot2 when creating the plot. Eg. with goem_smooth() See: https://cpsievert.github.io/plotly_book/extending-ggplotly.html (Extending ggplotly)
+6. Can still use R console when interacting with the plot.
+
+### Disadvantages
+1. Does NOT talk back to R: cannot re-execute statistical procedures in response to user event since can’t talk back to R (currently loses the inverse function required to get from the graphic back to the data object when the results are pushed to a web browser). 
+2. When data points > 50 000 (eg. AQ delay data):
+    + Delay in creating ‘zoom in’ default scaling of plot.
+    + Difficulty keeping up with tooltip display.
+    + Lasso/click drag selection very slow and hard to control, difficult to use for exploration.
+3. Tooltip default for comparing values can only compare a maximum of 4 obs?
+4. Tooltip identification for area plots (bar charts) a bit hit and miss? Esp with ggplot2 plots? Does not take all categorical labels with it when passed thru ggplotly()?
+5. Tooltip can only identify aesthetics of the plot 
+
+## Crosstalk (htmlwidgets, highchartr?)
+* https://rstudio.github.io/crosstalk/using.html
+* Crosstalk creates a ShareData environment for inter-widgets communication.
+* ? Can still use R console during interaction?
+* htmlwidgets for 3D rotation (and more dimensions?): https://www.r-bloggers.com/a-first-look-at-htmlwidgets/
+
+### Advantages
+1. Talks back to R.
+2. Purely Javascript, so easy to embed in web pages.
+3. Achieves similar linked brushing as Plotly by creating a common data set automatically (via ShareData) rather than the user having to manually subset (as with Plotly).
+4. The Methods in the documentation of ShareData suggests it captures more info than event_data() in Plotly+Shiny.
+5. Much easier to link plots ‘both ways’. Also possible in Plotly but requires more code. Crosstalk seems to be created specifically for linked brushing, while Plotly more generally for identification (that can then be manipulated for linked brushing).
+6. There are html widgets which are ‘Shiny-like’ filter inputs that can work in static HTML documents, like Rmarkdown (eg. htmlwidgets frame is like a Shiny sliderInput).
+7. Has the potential to connect with html widgets of your own choice, but currently has specific requirements in terms of which htmlwidgets Crosstalk is appropriate for.
+8. Allows linked views between two independent graphing systems (eg. plotly and leaflet maps)
+
+### Disadvantages
+1. Not appropriate for large datasets. Serious delay in interactivity when only around 5000 points are displayed (see Example 3 in MidSem1Report).
+2. Only appropriate for html widgets where obs are represented individually (ie. not appropriate for aggregate plots).
+    + Not appropriate for aggregates since cannot ‘dim’ unselected values in a box plot, but with (plotly+shiny) can re-draw with selected points.
+3. No equivalent “plotly_click” type of interaction.  Not necessary for scatterplots since can brush just one point, but this may limit Crosstalk interactions (e.g. not possible to create the Plotly correlation heat map type of interaction, https://plot.ly/r/shinyapp-linked-click/).
+
+## ggvis 
+* http://ggvis.rstudio.com/ggvis-basics.html
+* R package that is ike a combination of Shiny and Plotly, under development, likely to change quite a bit.
+* Has a similar layer ggplot2/plotly approach to plotting with ~ before vars and piping %>%.
+* Comments on tooltip here are useful: https://github.com/rstudio/ggvis/blob/master/R/interact_tooltip.R
+    + Tooltip identification allows only ONE aes to be identified
+    + Like plotly, only uses data columns used in the plot BUT can "use a key to line up the item from the plot with a row in the data".
+    
+### Disadvantages
+* Cannot use R Console when interacting with a ggvis plot: "every interactive ggvis plot must be connected to a running R session"
+* Likely to change.
+* Tooltip identification only allows 1 var, but may be able to display a var that is not an aes from the plot (see above).
+
+## Shiny + Crosstalk
+* https://beta.rstudioconnect.com/jcheng/shiny-crosstalk/
+
+## Plotly + Crosstalk
+* Can talk back to R? (Crosstalk can by Plotly can't)
+
+### Advantages
+1. Can still use R console when interacting with the plots.
+
+### Disadvantages
+1. Not appropriate for large ds (see Crosstalk)
+
+## Plotly + Shiny
+* https://plot.ly/r/shiny-gallery/
+* Uses event_data() to capture 'event' of interactivity.
+    + event = 'plotly_click' and 'plotly_selected' are useful of the 4 possibilities.
+    + ‘plotly_hover’ and ‘plotly_relayout’ do not provide meaningful interactions. (Output for plotly_relayout is x and y window dimensions of zoom).
+* layout(dragmode="select") useful if want to default to brushing when drag to select (rather than scaling)
+
+### Advantages
+1. plotly_click allows for aggregate brushing for discrete vars. BUT can be extended to aggregate plots of real-valued variables? (eg. histograms, hexbins?)
+    + Compare Brush_histogram.R and Brush_bar.R (works fine).
+    + geom_hexbin:
+        - 'plotly_selected' records nothing, returns empty list.
+        - ‘plotly_click’ records ‘curveNumber'=rank of frequency (ie. all bins with count=1 has curveNumber=0). This could not be used to group data as it may be possible with using plotly_click with a histogram (see below).
+    + geom_histogram:
+        - might be possible to use 'plotly_click' but need to see how to access the bins that are 'imported' into plotly.
+        - Brush_histogram.R: The highest frequency (count=11302) bin has curveNumber=75. All the bins with frequency = 1 has curveNumber=0.
+
+### Disadvantages
+1. Linked plots can only use variables that were in previous plots or called on by Shiny inputs (unable to use a diff var for colour in output plot of Brush_input).
+2. Brushed linking possible, but requires more code to set up than using Plotly+Crosstalk. Especially "two-way brushing" (ie. brushing from any plot). Defaults to rescaling plot according to selection. 
+3. event_data() is limited in the 'details' it captures from each event (x, y, curveNumber, pointNumber)
+4. Need the 'details' from the event differently depending on the type of plot that the interaction was initiated in. Eg. For scatterplots pointNumber=(obs#-1) offset by 1 due to different languages being used. For brushing on a bar chart 'x' can be directly used to subset and identify selection in df.
+5. Brush and link does not work for large data sets. Not all members of the brushed subset are plotted on the linked plot.  Number of obs plotted seems fewer than those showing in the R output for the subset.  See: Brush_Link_large.R 
+
+## Shiny + Crosstalk + Plotly (?)
+* If using Crosstalk w ggplot2 in Shiny, then need Plotly, since ggplot2 plots are not htmlwidgets?
+* SharedData environment needs to be activated in R before launching Shiny app. See: 
+https://github.com/ropensci/plotly/blob/51e159ba825b007657c1d7534825ef25afc7e7af/demo/shiny/basic/app.R
+
+## GGobi
+* ggobi may set the benchmark of interactive techniques possible and help identify gaps.
+* rggobi R package is useful for getting data in and out of ggobi, but otherwise interaction is all carried out independent of R.
+
+### Advantages
+1. Everything is in-house (ie. it is a complete pipeline and does not need add-ons to achieve the interactive techniques). 
+2. Statistical functions that respond directly to interaction.
+
+### Disadvantages
+1. Open source but difficult to install due to specific software requirements.
+2. Easy to publish? Export options? Sharing options?
+
+## Large datasets
+* Current interaction tools can help when there is a large number of variables, through filtering inputs, but when there is a large number of observations, problems with over plotting and time taken to create plots, get in the way of using these tools for meaningful interactions.
+* Brushing or “click selecting” on plots using bins would be useful for large ds, since difficult to brush with over plotting.
+
+## Tips
+* Testing: Assign variable to interaction fn and print() the output.
+* Colour #RRGGBB__: http://sape.inf.usi.ch/quick-reference/ggplot2/colour
+
+## General comments 
+### Indirect and direct manipulation
+* NOT equivalent to off-plot and on-plot interaction?
+    + on-plot: user interaction with the plot region (eg. brushing, hovering on a plot feature).
+    + off-plot: user interaction with widgets that are not in the plot region (eg. Shiny inputs, htmlwidgets frames). (htmlwidgets will a mixture of on-plot and off-plot interactions)
+* See *Linking views without Shiny* in:  https://cpsievert.github.io/plotly_book/linking-views-without-shiny.html
+    + Indirect manipulation useful when the ‘unit(s) of interest’ cannot be easily located on the graphical space. 
+    + Powerful to use both indirect and direct manipulation if they are synced. 
+  eg. Select city from drop down menu to highlight plot (indirect) AND click on plot to have city appear in selection box (direct).
+
+### (Plotly+Shiny) vs (Plotly+Crosstalk)
+* Linking requires either (plotly+shiny) or (plotly+crosstalk).
+    + (plotly+shiny) re-draws whole plot after selection, inefficient if large ds or many graphical elements. eg. For brushed linking of scatterplots the full plot is re-drawn and then the layer for the selected points (in a different colour).
+    + (plotly+crosstalk) changes the colour attributes of the selected points (dims unselected). 
+* Large ds interaction (plotly+crosstalk) feels even slower than (plotly+shiny). Slowed down by crosstalk (?) which is self-claimed to be inappropriate for large DS. Compare Brush_Large (50 000 points). BUT (plotly+crosstalk) can brush both ways.
+* (plotly+crosstalk) cannot use for aggregate values (eg. cannot ‘dim’ unselected values in a box plot), but with (plotly+shiny) can re-draw with selected points.
+* Which allows for more flexible interaction or manipulation? Crosstalk uses ShareData to create an ‘environment’ while Plotly uses event_data() to capture default “identifiers” in a list. The Methods in the documentation of ShareData suggests it captures more info than event_data().
+
+### Fostering Undergraduate Data Science (Review of Undergrad course in US)
+* Project based, focus on large ds, interdisciplinary. Students given videos and code (flipped classroom). Specific learning targets and open-ended data exploration. One-to-one, hands on interaction during lectures. No pre-req assumed.
+* Projects: approx 2 weeks in length, groups of 3 students.
+* Start with data sets rather than “introducing a tool without motivation”. Motivation to solve a certain problem with the data set.
+* Established skills in extracting, querying, wrangling large ds, laying the foundations for further work with large ds. Mentions visualisation in some parts.
+* Picking up ’bad habits’ from overuse of stack exchange etc. (e.g. use of for loops that would be inefficient for large ds).
+
+## Reading list
+* Wickham, Hadley, Michael Lawrence, Dianne Cook, Andreas Buja, Heike Hofmann, and Deborah F Swayne. 2010. “The Plumbing of Interactive Graphics.” Computational Statistics, April, 1–7.
+
+* Anthony Unwin’s Graphical Data Analysis with R (CRC Press 2015)

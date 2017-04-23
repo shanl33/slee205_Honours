@@ -1,10 +1,23 @@
-2017-04-??
+Shiny 
+* reactive({}) ‘reactive conductors’ (http://rstudio.github.io/shiny/tutorial/#reactivity-overview)
+ + reactive conductors sit between reactivity source(s) and endpoints (eg. between a sliderInput and the plotOutputs it updates). This allows any objects defined by reactive({}) to be called as a function in the code for the output plots.
+ + reactive({}) has the same effect as defining the object as a function (and calling it up as a function in the code for output plots).
+ - Shiny+Plotly: Using function(){} rather than reactive({}) seems to be better if the object is defined by complicated computations of inputs. Using reactive({}) seems to slow down the tooltip and plotly_click reactivity. (See poisdp.R)
+
+2017-04-19
+
+* Main to do’s: Large ds and applications (look at other data visualisation courses)
+
++ trelliscope: large data option.
+
+- ggvis: R package that is like a combination of Shiny and Plotly, under development, likely to change quite a bit.
 
 Fostering Undergraduate Data Science
 * Project based, focus on large ds, interdisciplinary. Students given videos and code (flipped classroom). Specific learning targets and open-ended data exploration. One-to-one, hands on interaction during lectures. No pre-req assumed.
 * Projects: approx 2 weeks in length, groups of 3 students.
 * Start with data sets rather than “introducing a tool without motivation”. Motivation to solve a certain problem with the data set.
 * Established skills in extracting, querying, wrangling large ds, laying the foundations for further work with large ds. Mentions visualisation in some parts.
+* Picking up ’bad habits’ from overuse of stack exchange etc. (e.g. use of for loops that would be inefficient for large ds).
 
 __________
 
@@ -14,9 +27,9 @@ Plotly
 https://cpsievert.github.io/plotly_book/
  + plotly objects can have more than aes mapping data attached to them, such as statistical output that was generated in R when creating the plot (eg. with goem_smooth())  
   
- - BUT cannot re-execute statistical procedures in response to user event since can’t talk back to R (currently loses the inverse function required to get from the graphic back to the data object when the results are pushed to a web browser). (plotly+shiny) can resolve this, but not (plotly+crosstalk).
+ - BUT cannot re-execute statistical procedures in response to user event since can’t talk back to R (currently loses the inverse function required to get from the graphic back to the data object when the results are pushed to a web browser). (plotly+shiny) can resolve this, but not (plotly+crosstalk)?
 
- + plot_ly() interacts more directly with plotly.js and hence generally not as ‘expensive’ as ggploty(). Maybe faster with large ds? Theoretically should be but hard to distinguish if using plotly+crosstalk. See runtime.R comparisons and compare 
+ + plot_ly() interacts more directly with plotly.js and hence generally not as ‘expensive’ as ggplotly(). Maybe faster with large ds? Theoretically should be but hard to distinguish if using plotly+crosstalk. See runtime.R comparisons and compare 
 Brush_Large files.
 
  - ggplotly() translates each layer of ggplot2 into one or more plotly.js traces. Assumptions about trace attributes not always appropriate, can modify. See: https://cpsievert.github.io/plotly_book/extending-ggplotly.html (Extending ggplotly).
@@ -27,7 +40,7 @@ Brush_Large files.
 
  - (plotly+crosstalk) cannot use for aggregate values (eg. cannot ‘dim’ unselected values in a box plot), but with (plotly+shiny) can re-draw with selected points.
 
- + Persistent brushing: pipe plotly object to a ‘highlight()’ layer with ‘persistent=F/T’ and ‘dynamic=F/T’ arguments. Limitations to ‘memorising selections’ and currently a limited number of modes to choose from (cannot support AND), rewinding selections? (see Hofmann and Theus (1998)
+ + Persistent brushing: pipe plotly object to a ‘highlight()’ layer with ‘persistent=F/T’ and ‘dynamic=F/T’ arguments. Limitations to ‘memorising selections’ and currently a limited number of modes to choose from (cannot support AND), rewinding selections? (See Hofmann and Theus (1998))
 
 Crosstalk
 + Link views between two independent graphing systems (eg. plotly and leaflet maps)
@@ -41,7 +54,7 @@ Shiny
 
 Crosstalk
 https://rstudio.github.io/crosstalk/using.html
-Crosstalk and Shiny and Plotly (if using Crosstalk w ggplot2 need Shiny, since not html widget)
+Crosstalk and Shiny and Plotly (if using Crosstalk w ggplot2 need Plotly, since not html widget)
 https://beta.rstudioconnect.com/jcheng/shiny-crosstalk/
  + Achieves similar linked brushing as Plotly by creating a common data set automatically (via ShareData) rather than the user having to manually subset (as with Plotly).  
  + Much easier to link plots ‘both ways’. Also possible in Plotly but requires more code. Crosstalk seems to be created specifically for linked brushing, while Plotly more generally for identification (that can then be manipulated for linked brushing).
