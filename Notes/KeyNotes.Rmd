@@ -8,8 +8,72 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## To do's
-* How to access ggplot() + geom_mosaic():  https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html
 * Large ds and applications (look at other data visualisation courses)
+* Look at documenting interactions when used for exploration
+   + 'capture' an useful view or brushed selection
+* Shiny sliders:
+    + cycling of combinations of possible vars for scatterplot and mosaic plots (2 to 3 vars only)
+
+### ggobi
+* I only used as a GUI (not through command line)
+* Interaction choices vary according to the type of plot in the active view (eg. the plot you want to brush on)
+    + All have at least: scale, brush, identify
+    + Identify: 
+        - Either by hover or display info in console 
+        - Can display any variable value (even those not in plot)
+    + Scatterplots have more interaction options: 
+        - Edit edges: add points or edges
+        - Move points
+        - Cycling of pairwise combos for scatterplot axes
+    + Scatter matrix can brush, scale and identify, linking within itself and to other views too
+    + Bar charts: 
+        - Responds to brushing in other plots by highlighting the proportion brushed (or a highlighted line appears if only one obs brushed)
+        - More than one bar can be brushed (when initiating interaction from the bar chart)
+* Similarly plot display options vary depending on type of plot
+    + Parallel coords plot: 
+        - Advanced options (eg. using ASH)
+        - Easily drag to change order of axes
+        - Brush node to select (or edge)
+
+### Advantages
+* Very fast and flexible
+    + Can have multiple plots linked at once
+    + Brushing takes effect immediately using the olive.csv (around 572 obs)
+* Lots of options for interaction and plot display
+
+### Disadvantages
+* Easy of installing software (X11 problem on macs only?)
+* Very specialised, only useful if you know what you are doing!
+
+### Area plots
+#### ggplot2 + Plotly
+* Using ggplot2 + geom_bar(): Assign the fill=probability and col="y factor level" and then use scale_color_discrete(low="black", high="black"). This means the y-variable will also appear in the tooltips.
+* productplots package 
+    + The best option so far (see code below, from AreaPlots.R)
+* ggmosaic package (an add-on to ggplot2) allows you to add a geom_mosaic. 
+    + See: https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html
+    + Comment at bottom of page on using geom_mosaic with Plotly has been masked
+    + It uses the  productplot package but seems to disable the productplot package with errors (resolved by installing productplot from CRAN again). The version of productplot used in ggmosaic outdated?
+    + Currently cannot get ggmosaic working
+```{r}
+install.packages("productplots")
+library(productplots)
+library(ggplot2)
+library(plotly)
+data("happy")
+prodplot(happy, ~ marital + happy, c("vspine", "hspine"), na.rm = TRUE) + aes(fill=marital)
+mosaic2_coords <- prodcalc(happy, ~ marital + happy, c("vspine", "hspine"), na.rm = TRUE)
+str(mosaic2_coords) # level = 1 or 2 since 2 vars involved. Need to plot only level 2
+p <- ggplot(mosaic2_coords[mosaic2_coords$level==2,]) + 
+  geom_rect(aes(xmin=l, xmax=r, ymin=b, ymax=t, fill=marital, color=happy)) +
+  scale_color_discrete (c=0, l=100) +
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        axis.text.y = element_text(),
+        axis.text.x = element_blank())
+ggplotly(p, tooltip = c("fill", "color")) 
+```
 
 ## Trelliscope
 * For large ds.

@@ -4,10 +4,13 @@ library(ggplot2)
 library(dplyr)
 library(ggvis)
 library(plotly)
-library(Bolstad)
-mu <- 1:6
-prior <- c(0.1,.2,.3,.2,.1,.1)
-results <- poisdp(2, mu, prior)
+
+# If load ggmosaic then will need to re-install productplots
+# Currently cannot get ggmosaic working
+install.packages("ggmosaic")
+library(ggmosaic)
+# See https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html
+
 data("happy")
 str(happy)
 # See: https://github.com/hadley/productplots/tree/master/R
@@ -37,20 +40,24 @@ prodplot(happy, ~ sex + happy, mosaic()) + aes(fill=sex)
 # stacked() best with only 2 vars (like a trellis plot)
 prodplot(happy, ~ sex + happy, stacked())
 
-# 2 vars and coords and plotly interaction -------------------------------------------------------
+# 2 vars + ggplot2 + plotly -------------------------------------------------------
 prodplot(happy, ~ marital + happy, c("vspine", "hspine"), na.rm = TRUE) + aes(fill=marital)
 mosaic2_coords <- prodcalc(happy, ~ marital + happy, c("vspine", "hspine"), na.rm = TRUE)
 str(mosaic2_coords) # level = 1 or 2 since 2 vars involved. Need to plot only level 2
-p <- ggplot(mosaic2_coords[mosaic2_coords$level==2,]) + geom_rect(aes(xmin=l, xmax=r, ymin=b, ymax=t, fill=marital))
-q <- ggplotly(p) #defalut "all" aes for tooltip only has the color var (does not pick up a x or y tooltip)
-# q is a plotly object (p is a ggplot2 plot)
-str(plotly_data(q))
-str(mosaic2_coords)
-# Same info except plotly object has fewer obs since only needed to plot level = 2
-library(listviewer)
-plotly_json(q)
-# plotly can only pick up on colour aes and nothing else (?)
+p <- ggplot(mosaic2_coords[mosaic2_coords$level==2,]) + 
+  geom_rect(aes(xmin=l, xmax=r, ymin=b, ymax=t, fill=marital, color=happy)) +
+  scale_color_discrete (c=0, l=100) +
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        axis.text.y = element_text(),
+        axis.text.x = element_blank())
+ggplotly(p, tooltip = c("fill", "color")) 
 
+# With geom_mosaic (ggmosaic package) currently does NOT work
+ggplot(happy) +
+  geom_mosaic(aes(x = product(happy, sex)))
+  
 # 2 vars and coords and ggvis interaction ---------------------------------
 # using mosiac2_coords from above
 mosaic2_coords[mosaic2_coords$level==2,] %>%
