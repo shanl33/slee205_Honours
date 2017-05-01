@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### ggobi
 * I only used as a GUI (not through command line)
+* Did not use rggobi package
 * Interaction choices vary according to the type of plot in the active view (eg. the plot you want to brush on)
     + All have at least: scale, brush, identify
     + Identify: 

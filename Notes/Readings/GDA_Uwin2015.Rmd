@@ -1,0 +1,24 @@
+---
+title: "Graphical Data Analysis with R"
+author: "Antony Uwin 2015"
+date: "5/2/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## What is GDA?
+- Used for *data cleaning, exploring data structure, detecting outliers and unusual groups, identifying trends and clusters, spotting local patterns, evaluating modelling output and presenting results* (p.xi) 
+- Many graphics should be drawn (even when presenting). Difficult if not impossible to summarise with just one graphic. GDA is open-ended and you *pursue multiple ideas in parallel* (p.5)
+- GDA and statistical analysis complement each other. Results found graphically should be supported by statistical analysis, and vice versa.
+    + Graphics often *casually* used, seems more decorative than informative and *for reasons of routine* rather than communication (p.3)
+    + Often possible to find a graphic to support results of a statistical test but not so the other way around (always be able to find a stats analysis to support something you discover graphically) (p.5)
+    + Draw many graphs when involved GDA but need to choose wisely which to keep and then finally present.
+    
+## Possible datasets to explore further w interaction
+- UC Berkley dataset (p.9)
+    + 3 categorical vars, add Shiny slider to display arrangements for a mosaic plot (reveal levels)
+
+## Graphics for exploring datasets vs presenting results?
