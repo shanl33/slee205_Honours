@@ -5,7 +5,8 @@ library(plotly)
 library(shiny)
 
 data("happy")
-# hap and mar not working.
+# 51,020 obs so interaction is VERY slow.
+# Change "scatter" to a different plot, maybe bar chart w proportion highlighted
 
 ui <- fluidPage(
   mainPanel(
@@ -34,26 +35,37 @@ server <- function(input, output, session) {
     # event_data() listens for the "selected" event in the "source".
     s <- event_data("plotly_click", source = "plot1")
     print(s) 
-    level <- s$curveNumber + 1
-    # level for 'happy' categorical var
-    # Output from the brushing 'event'(x, y, curve#, point#=(obs#-1) in mtcars)
-    # Diff of 1 between point# and obs# index is common when using diff languages
+    lev <- s$curveNumber + 1
+    # "lev" converts curveNumber so it starts at 1 and can match up with length of levels for each factor
+    # Max (curveNumber+1) = total # of rectangles = length(levels(factor1)))*length(levels(factor2)))
+    # factor1 levels will align w dividing max curve# into intervals of length: length(levels(factor2)))
+    # eg. "hap" = level for 'happy' categorical var (1-5 is level1 of happy, 6-10 is..)
+    # factor2 levels will align w modular division of (curveNumber+1) %% lenght(levels(factor2))
+    # Remainder 0 = max level for factor2 = length(levels(factor2)) 
+    # Otherwise the rest match up as is (ie. rem)
+    # "mar" = level for 'marital'
     if (length(s)) {
       # curveNumber is the category from (0 to 14)
       # Numbered from the bottom up, starting with left col
-      if (0 < level < 6) {
+      if (lev<6) {
         hap <- levels(happy$happy)[1]
-      } else if (5 < level < 11) {
+      } else if (lev>5 & lev<11) {
         hap <- levels(happy$happy)[2]
       } else {
         hap <- levels(happy$happy)[3]
       }
-      # level for 'marital'
-      m <- level %% 5
-      mar <- levels(happy$marital)[m]
+      m <- lev %% 5
+      if (m==0) {
+        mar <- levels(happy$marital)[5]
+      } else {
+        mar <- levels(happy$marital)[m]
+      }
       ggplot() +
-        geom_point(data=happy, aes(x=age, y=wtssall)) +
-        geom_point(data = happy[c(happy$happy==hap, happy$marital==mar), ], aes(x=age, y=wtssall), colour="red")
+        geom_point(data=happy, aes(x=year, y=age)) +
+        geom_jitter() +
+        geom_point(data = happy[c(happy$happy==hap, happy$marital==mar), ], 
+                   aes(x=year, y=age), colour="red") +
+        geom_jitter()
     } else {
       plotly_empty()
     }

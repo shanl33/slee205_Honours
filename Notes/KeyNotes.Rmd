@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## To do's
 * Large ds and applications (look at other data visualisation courses)
 * Look at documenting interactions when used for exploration
-   + 'capture' an useful view or brushed selection
+    + 'capture' an useful view or brushed selection
 * Shiny sliders:
     + cycling of combinations of possible vars for scatterplot and mosaic plots (2 to 3 vars only)
 
@@ -43,11 +43,15 @@ knitr::opts_chunk$set(echo = TRUE)
 * Lots of options for interaction and plot display
 
 ### Disadvantages
-* Easy of installing software (X11 problem on macs only?)
+* Ease of installing software (X11 problem on macs only?)
 * Very specialised, only useful if you know what you are doing!
 
 ### Area plots
-#### ggplot2 + Plotly
+#### ggplot2 + Plotly + Shiny
+* Linked brushing via click on mosaic plot works (see Brush_mosaic.R in Shiny_Plotly folder).
+    + VERY slow due to 50 000+ points in scatterplot
+    + Use a highlighted bar instead, or something more appropriate for categorical data
+    + See: 
 * Using ggplot2 + geom_bar(): Assign the fill=probability and col="y factor level" and then use scale_color_discrete(low="black", high="black"). This means the y-variable will also appear in the tooltips.
 * productplots package 
     + The best option so far (see code below, from AreaPlots.R)
