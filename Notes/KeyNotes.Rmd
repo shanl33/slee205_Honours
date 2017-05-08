@@ -7,6 +7,16 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Questions
+* Do I have to cite a specific source when making "common statements"?
+    + eg. Order of vars for a parallel coord point is impt?
+    + Choice of file type for image (raster vs scalable)
+* `Acinonyx` R package is a possible successor for `iplots`? (Unwin)
+* `Trelliscope` talks back to R? (Its js library and R package library are the same entity)
+* `rbokeh` similar to `plotly`? 
+    + `rbokeh` requires more code to display hover tips
+    + `rbokeh` + trelliscope has explicit examples, not so with `plotly` (currently I cannot get working)
+
 ## To do's
 * Large ds and applications (look at other data visualisation courses)
 * Look at documenting interactions when used for exploration
@@ -14,7 +24,94 @@ knitr::opts_chunk$set(echo = TRUE)
 * Shiny sliders:
     + cycling of combinations of possible vars for scatterplot and mosaic plots (2 to 3 vars only)
 
-### ggobi
+## Possible datasets 
+### From Unwin book:
+* Small datasets for teaching purposes (p.24)
+    + Statlib at Carnegie Mellon University
+        - <http://lib.stat.cmu.edu/datasets/>
+    + UCI's Machine Learning repository: for studying algorithms
+        - <http://archive.ics.uci.edu/ml/>
+* UC Berkley dataset (p.9)
+    + 3 categorical vars, add Shiny slider to display arrangements for a mosaic plot (reveal levels)
+* Parallel coord plots: Use `iris` data set (p.105)
+    + Brings out the clustering by the 3 species
+    + Experiment with different scaling of axes, orderings, identify associations (compare with bivariate scatterplot)
+    + Not possible to see the clustering if just used linked scatterplots? Or scatterplot matrix?
+    + Compare to a 2D tour?
+    + Shiny interaction to 'cycle' through different orderings of axes. Similarly w diff axes scaling (checkbox input)
+    + Order vars on axes by amount of difference between groups (F-statistic) (see p.120)
+    + Order of colouring obs important since the last group will be on top. Selected group should always be last to be plotted, so that it is above the rest.
+* Changes in NZ Consumer Price Index over the years using paralle coord plots
+    + See `Pcps for indices` under `Parallel coord plots`
+    + Unwin p.113
+* Mosaic plots for `Berkley` admissions' dataset is a common example
+    + See: <http://www.theusrus.de/blog/understanding-mosaic-plots/>
+    + An example of Simpson's paradox (where a conclusion appear true for the subsets but then disappears of reverses for the aggregate)
+* Tour de France datasets analysed using Mondrian
+    + Interesting short clip (10mins) of how interactive graphics (esp showcasing parallel coord plots) can be used to identify patterns in context. Good commentary (by Unwin, using data and software from Theus) <http://www.theusrus.de/blog/the-tour-is-over-long-live-the-tour/>
+    + Showcases the applications of changing scale on axes of parallel coord plots.
+        - Aligning times at each stage by the median time allows for comparison with the main bunch of riders, the peloton.
+        - Comparing w the winner's times identifies which stages other riders gained on him.
+        - In `ggparcoord` the arg `scale="center"` allows for scaling of each var's axes individually (eg. based on each var's median), so would need to manually center the data first (subtract the median time from the values), then plot (leaving `scale="globalminmax"`). (See p.115 and 116 for more info on scaling) 
+    + Links to download and tutorial for Mondrian software
+        - <http://www.theusrus.de/Mondrian/>
+
+## Trelliscope
+* See <https://hafen.github.io/trelliscopejs/#why>
+* Trelliscope is like trellis plots with the added interactivity of being able to filter and sort panels of multiple trellis plots based on "cognostic" summaries of the data.
+    + "cognostic" = diagnostics guided by computers (term proposed by Tukey)
+    + Cognostics in trelliscope: Statistical summaries automatically calculated for the subsets that are created by interactive filtering.
+    + Defualt cognostics automatically calculated by trelliscope:
+        - Mean for all numeric vars (whether used is current aes or not)
+        - Value of the categorical vars used in the subsetting/ the "conditioning variables" (will not display the values for other categorical vars that were not used to subset the data and 'trellis' the plots, this would require something like a list of counts)
+    + Customised cognostics possible: eg.
+* Trelliscope produces *small multiple plots which can be navigated with respect to the summaries*
+* Interactive options on sidebar:
+    + `Grid`: # rows and cols of plots for each panel, and order by row or col.
+    + `Labels`: The cognistic summaries to display below each plot (ie. mean for the subset across all the numeric vars in ds, count for subset and categorical values defining the subset)
+    + `Filter`: Selection plots to view based on cognistics (same list as in Labels)
+    + `Sort`: Ordering of plots based on values of cognistics.
+* Low level functions: 
+    + `facet_trelliscope()`: Use in place of `facet_wrap()` in `ggplot2` (turns it into a interactive faceted plot rather than a static one)
+        - `path` arguments sets the directory where you want the displays to be saved and accessed for viewing
+    + `trelliscope()`: Use when you want to customise cognostics (ie. calculate and display summary stats other than the defaults calculated by `facet_trelliscope()`) 
+        - Use with a "tidy" workflow: group data for computing summaries for each group (using `dplyr` or `tidyr`) and then use `trelliscope()` to display the summary stats alongside (below) the plots of the subsets
+* `trelliscopejs` is an `htmlwidget` interface to the JavaScript library by the same name (`trelliscopejs-lib` - allows for the interactive viewing). Uncommon for both JavaScript and R libraries to be in the same entity - what are the advantages? (talks back to R??)
+
+### Trelliscope and `rbokeh`: `ly_points()` has `hover=` argument.
+    * See <https://hafen.github.io/trelliscopejs/#getting-started>
+    * Can use `plotly` insteand of `rbokeh`?
+    
+### Advantages
+* Intended for exploratory data analysis (easy, quick) and in some ways for presentation/communication of exploration to others (see next point)
+* Easy to understand for "non-data-scientists" or domain experts
+    + A communication tool between data scientists and their audience or those they collaborate with.
+* Exemplifies *small multiples* as an interactive technique:
+    + breaking up the dataset into multiple plots of the subsets - what a trellis plot achieves.
+    + small multiples = *where data are split into groups and a plot is made for each group, with the resulting plots arranged in a grid.*
+    + Easy and quick to create small multiple plots, hence well suited for EDA where some may be dead ends and want to reiterate rapidly.
+    + Tufte, *Visual Display of Quantitative Info*: Understanding how to read one *slice* allows the user to access all of the data via the other slices. *Allows viewer to focus on changes in the data rather than changes in the graphical design*.
+    + Slicing data to allow for multiple views is useful when there are many vars involved.
+        - Uses one or more vars to determine how to splice up data.
+        - For each subset plot the data using one or two vars.
+        - More effective than 3D visualisation and can scale up higher than 3D.
+    + Resolves problems w overplotting and allows detailed views.
+    + Scalable since does not require all points to be plotted in one view.
+        - The "cognostic" panels guide the user to the panels w the "most interesting content"
+* The *input combinations represented as cognostics* allows for many outcomes to be compared simultaneously.
+    + As opposed to apps that allows a few inputs and then the plot updates.
+* Easy to use with `ggplot2` and `lattice`. 
+    + `rbokeh` recommended rather than `ggplot2` since its faster at drawing panels of plots. See <https://hafen.github.io/trelliscopejs/#gapminder_data> 
+* Combinations for how the dataset can be subsetted are easily generated in `trelliscopejs`.
+* Trelliscope graphics can be shared as standalone apps or embedded in RMarkdown notebooks.
+    + For use in RMarkdown: Must set argument `self_contained=TRUE` (in either `facet_trelliscope()` or `trelliscope()` function).
+        - This loads all of the plot dependencies onto the html page instead of saving in separate files for access as they are viewed. Do NOT set as TRUE otherwise, since this is esp expensive when there are many panels and hence is more efficient to load on demand rather than all at the beginning.
+        
+### Disadvantages
+* Underdevelopment
+* Specific to *small multiples* interaction (filtering and sorting of trellis plots). 
+
+## ggobi
 * I only used as a GUI (not through command line)
 * Did not use rggobi package
 * Interaction choices vary according to the type of plot in the active view (eg. the plot you want to brush on)
@@ -238,6 +335,16 @@ https://github.com/ropensci/plotly/blob/51e159ba825b007657c1d7534825ef25afc7e7af
 ## Large datasets
 * Current interaction tools can help when there is a large number of variables, through filtering inputs, but when there is a large number of observations, problems with over plotting and time taken to create plots, get in the way of using these tools for meaningful interactions.
 * Brushing or “click selecting” on plots using bins would be useful for large ds, since difficult to brush with over plotting.
+* Unwin, 2015 "Graphical Data Analysis with R" (p.272):
+    + Two problem areas for statistical analysis:
+        - Large # vars = large # tests = more likely to get significant results
+        - Large # cases = even small effects will be found to be significant in individual tests, but may not be of practical importance
+    + *Large ds tend to be heterogenenous rather than homogeneous*
+        - Select vars to create a subset of cases to use in the analysis.
+    + The aggregate properties of the whole dataset will be reflected in a random sample. 
+        - Perform statistical analysis on a sample, or repeat analysis on several samples.
+        - Good for *global properties* of a dataset, but not good for local properties such as unusual small groups.
+* Zooming in (w an un-zoomed view on the side, so contest is not lost) is esp useful for large ds.
 
 ## Tips
 * Testing: Assign variable to interaction fn and print() the output.

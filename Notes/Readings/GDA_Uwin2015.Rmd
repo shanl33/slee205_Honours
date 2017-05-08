@@ -22,10 +22,165 @@ knitr::opts_chunk$set(echo = TRUE)
 * GDA and statistical analysis complement each other. Results found graphically should be supported by statistical analysis, and vice versa.
     + Graphics often *casually* used, seems more decorative than informative and *for reasons of routine* rather than communication (p.3)
     + Often possible to find a graphic to support results of a statistical test but not so the other way around (not always able to find a stats analysis to support something you discover graphically) (p.5)
+    + *Statistics should be used to check graphical results* (p.13)
     + Draw many graphs when involved GDA but need to choose wisely which to keep and then finally present.
-    
+* Many individual displays of univariate data when first exploring a dataset (p.159)
+    + Barchars for categorical and discrete vars and histograms for continuous vars, where possible.
+    + Special var types, like dates, should be analysed separately.
+    + *Plots of individual vars give a quick view of the variable distns and of any features that stand out* (p.159)
+* Data analysis and graphics (p.275): 
+    + Graphics can make results of statistical analysis easier to explain to others, more insightful and convincing than commentary alone.
+    + Aim: To draw many displays and find an optimal set of plots that show *a lot--if not all -- of the info that is in the data.*
+    + Important to have an overall goal for your GDA but also have the flexibility to pursue the general goal making unexpected findings (if you come across it)
+    + *Using many graphics at once and being prepared to consider several diff lines of thought in parallel* (p.276)
+    + GDA = generating of ideas, not just describing data and NOT testing of ideas. GDA needs to be supported by statistical analysis.
+        - Statistical tests tell you if a hypothesis should be rejected, but not why. Graphics can help identify where it went 'wrong'.
+        - Tests are useful fo checking whether something found graphically is significant, while graphics can help determine whether *statistically significant results are really of interest*.
+* Disadvantages of GDA (p.276):
+    + quality of GDA depends on choice of graphics used and organisation of plots
+    + Over-interpretation is a danger and seeing patterns where there aren't any.
+    + Inadequate data causes problems, as with any data analyses
+* Advantages of GDA:
+    + Flexibility, ease of communication
+    + Facilitates generating ideas (as opposed to evaluating ideas - statistical analysis)
+* Recommendations for GDA (p.277):
+    + *Gain experience in interpreting graphics and use the graphics types you know well*
+        - This suggests it's important that in a data vis course we "teach" useful but less well known plots, like parallel coord plots, so that students will "turn to these plots" later on in their career.
+
 ## Possible datasets to explore further w interaction
 * UC Berkley dataset (p.9)
     + 3 categorical vars, add Shiny slider to display arrangements for a mosaic plot (reveal levels)
+* Parallel coord plots: Use `iris` data set (p.105)
+    + Brings out the clustering by the 3 species
+    + Experiment with different scaling of axes, orderings, identify associations (compare with bivariate scatterplot)
+    + Not possible to see the clustering if just used linked scatterplots? Or scatterplot matrix?
+    + Compare to a 2D tour?
+    + Shiny interaction to 'cycle' through different orderings of axes. Similarly w diff axes scaling (checkbox input)
+    + Order vars on axes by amount of difference between groups (F-statistic) (see p.120)
+    + Order of colouring obs important since the last group will be on top. Selected group should always be last to be plotted, so that it is above the rest.
+* Changes in NZ Consumer Price Index over the years using paralle coord plots
+    + See `Pcps for indices` under `Parallel coord plots`
+    + Unwin p.113
+* Mosaic plots for `Berkley` admissions' dataset is a common example
+    + See: <http://www.theusrus.de/blog/understanding-mosaic-plots/>
+    + An example of Simpson's paradox (where a conclusion appear true for the subsets but then disappears of reverses for the aggregate)
+* Categorical outliers: Malik, 2010 using Pakistani Labour Force Survey of 2003
+    + identified low education and employment status, but also recorded as corporate managers
+* Tour de France datasets analysed using Mondrian
+    + Interesting short clip (10mins) of how interactive graphics (esp showcasing parallel coord plots) can be used to identify patterns in context. Good commentary (by Unwin, using data and software from Theus) <http://www.theusrus.de/blog/the-tour-is-over-long-live-the-tour/>
+    + Showcases the applications of changing scale on axes of parallel coord plots.
+        - Aligning times at each stage by the median time allows for comparison with the main bunch of riders, the peloton.
+        - Comparing w the winner's times identifies which stages other riders gained on him.
+        - In `ggparcoord` the arg `scale="center"` allows for scaling of each var's axes individually (eg. based on each var's median), so would need to manually center the data first (subtract the median time from the values), then plot (leaving `scale="globalminmax"`). (See p.115 and 116 for more info on scaling) 
+    + Links to download and tutorial for Mondrian software
+        - <http://www.theusrus.de/Mondrian/>
 
-## Graphics for exploring datasets vs presenting results?
+## Links with interactive graphics
+* Adv, disadv, challenges (p.21)
+    + Advantages:
+        - faster graphical analyses
+        - more flexible
+    + Disadvantages:
+        - difficult to record interaction
+        - quality not good to reproduce for presentation purposes
+    + Current challenges:
+        - *how to formalise interactive graphics*
+        - an intuitive user interface for software
+        - *how to provide results of analyses interactively in a structured form for occassional users* (emphasis on occassional users)
+* Plots like parallel coord plots, are *most effective when individuals or groups identified by colour* (p.112). Best if colouring can be done via brushing on plot and *redrawing occurs immediately*. Static plots limited to defining a selection by an existing variable or coding to create a variable to identify obs of interest from an initial first plot.
+        
+### Scatterplots for many continous vars
+* Scatterplot matrices (sploms) difficult to read and use for large datasets, but still useful to identify which scatterplots to examine in more detail (p. 92)
+    + Plotly linked correlation heatmap is a good use of interaction to overcome this limitation.
+* Multivariate continuous data (p.99)
+    + Interactive linking of several scatterplots or scatterplot matrices may still not be enough to bring out multivariate structures in data.
+    + Dimension reduction methods, such as principal component analysis and multidimensional scaling, are *graphics-related approaches* to bringing out multivariate structures.
+        - Disadvantage: Dim reduction approaches are approximations of the data and difficult to measure how well they approximate the data.
+    + 2D tours: rotate through 2D projections of multivariate data are a flexible dim reduction method. Need to be used in combination with projection pursuit indices.
+        - *Specialist tool*.
+        
+### Parallel coordinate plots, pcp (Section 6.2)
+* Inselberg, 2009, *Parallel Coordinates: Visual Multidimensional Geometry and Its Applications*
+* TimelyPortfolio, 2013 website, compares the diff R packages for plotting time series.
+* Allows user to view several univariate distributions simultaneously. Particularly good for identifying features like (p.102):
+    + Skewness in distn
+    + Outliers
+    + Gaps or groupings
+    + Multivariate structures (of some of the features above)
+        - groups of obs w similar values across several vars.
+        - obs that are outliers on more than one var.
+    + Associations between 2 adjacent vars but if that was our may interest a scatterplot matrix would be more effective (p.104)
+    + Unwin seems to suggest pcps are better for checking analytical results rather than as a starting point for identifying features. Definitely should not use pcps as a standalone analysis, must be supported by analytical methods. Such as:
+        - correlations, cluster analysis
+* **Parallel coordinate plots need to used interactively inorder to be fully effective** (p.102)
+    + eg. *Reordering axes of the fly*
+    + R functions have lots of options for how and what to display in pcp and this will have a big influence on the features you can 'see' in the pcp and hence how the plots should be interpreted.
+    + Suggests using interactive tool like `ipcp` in the `iplots` package first to identify patterns and useful views and then use your preferred static pcp function to draw the chosen view(s) for presentation.
+    + Table of options in R for pcp's (p.102)
+    + Unwin's book uses mainly `ggparcoord` function in `GGally` package
+* **Wegman and others (like Hurley and Oldford, 2010): discuss need to choose from all possible adjacencies of pcp's** Unwin doesn't seem to see as necessary but why did they suggest so? (p.104)
+    + This could be possible through Shiny
+* Cluster analysis: popular tool, but *most of the methods have little statistical basis and results are judged more widely by what users want to do with them than by any statistical approach.* (p.106)
+    + Once you identify clusters need to record how they differ in which vars.
+    + Regardless of analytical clustering method used, the results should not be accepted without exploring them graphically (using plots like pcp).
+* **Pcps for indices** (p.112)
+    + Index values = weighted combos of values of their components.
+        - eg. stock market indices, consumer price index (summary of prices across a wide range of products)
+    + Use of pcps: Overlay the index series in bold over the series for the separate components. Using either:
+        - Axes=Time, Cases=Components
+        - Axes=Components, Cases=Time
+    + Or: Axes=Index+Components, Cases=Individual obs (see p.113)
+* Time series data displayed as pcps (p.108)
+    + There are many analysis and diplay tools for time series in R (See Hyndman 2013, *Time series task view*)
+    + Unwin shows how *some* time series can be plotted as pcps, but what are the additional advantages of doing this??? (except for looking at indices over time. See `Pcps for indices` above)
+        - Allows you to inspect distns at individual time points using boxplots (p.237).
+    
+### Mosaic plots (Section 7.3)
+* Suggests starting with barcharts of individual vars before adding more vars (and dimensions). Some features that are easily identified in lower dimensions may be hard to see in higher dimensional plots. Cook and Swayne also highlighted this.
+* Mosaic plots aim to *make the most efficient use of the space available* (maximises the area used to represent each combination) but at the cost of ease of interpretation, since rectangles do not remain aligned for easy comparison (p.140) 
+* Not appropriate for a large number combinations. Can be good for between 4 to 24 combinations. More than that would depend on the *structure of the data* (p.140)
+* Uses of mosaic plots:
+    + Identifying combinations that have no obs. 
+    + Identifying categorical clusters (esp if there are a large # of combinations possible)
+    + Fluctuation diagrams: Good when the rows and cols do not need to be differentiated (p.140)
+        - Large contingency tables
+        - Large transition matrices
+        - Confusion matrices
+* Mosaic plot as a graphic to support modeling (p.148)
+    + Rectangles drawn proportional to expected values from a specific model ad coloured or part-fileed according to the model residuals.
+        - Helps to identify where model fits well or poorly
+    + `vcd` package has examples of applying mosaicplots in modeling.
+        - `vcd` is a grid package like `ggplot2` but based on an earlier version so will take a bit of work if want to arrange several plots in same window 
+* Ordering of vars: Binary var should be last, best as a vertical split.
+    + Ordering determines which conditional relationships are shown.
+    + Sometimes there exists a *natural hierarchical order*, otherwise *data-driven orderings* are used (ie. chosen because it reveals something about the data, found by experimenting w diff orderings)
+* Order levels of vars by it's existing sequence if there is one, otherwise by frequency. Keep direction consistent (ie. either increasing or decreasing)
+
+### Heatmaps (p.164)
+* Represents each obs by a row and each var by a col. The individual cells are coloured relative to the other values in the column (ie. the range of values for a variable).
+    + The colouring means the variables are standardised indvidually, either by z-scores or to its min-to-max scale.
+    + Ordering of obs and vars is arbituary, good to order in an informative order (eg. by clusters)
+    + Possible to colour according to all values in a dataset, but this would emphasis differences between levels of diff variables, rather than differences between individual cases.
+        - Plotly correlation `heatmap` is more like the latter, but is still not strictly a "heatmap"? (each cell is not an obs)
+        
+## Use graphics for checking and cleaning data (Chapter 9)
+### Missing values
+* If only a few missing then can ignore but if many may decide to impute to replace them.
+* Also interested in seeing if there are patterns in missingness.
+* `extracat` package with `visna` function uses a graphic to display frequency of combinations of missing values (Example with `VGAMdata` from 2012 London Olympics on p.180)
+* To investigate missing by MAR (Missing At Random) vs MCAR (Missing Completely At Random) vs NMAR (Not Missing At Random):
+    + compare subsets of cases with and without missings (mentioned but not really demonstrated w a good example)
+
+## Graphics for presenting and exploratory analysis (Chapter 12)
+* *Ensemble of graphics*: choosing an effective view, grouping plots in a structured order and layout, and encorporating text where necessary to tell a story. ie. a *Carefully laid out combination of graphics*
+    + *groups of displays for presenting several different aspects of a dataset simultaneously. They should be viewed as a group, with each contributing something else to the overall picture* (p.246)
+    + *implies a STATIC collection of graphics* (p.247)
+    + Possible approaches to creating an ensemble (p.246)
+    + When used in exploratory analysis, ensembles of graphics are for keeping track of many *lines of thought in parallel* (p.247)
+        - The flexibility of having multiple views open (like in GGobi) is impt for exploratory analysis (disadvantage of some of the recent interactive tools?)
+    + Multiple plot windows are possible in R: 
+        - In the RStudio interface is can 'scroll back' through the history of plots OR use the `x11` function if you have access to an X Server (results in some plots in `X11` some in RStudio). 
+        - R requires you to open a new graphics window if you don't want the new graphics to be drawn over the existing active window.
+* Exploratory analysis' focus is on interpreting the content of the plots to reveal info, presentation focuses on the technical details of display that are too time consuming to consider (and unnecessary) when carrying out exploratory analysis. The two are different activities (p.243)
+* *It is rarely crucial to describe how a result was obtained, but it is essential to be able to draw graphics which show that there is evidence to support the result.* (p.244)
+* *Drawing many graphics quickly and informatively for exploratory purposes is also different from drawing a few graphics attractively and precisely for presentation purposes.* (p.276)

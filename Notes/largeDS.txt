@@ -4,6 +4,7 @@ Large data notes:
  - Summary (proportions, averages)
  - Binning techniques, R Base: smoothScatter(), statbinhex().
  - Density plots 
+ - Alpha blending: Give each point a weight between 0 and 1 (1=no alpha blending). So that when points overlap the area is darker (more opaque). Eg. if alpha=0.1 then the area will be at maximum darkness when there are 10 points at the same location. Interactive: Explore a range of alpha values to see the diff patterns identified at diff levels (slider for alpha). (Unwind, 2007, p.93).
 
 + Exporting and viewing graphics:	
  - Vector based formats: (eg. PDF, SVG, XML, Javascript)
