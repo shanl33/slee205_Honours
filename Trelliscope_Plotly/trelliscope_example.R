@@ -1,5 +1,5 @@
 devtools::install_github("hafen/trelliscopejs")
-install.packages("rbokeh")
+
 library(ggplot2)
 library(trelliscopejs)
 
@@ -35,20 +35,23 @@ qplot(cty, hwy, data = mpg) +
   facet_trelliscope(~ manufacturer + class, nrow=2, ncol=4, as_plotly = TRUE)
 
 # Currently cannot get working with trelliscope() 
+# Plots all of the data rather than the subset 
+# if remove data=mpg in plot_ly arg then cannot find the vars cty and hwy
 # Ideally want this so that can customise cognostics (summary stats for filtering etc)
 # Should be similar to using rbokeh+trelliscope 
-# See: above for easier example and harder <http://ryanhafen.com/blog/trelliscopejs>
+# See: above for easier example (from a blog by creater of trelliscopejs) 
+# Harder <http://ryanhafen.com/blog/trelliscopejs> (same person as above)
 p <- mpg %>%
   group_by(manufacturer, class) %>%
   summarise(
     mean_city_mpg = mean(cty),
     mean_hwy_mpg = mean(hwy),
     panel = panel(
-      plot_ly(x=~cty, y=~hwy) %>% 
+      plot_ly(mpg, x=~cty, y=~hwy) %>% 
         layout(
           xaxis = list(range = c(7, 37)),
           yaxis = list(range = c(9, 47))
         )))
-p       
+p
 p %>%
   trelliscope(name = "testing_w_Plotly", nrow = 2, ncol = 4)

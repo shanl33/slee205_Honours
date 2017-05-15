@@ -11,109 +11,112 @@ knitr::opts_chunk$set(echo = TRUE)
 * Do I have to cite a specific source when making "common statements"?
     + eg. Order of vars for a parallel coord point is impt?
     + Choice of file type for image (raster vs scalable)
-* `Acinonyx` R package is a possible successor for `iplots`? (Unwin)
-* `Trelliscope` talks back to R? (Its js library and R package library are the same entity)
-* `rbokeh` similar to `plotly`? 
-    + `rbokeh` requires more code to display hover tips
-    + `rbokeh` + trelliscope has explicit examples, not so with `plotly` (currently I cannot get working)
+    
+### Answered
+* `Acinonyx` R package is a possible successor for `iplots`? YES
+* `rggobi` and `iplots` packages are installed on postgrad uni lab machines.
 
 ## To do's
-* Large ds and applications (look at other data visualisation courses)
+* Large ds and applications 
+* Look at other data visualisation courses (see Reading List section)
 * Look at documenting interactions when used for exploration
     + 'capture' an useful view or brushed selection
 * Shiny sliders:
     + cycling of combinations of possible vars for scatterplot and mosaic plots (2 to 3 vars only)
+* Tableau <https://public.tableau.com/s/>
+    - See if there are any interaction techniques that have not been demonstrated using other tools (esp ggobi)
+* Use interactive environments in Shiny to record interactions and send them back to R (and back again?). 
+    + See *Interactive environments in Shiny* section
 
-## Possible datasets 
-### From Unwin book:
-* Small datasets for teaching purposes (p.24)
-    + Statlib at Carnegie Mellon University
-        - <http://lib.stat.cmu.edu/datasets/>
-    + UCI's Machine Learning repository: for studying algorithms
-        - <http://archive.ics.uci.edu/ml/>
-* UC Berkley dataset (p.9)
-    + 3 categorical vars, add Shiny slider to display arrangements for a mosaic plot (reveal levels)
-* Parallel coord plots: Use `iris` data set (p.105)
-    + Brings out the clustering by the 3 species
-    + Experiment with different scaling of axes, orderings, identify associations (compare with bivariate scatterplot)
-    + Not possible to see the clustering if just used linked scatterplots? Or scatterplot matrix?
-    + Compare to a 2D tour?
-    + Shiny interaction to 'cycle' through different orderings of axes. Similarly w diff axes scaling (checkbox input)
-    + Order vars on axes by amount of difference between groups (F-statistic) (see p.120)
-    + Order of colouring obs important since the last group will be on top. Selected group should always be last to be plotted, so that it is above the rest.
-* Changes in NZ Consumer Price Index over the years using paralle coord plots
-    + See `Pcps for indices` under `Parallel coord plots`
-    + Unwin p.113
-* Mosaic plots for `Berkley` admissions' dataset is a common example
-    + See: <http://www.theusrus.de/blog/understanding-mosaic-plots/>
-    + An example of Simpson's paradox (where a conclusion appear true for the subsets but then disappears of reverses for the aggregate)
-* Tour de France datasets analysed using Mondrian
-    + Interesting short clip (10mins) of how interactive graphics (esp showcasing parallel coord plots) can be used to identify patterns in context. Good commentary (by Unwin, using data and software from Theus) <http://www.theusrus.de/blog/the-tour-is-over-long-live-the-tour/>
-    + Showcases the applications of changing scale on axes of parallel coord plots.
-        - Aligning times at each stage by the median time allows for comparison with the main bunch of riders, the peloton.
-        - Comparing w the winner's times identifies which stages other riders gained on him.
-        - In `ggparcoord` the arg `scale="center"` allows for scaling of each var's axes individually (eg. based on each var's median), so would need to manually center the data first (subtract the median time from the values), then plot (leaving `scale="globalminmax"`). (See p.115 and 116 for more info on scaling) 
-    + Links to download and tutorial for Mondrian software
-        - <http://www.theusrus.de/Mondrian/>
+### Focus on making/finding examples that..
+* Connect with statistical analysis or some part of EDA. For example:
+    + Interactive graphics for examining missingness
+* Bridge R/Shiny and "EDA/GDA-focused interactive software" to demonstrate how the transition from interactive graphics for exploratory analysis to presenting can be "effortless" and hence encourage ppl to use more interactive graphics in all stages of data analysis.
+    + ie. Use the popularity of Shiny to encourage use of other interactive software, like `ggobi`.
+    + `ggobi` and `rggobi` in `R` to `Shiny`: 
+        - EDA in `ggobi`: Use grand 2D tour to identify views where clusters are most clearly defined.
+        - Send these optimal views to `R` via `rggobi`
+        - Re-create the principal component plots (?) in `R` to use in a `Shiny` app to PRESENT results of the grand tour.
+        - NOT focus on trying to replicate a grand 2D tour in another tool (ie.`R` and/or `Shiny`).
 
-## Trelliscope
-* See <https://hafen.github.io/trelliscopejs/#why>
-* Trelliscope is like trellis plots with the added interactivity of being able to filter and sort panels of multiple trellis plots based on "cognostic" summaries of the data.
-    + "cognostic" = diagnostics guided by computers (term proposed by Tukey)
-    + Cognostics in trelliscope: Statistical summaries automatically calculated for the subsets that are created by interactive filtering.
-    + Defualt cognostics automatically calculated by trelliscope:
-        - Mean for all numeric vars (whether used is current aes or not)
-        - Value of the categorical vars used in the subsetting/ the "conditioning variables" (will not display the values for other categorical vars that were not used to subset the data and 'trellis' the plots, this would require something like a list of counts)
-    + Customised cognostics possible: eg.
-* Trelliscope produces *small multiple plots which can be navigated with respect to the summaries*
-* Interactive options on sidebar:
-    + `Grid`: # rows and cols of plots for each panel, and order by row or col.
-    + `Labels`: The cognistic summaries to display below each plot (ie. mean for the subset across all the numeric vars in ds, count for subset and categorical values defining the subset)
-    + `Filter`: Selection plots to view based on cognistics (same list as in Labels)
-    + `Sort`: Ordering of plots based on values of cognistics.
-* Low level functions: 
-    + `facet_trelliscope()`: Use in place of `facet_wrap()` in `ggplot2` (turns it into a interactive faceted plot rather than a static one)
-        - `path` arguments sets the directory where you want the displays to be saved and accessed for viewing
-    + `trelliscope()`: Use when you want to customise cognostics (ie. calculate and display summary stats other than the defaults calculated by `facet_trelliscope()`) 
-        - Use with a "tidy" workflow: group data for computing summaries for each group (using `dplyr` or `tidyr`) and then use `trelliscope()` to display the summary stats alongside (below) the plots of the subsets
-* `trelliscopejs` is an `htmlwidget` interface to the JavaScript library by the same name (`trelliscopejs-lib` - allows for the interactive viewing). Uncommon for both JavaScript and R libraries to be in the same entity - what are the advantages? (talks back to R??)
+## ggobi/rggobi
+* See <http://www.ggobi.org/docs/>
+    + Teaching ideas (stats concepts linked w demo of how ggobi can be used to explore, reinforce those concepts). Lots of good ideas but need to pick which to focus on.
+    + Datasets and code from Cook & Swayne book.
+    + Bibtex references for ggobi readings 
+* ggobi may set the benchmark of interactive techniques possible and help identify gaps.
+* Developments to connect with R seem to be active (blog up to 2010). Recently?
 
-### Trelliscope and `rbokeh`: `ly_points()` has `hover=` argument.
-    * See <https://hafen.github.io/trelliscopejs/#getting-started>
-    * Can use `plotly` insteand of `rbokeh`?
-    
-### Advantages
-* Intended for exploratory data analysis (easy, quick) and in some ways for presentation/communication of exploration to others (see next point)
-* Easy to understand for "non-data-scientists" or domain experts
-    + A communication tool between data scientists and their audience or those they collaborate with.
-* Exemplifies *small multiples* as an interactive technique:
-    + breaking up the dataset into multiple plots of the subsets - what a trellis plot achieves.
-    + small multiples = *where data are split into groups and a plot is made for each group, with the resulting plots arranged in a grid.*
-    + Easy and quick to create small multiple plots, hence well suited for EDA where some may be dead ends and want to reiterate rapidly.
-    + Tufte, *Visual Display of Quantitative Info*: Understanding how to read one *slice* allows the user to access all of the data via the other slices. *Allows viewer to focus on changes in the data rather than changes in the graphical design*.
-    + Slicing data to allow for multiple views is useful when there are many vars involved.
-        - Uses one or more vars to determine how to splice up data.
-        - For each subset plot the data using one or two vars.
-        - More effective than 3D visualisation and can scale up higher than 3D.
-    + Resolves problems w overplotting and allows detailed views.
-    + Scalable since does not require all points to be plotted in one view.
-        - The "cognostic" panels guide the user to the panels w the "most interesting content"
-* The *input combinations represented as cognostics* allows for many outcomes to be compared simultaneously.
-    + As opposed to apps that allows a few inputs and then the plot updates.
-* Easy to use with `ggplot2` and `lattice`. 
-    + `rbokeh` recommended rather than `ggplot2` since its faster at drawing panels of plots. See <https://hafen.github.io/trelliscopejs/#gapminder_data> 
-* Combinations for how the dataset can be subsetted are easily generated in `trelliscopejs`.
-* Trelliscope graphics can be shared as standalone apps or embedded in RMarkdown notebooks.
-    + For use in RMarkdown: Must set argument `self_contained=TRUE` (in either `facet_trelliscope()` or `trelliscope()` function).
-        - This loads all of the plot dependencies onto the html page instead of saving in separate files for access as they are viewed. Do NOT set as TRUE otherwise, since this is esp expensive when there are many panels and hence is more efficient to load on demand rather than all at the beginning.
-        
-### Disadvantages
-* Underdevelopment
-* Specific to *small multiples* interaction (filtering and sorting of trellis plots). 
+### rggobi
+* Code of basics in `rGGobi_intro.R` (following the `introductionRGGobi.pdf` from website)
+* Transfering data between R and ggobi.
+    + `ggobi()` function: 
+        - Initiates ggobi in R, by transfering R data to ggobi 
+        - Creates a `GGobiData` object
+    + In R can retrieve `GGobiData` objects that are linked to GGobi 
+    + 'ggobi_find_file()` function: (??)
+        - Initiates ggobi in R, by accessing ggobi's "data" library
+        - Tried: ggobi(ggobi_find_file("data", "olives.csv")) 
+        - Returns blank ggobi control window
+* Control ggobi displays/interactions from R using commands. (TBC)
+    + `display()` function:
+        - Inputs: `GGobiData`, "Name of plot"
+    + `variables()` function: Two forms
+        1. Returns the ggobi X, Y, Z values of its argument, the `display()`.
+        2. Sets the attribute: `variables() <-` allows you to assign values to control interaction via R commands. 
+* Recording interactions in ggobi (and transfering record to R). (TBC)
+    + ggobi allows interactions to be recorded (independent of R) and exported as movie clips (see Disadvantages)
+    + `ggobi_display_save_picture()` captures ggobi display as a raster image on file.
+    + `DescribeDisplay` ggobi plugin and R package (TBC)
+        - See <http://www.ggobi.org/describe-display/>
+        - Create "R versions" of ggobi plots
+        - Need to save to file in ggobi first and then load into R 
+        - Can re-create using either plot() or ggplot()
 
-## ggobi
-* I only used as a GUI (not through command line)
-* Did not use rggobi package
+```{r}
+library(rggobi)
+# Transfering data between R and ggobi.
+## Initiates ggobi and transfers mtcars data set from R
+g <- ggobi(mtcars)
+# Get this data back to R (either will work)
+g[[1]]
+g[["mtcars"]]
+
+# Control GGobi displays/interactions from R using commands.
+# Parallel coordinate plots  ----------------------------------------------------------
+d <- display(g[1], "Parallel Coordinates Display")
+# Interaction: subsets and re-orders the variables on the axes of plot 
+# Will order subset of vars in ascending number order 
+d <- display(g[1], "Parallel Coordinates Display") #Displays all vars
+variables(d) 
+variables(d) <- list(X=c(2, 8, 1)) # Displays mpg(1), cyl(2), vs(8)
+# Wanted: cyl(2), vs(8), mpg(1)
+# To try:
+variables(d) <- list(X=c("mpg", "cyl", "vs"))
+
+# The order in which you call up the variables() <- assignments results in different orderings of the axes
+# Sometimes order of (X=#:#) matters 
+d <- display(g[1], "Parallel Coordinates Display")
+variables(d)
+variables(d) <- list(X=8:6) # Subset: Displays wt(6), qsec(7), vs(8)
+variables(d) <- list(X=8:1) # Reorders
+# If use (X=1:8) above, the final result is 6, 7, 8, 1, 2, 3, .., 5.
+variables(d) # Displays wt(6), qsec(7), vs(8), then drat(5), vs(4), .., mpg(1)
+```
+
+#### Thoughts in progress (on rggobi)
+* Focus on: *Recording interactions in ggobi (and transfering record to R)*, rather than, *Control ggobi displays/interactions* 
+    + Parallel coordinate plots interaction seems un-intuitive. Re-ordering of axes is possible but tricky since order defaults to ascending the numeric value the var is associated with.
+        - Check if calling by var name works. 
+    + The `introductionRGGobi.pdf` suggests this area could be limited:
+        - "Modifying observation-level attributes, or automatic
+brushing." and "Basic plot control"
+        - BUT this document could be dated.
+    + Regardless may be good to focus on how to get a "code record" of interaction via ggobi GUI out, rather than focus on controlling interaction via R commands?
+        - This would allow us to build on TOP of the teaching ideas offered by ggobi, rather than just write code to replicate the interactions.
+        - Instead focus on processing the "code record" of interaction that we would get from ggobi and how to analyse that further in R or present it with Shiny and/or other interactive tools.
+
+### ggobi
 * Interaction choices vary according to the type of plot in the active view (eg. the plot you want to brush on)
     + All have at least: scale, brush, identify
     + Identify: 
@@ -133,59 +136,22 @@ knitr::opts_chunk$set(echo = TRUE)
         - Easily drag to change order of axes
         - Brush node to select (or edge)
 
-### Advantages
+#### Advantages
 * Very fast and flexible
     + Can have multiple plots linked at once
     + Brushing takes effect immediately using the olive.csv (around 572 obs)
 * Lots of options for interaction and plot display
+* A rich resource for teaching ideas (see website link)
+* A wide range of in-house interactions (ie. it is a complete pipeline and does not need add-ons to achieve the interactive techniques). 
+* Some statistical analyses available that can be applied directly to interaction.
+* Currently, probably the best interactive tool for handling large ds.
 
-### Disadvantages
-* Ease of installing software (X11 problem on macs only?)
+#### Disadvantages
+* Open source but difficult to install due to specific software requirements.
+    + Ease of installing software (X11 problem on macs only?)
 * Very specialised, only useful if you know what you are doing!
-
-### Area plots
-#### ggplot2 + Plotly + Shiny
-* Linked brushing via click on mosaic plot works (see Brush_mosaic.R in Shiny_Plotly folder).
-    + VERY slow due to 50 000+ points in scatterplot
-    + Use a highlighted bar instead, or something more appropriate for categorical data
-    + See: 
-* Using ggplot2 + geom_bar(): Assign the fill=probability and col="y factor level" and then use scale_color_discrete(low="black", high="black"). This means the y-variable will also appear in the tooltips.
-* productplots package 
-    + The best option so far (see code below, from AreaPlots.R)
-* ggmosaic package (an add-on to ggplot2) allows you to add a geom_mosaic. 
-    + See: https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html
-    + Comment at bottom of page on using geom_mosaic with Plotly has been masked
-    + It uses the  productplot package but seems to disable the productplot package with errors (resolved by installing productplot from CRAN again). The version of productplot used in ggmosaic outdated?
-    + Currently cannot get ggmosaic working
-```{r}
-install.packages("productplots")
-library(productplots)
-library(ggplot2)
-library(plotly)
-data("happy")
-prodplot(happy, ~ marital + happy, c("vspine", "hspine"), na.rm = TRUE) + aes(fill=marital)
-mosaic2_coords <- prodcalc(happy, ~ marital + happy, c("vspine", "hspine"), na.rm = TRUE)
-str(mosaic2_coords) # level = 1 or 2 since 2 vars involved. Need to plot only level 2
-p <- ggplot(mosaic2_coords[mosaic2_coords$level==2,]) + 
-  geom_rect(aes(xmin=l, xmax=r, ymin=b, ymax=t, fill=marital, color=happy)) +
-  scale_color_discrete (c=0, l=100) +
-  theme(panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        axis.title = element_blank(),
-        axis.text.y = element_text(),
-        axis.text.x = element_blank())
-ggplotly(p, tooltip = c("fill", "color")) 
-```
-
-## Trelliscope
-* For large ds.
-
-## R Base graphics
-* Some interaction techniques are possible. See example from Paul (email attachment)
-
-### Disadvantages
-* Relatively slow at drawing graphics compared to a browser platform, but base plots will be faster at rendering plots in R than grid plots, like ggplot2 (see runtime.R).
-* Possible, but difficult to locate interaction (ie. click location) since raster images are used.
+* Easy to publish? Export options? Sharing options?
+    + Movie clips seem to be one of the main ways of documenting visual interactions in ggobi (see website demos). Raster images, pre-recordered, cannot be interactive "again" during presentation.
 
 ## Shiny
 * http://shiny.rstudio.com/reference/shiny/latest/
@@ -198,7 +164,49 @@ ggplotly(p, tooltip = c("fill", "color"))
     + Four interaction arguments: click = "plot_click", dblclick = "plot_dblclick", hover = "plot_hover", brush = "plot_brush".
     + "Results" of interaction are displayed off-plot in text form in the examples on the website, but doesn't have to be?
     + Might not be useful since needs to link up with nearPoints() and brushedPoints() functions in server code which all use pixel approximations (see Disadvantages below)
-    
+
+### Interactive environments in Shiny
+* Possible use: Documenting interaction back to R
+* `eventReactive()` in Shiny with a `actionButton`?
+* Tips: Double arrow assignment allows you to assign value to a global variable from within a 'local' environment
+    + eg. posterior.global <<- a (where a is a value from within ONE of the output chunks in the server code for the Shiny app)
+* `isolate()` useful in a reactive environment when you want certain vars to remain the same (unaffected by interaction)
+* Possible differences between `eventReactive()` and `observeEvent()` (used below):
+    - `eventReactive()` delays code running while `observeEvent()`'s code in second argument is triggered straight away by the `input$___` (first arg).
+    - Hence `eventReactive()` can be assigned as a var and executed in another chunk of server output code (ie. it becomes a "reactive expression"/global variable)
+```{r}
+# You can define a plotly_click event as a reactive expression and then use s() and a() to create (multiple) Shiny outputs
+  s <- reactive({event_data("plotly_click", source = "obs")})
+  a <- reactive({poisdp(s()$x, mu(), prior(), plot = FALSE)})
+  
+# Updates with a Shiny button
+## ui
+# Button to submit posterior as the "new" prior distn
+actionButton("new", "Update posterior as prior")
+
+## server
+prior <- reactiveValues() # set by user input initially, then it will be updated by posterior.
+  posterior.global <- reactiveValues() # to keep the posterior values for the next round.
+  newButton.reactive <- reactiveValues() # to redraw heatmap by pressing button 
+
+# Uses the initial prior (from the user input text box) if the "update button" has not been used
+if(is.null(posterior.global$posterior)) {
+          prior$obj <- as.numeric(unlist(strsplit(input$prior, ",")))
+}
+  
+# Using a ______$___ creates a var to attach to a reactiveValues() object. 
+observeEvent(input$new, {
+      if(!is.null(posterior.global$posterior)) {
+          prior$obj <- posterior.global$posterior # update prior (reactive variable) with posterior values in the previouse round.
+          newButton.reactive$obj <- Sys.time() # Once newButton.reactive values is updated, it will draw heatmap again.    
+      } else {
+          # Do nothing
+      }
+  })
+
+```
+
+
 ### Advantages
 1. Talks back to R.
 2. Easy to learn and set up. Good online tutorials.
@@ -266,19 +274,6 @@ ggplotly(p, tooltip = c("fill", "color"))
     + Not appropriate for aggregates since cannot ‘dim’ unselected values in a box plot, but with (plotly+shiny) can re-draw with selected points.
 3. No equivalent “plotly_click” type of interaction.  Not necessary for scatterplots since can brush just one point, but this may limit Crosstalk interactions (e.g. not possible to create the Plotly correlation heat map type of interaction, https://plot.ly/r/shinyapp-linked-click/).
 
-## ggvis 
-* http://ggvis.rstudio.com/ggvis-basics.html
-* R package that is ike a combination of Shiny and Plotly, under development, likely to change quite a bit.
-* Has a similar layer ggplot2/plotly approach to plotting with ~ before vars and piping %>%.
-* Comments on tooltip here are useful: https://github.com/rstudio/ggvis/blob/master/R/interact_tooltip.R
-    + Tooltip identification allows only ONE aes to be identified
-    + Like plotly, only uses data columns used in the plot BUT can "use a key to line up the item from the plot with a row in the data".
-    
-### Disadvantages
-* Cannot use R Console when interacting with a ggvis plot: "every interactive ggvis plot must be connected to a running R session"
-* Likely to change.
-* Tooltip identification only allows 1 var, but may be able to display a var that is not an aes from the plot (see above).
-
 ## Shiny + Crosstalk
 * https://beta.rstudioconnect.com/jcheng/shiny-crosstalk/
 
@@ -297,6 +292,39 @@ ggplotly(p, tooltip = c("fill", "color"))
     + event = 'plotly_click' and 'plotly_selected' are useful of the 4 possibilities.
     + ‘plotly_hover’ and ‘plotly_relayout’ do not provide meaningful interactions. (Output for plotly_relayout is x and y window dimensions of zoom).
 * layout(dragmode="select") useful if want to default to brushing when drag to select (rather than scaling)
+
+### Area plots: ggplot2 + Plotly + Shiny
+* Linked brushing via click on mosaic plot works (see Brush_mosaic.R in Shiny_Plotly folder).
+    + VERY slow due to 50 000+ points in scatterplot
+    + Use a highlighted bar instead, or something more appropriate for categorical data
+    + See: 
+* Using ggplot2 + geom_bar(): Assign the fill=probability and col="y factor level" and then use scale_color_discrete(low="black", high="black"). This means the y-variable will also appear in the tooltips.
+* productplots package 
+    + The best option so far (see code below, from AreaPlots.R)
+* ggmosaic package (an add-on to ggplot2) allows you to add a geom_mosaic. 
+    + See: https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html
+    + Comment at bottom of page on using geom_mosaic with Plotly has been masked
+    + It uses the  productplot package but seems to disable the productplot package with errors (resolved by installing productplot from CRAN again). The version of productplot used in ggmosaic outdated?
+    + Currently cannot get ggmosaic working
+```{r}
+install.packages("productplots")
+library(productplots)
+library(ggplot2)
+library(plotly)
+data("happy")
+prodplot(happy, ~ marital + happy, c("vspine", "hspine"), na.rm = TRUE) + aes(fill=marital)
+mosaic2_coords <- prodcalc(happy, ~ marital + happy, c("vspine", "hspine"), na.rm = TRUE)
+str(mosaic2_coords) # level = 1 or 2 since 2 vars involved. Need to plot only level 2
+p <- ggplot(mosaic2_coords[mosaic2_coords$level==2,]) + 
+  geom_rect(aes(xmin=l, xmax=r, ymin=b, ymax=t, fill=marital, color=happy)) +
+  scale_color_discrete (c=0, l=100) +
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        axis.text.y = element_text(),
+        axis.text.x = element_blank())
+ggplotly(p, tooltip = c("fill", "color")) 
+```
 
 ### Advantages
 1. plotly_click allows for aggregate brushing for discrete vars. BUT can be extended to aggregate plots of real-valued variables? (eg. histograms, hexbins?)
@@ -320,17 +348,108 @@ ggplotly(p, tooltip = c("fill", "color"))
 * SharedData environment needs to be activated in R before launching Shiny app. See: 
 https://github.com/ropensci/plotly/blob/51e159ba825b007657c1d7534825ef25afc7e7af/demo/shiny/basic/app.R
 
-## GGobi
-* ggobi may set the benchmark of interactive techniques possible and help identify gaps.
-* rggobi R package is useful for getting data in and out of ggobi, but otherwise interaction is all carried out independent of R.
+## trelliscopejs
+* See <https://hafen.github.io/trelliscopejs/#why>
+* `Trelliscope` (the predecessor of `trelliscopejs`) was focused on catering for large ds and it was built on a different platform (and not a JavaScript library like `trelliscopejs`).
+    + `trelliscopejs` currently not catering for very large ds.
+* `trelliscopejs` talks back to R? 
+    + Yes, one of the aims is for the user to be able to record their interaction for sharing.
+    + See *Viewer improvements...* in <https://hafen.github.io/trelliscopejs/#upcoming-work>
+    + BUT I can still use R console while interacting with `trelliscopejs` in both the viewer AND the pop-out Viewer Zoom window in RStudio.
+* `trelliscopejs` is like trellis plots with the added interactivity of being able to filter and sort panels of multiple trellis plots based on "cognostic" summaries of the data.
+    + "cognostic" = diagnostics guided by computers (term proposed by Tukey)
+    + Cognostics in `trelliscopejs`: Statistical summaries automatically calculated for the subsets that are created by interactive filtering.
+    + Defualt cognostics automatically calculated by `trelliscopejs`:
+        - Mean for all numeric vars (whether used is current aes or not)
+        - Value of the categorical vars used in the subsetting/ the "conditioning variables" (will not display the values for other categorical vars that were not used to subset the data and 'trellis' the plots, this would require something like a list of counts)
+    + Customised cognostics possible: eg.
+* `trelliscopejs` produces *small multiple plots which can be navigated with respect to the summaries*
+* Interactive options on sidebar:
+    + `Grid`: # rows and cols of plots for each panel, and order by row or col.
+    + `Labels`: The cognistic summaries to display below each plot (ie. mean for the subset across all the numeric vars in ds, count for subset and categorical values defining the subset)
+    + `Filter`: Selection plots to view based on cognistics (same list as in Labels)
+    + `Sort`: Ordering of plots based on values of cognistics.
+* Low level functions: 
+    + `facet_trelliscope()`: Use in place of `facet_wrap()` in `ggplot2` (turns it into a interactive faceted plot rather than a static one)
+        - `path` arguments sets the directory where you want the displays to be saved and accessed for viewing
+    + `trelliscope()`: Use when you want to customise cognostics (ie. calculate and display summary stats other than the defaults calculated by `facet_trelliscope()`) 
+        - Use with a "tidy" workflow: group data for computing summaries for each group (using `dplyr` or `tidyr`) and then use `trelliscope()` to display the summary stats alongside (below) the plots of the subsets
+* `trelliscopejs` is an `htmlwidget` interface to the JavaScript library by the same name (`trelliscopejs-lib` - allows for the interactive viewing). 
+
+### trelliscopejs and `rbokeh`: 
+* See <https://hafen.github.io/trelliscopejs/#getting-started>
+* `figure()` is the equivalent of `ggplot()` in `rbokeh`.
+* `ly_points()` has `hover=` argument.
+* `rbokeh` similar to `plotly`? YES
+    + `rbokeh` requires more code to display hover tips
+    + `rbokeh` + `trelliscopejs` has explicit examples, not so with `plotly` (currently I cannot get working)
+* Can use `plotly` instead of `rbokeh`?
+* `rbokeh` less "integrated" to R/Shiny than `plotly` currently is (Shiny interactive functions for `plotly`, like `event_data()`).
+* `bokeh` is popular with Python users (Yu Han).
+    
+### trelliscopejs and `plotly`
+* See <https://plot.ly/r/shinyapp-explore-diamonds/>
+* Currently using plotly it's plotting all of the data in each plot, rather than the subset.  See `trelliscope_example.R`.
 
 ### Advantages
-1. Everything is in-house (ie. it is a complete pipeline and does not need add-ons to achieve the interactive techniques). 
-2. Statistical functions that respond directly to interaction.
+* Intended for exploratory data analysis (easy, quick) and in some ways for presentation/communication of exploration to others (see next point)
+* R Console still works while interacting in the RStudio Viewer panel and the pop-out Viewer Zoom window (with different interactions)
+* Easy to understand for "non-data-scientists" or domain experts
+    + A communication tool between data scientists and their audience or those they collaborate with.
+* Exemplifies *small multiples* as an interactive technique:
+    + breaking up the dataset into multiple plots of the subsets - what a trellis plot achieves.
+    + small multiples = *where data are split into groups and a plot is made for each group, with the resulting plots arranged in a grid.*
+    + Easy and quick to create small multiple plots, hence well suited for EDA where some may be dead ends and want to reiterate rapidly.
+    + Tufte, *Visual Display of Quantitative Info*: Understanding how to read one *slice* allows the user to access all of the data via the other slices. *Allows viewer to focus on changes in the data rather than changes in the graphical design*.
+    + Slicing data to allow for multiple views is useful when there are many vars involved.
+        - Uses one or more vars to determine how to splice up data.
+        - For each subset plot the data using one or two vars.
+        - More effective than 3D visualisation and can scale up higher than 3D.
+    + Resolves problems w overplotting and allows detailed views.
+    + Scalable since does not require all points to be plotted in one view.
+        - The "cognostic" panels guide the user to the panels w the "most interesting content"
+* The *input combinations represented as cognostics* allows for many outcomes to be compared simultaneously.
+    + As opposed to apps that allows a few inputs and then the plot updates.
+* Easy to use with `ggplot2` and `lattice`. 
+    + `rbokeh` recommended rather than `ggplot2` since its faster at drawing panels of plots. See <https://hafen.github.io/trelliscopejs/#gapminder_data> 
+* Combinations for how the dataset can be subsetted are easily generated in `trelliscopejs`.
+* `trelliscopejs` graphics can be shared as standalone apps or embedded in RMarkdown notebooks.
+    + For use in RMarkdown: Must set argument `self_contained=TRUE` (in either `facet_trelliscope()` or `trelliscope()` function).
+        - This loads all of the plot dependencies onto the html page instead of saving in separate files for access as they are viewed. Do NOT set as TRUE otherwise, since this is esp expensive when there are many panels and hence is more efficient to load on demand rather than all at the beginning.
+        
+### Disadvantages
+* See Hafen's "to do's" for `trelliscopejs` <https://hafen.github.io/trelliscopejs/#upcoming-work>
+* Underdevelopment still (not so much stackexchange 'help' out there)
+* Specific to *small multiples* interaction (filtering and sorting of trellis plots). Uses linked brushing when filtering by a continous var. Limited in scope of interaction or user customisation opportunities. Cannot really 'get under the hood'.
+* Will take a while to load all panels for large ds.
+    + Focus of `trelliscope` was for use w large ds.
+    + Initial/current focus of `trelliscopejs` is on the interface 
+* Aware of the usefulness of being able to record interaction (see link above on 'upcoming work')
+    + *We would also like to make the viewer be able to track and share state*
+* The target users of `trelliscopejs` may be limited (landing in between those who want to code and those who don't). `trelliscopejs` may be more like the user interfaces provided by commercial software like `Tableau` but on a much smaller scale (and hence not able to compete)
+    + It provides a very user-friendly user interface but leaves little room for the user to modify, customise or design their own user interface. This may not appeal to users who can code. 
+    + `Shiny` on the other hand provides the flexibility for customisation of the interaction interface to whatever extent the user's coding skills allows.
+    + The user-friendly interface appeals to users who do not want to code or have limited coding skills, but they may be unmotivated to learn the minimal amount of coding that is necessary to use `trelliscopejs` for just one specific interaction technique (*small multiples*). Especially if there are more comprehensive (commercial) ready-to-use interaction interfaces available, like `Tableau`.
+
+## ggvis 
+* http://ggvis.rstudio.com/ggvis-basics.html
+* R package that is ike a combination of Shiny and Plotly, under development, likely to change quite a bit.
+* Has a similar layer ggplot2/plotly approach to plotting with ~ before vars and piping %>%.
+* Comments on tooltip here are useful: https://github.com/rstudio/ggvis/blob/master/R/interact_tooltip.R
+    + Tooltip identification allows only ONE aes to be identified
+    + Like plotly, only uses data columns used in the plot BUT can "use a key to line up the item from the plot with a row in the data".
+    
+### Disadvantages
+* Cannot use R Console when interacting with a ggvis plot: "every interactive ggvis plot must be connected to a running R session"
+* Likely to change.
+* Tooltip identification only allows 1 var, but may be able to display a var that is not an aes from the plot (see above).
+
+## R Base graphics
+* Some interaction techniques are possible. See example from Paul (email attachment)
 
 ### Disadvantages
-1. Open source but difficult to install due to specific software requirements.
-2. Easy to publish? Export options? Sharing options?
+* Relatively slow at drawing graphics compared to a browser platform, but base plots will be faster at rendering plots in R than grid plots, like ggplot2 (see runtime.R).
+* Possible, but difficult to locate interaction (ie. click location) since raster images are used.
 
 ## Large datasets
 * Current interaction tools can help when there is a large number of variables, through filtering inputs, but when there is a large number of observations, problems with over plotting and time taken to create plots, get in the way of using these tools for meaningful interactions.
@@ -352,13 +471,18 @@ https://github.com/ropensci/plotly/blob/51e159ba825b007657c1d7534825ef25afc7e7af
 
 ## General comments 
 ### Indirect and direct manipulation
-* NOT equivalent to off-plot and on-plot interaction?
+* NOT equivalent to off-plot and on-plot interaction! "Direct manipulation" is a compsci term, becareful how you use it.
     + on-plot: user interaction with the plot region (eg. brushing, hovering on a plot feature).
     + off-plot: user interaction with widgets that are not in the plot region (eg. Shiny inputs, htmlwidgets frames). (htmlwidgets will a mixture of on-plot and off-plot interactions)
 * See *Linking views without Shiny* in:  https://cpsievert.github.io/plotly_book/linking-views-without-shiny.html
     + Indirect manipulation useful when the ‘unit(s) of interest’ cannot be easily located on the graphical space. 
     + Powerful to use both indirect and direct manipulation if they are synced. 
   eg. Select city from drop down menu to highlight plot (indirect) AND click on plot to have city appear in selection box (direct).
+  
+### Low-level and high-level programming:
+    - low-level: harder to do since the language is 'closer' to the computer's 'native' language.
+    - high-level: easier for the common user since the functions or commands will be 'translated' by intermediateries to the language that directly giving instructions to the computer.
+    - eg. ggobi has a complex 'native' programming language, through rggobi, R provides a high-level programming language for more users to access the capabilities of ggobi. (Using ggobi via it's GUI does not require programming but you would be using it as a standalone)
 
 ### (Plotly+Shiny) vs (Plotly+Crosstalk)
 * Linking requires either (plotly+shiny) or (plotly+crosstalk).
@@ -375,7 +499,58 @@ https://github.com/ropensci/plotly/blob/51e159ba825b007657c1d7534825ef25afc7e7af
 * Established skills in extracting, querying, wrangling large ds, laying the foundations for further work with large ds. Mentions visualisation in some parts.
 * Picking up ’bad habits’ from overuse of stack exchange etc. (e.g. use of for loops that would be inefficient for large ds).
 
+## Possible datasets 
+### From Unwin book:
+* Small datasets for teaching purposes (p.24)
+    + Statlib at Carnegie Mellon University
+        - <http://lib.stat.cmu.edu/datasets/>
+    + UCI's Machine Learning repository: for studying algorithms
+        - <http://archive.ics.uci.edu/ml/>
+* UC Berkley dataset (p.9)
+    + 3 categorical vars, add Shiny slider to display arrangements for a mosaic plot (reveal levels)
+* Parallel coord plots: Use `iris` data set (p.105)
+    + Brings out the clustering by the 3 species
+    + Experiment with different scaling of axes, orderings, identify associations (compare with bivariate scatterplot)
+    + Not possible to see the clustering if just used linked scatterplots? Or scatterplot matrix?
+    + Compare to a 2D tour?
+    + Shiny interaction to 'cycle' through different orderings of axes. Similarly w diff axes scaling (checkbox input)
+    + Order vars on axes by amount of difference between groups (F-statistic) (see p.120)
+    + Order of colouring obs important since the last group will be on top. Selected group should always be last to be plotted, so that it is above the rest.
+* Changes in NZ Consumer Price Index over the years using paralle coord plots
+    + See `Pcps for indices` under `Parallel coord plots`
+    + Unwin p.113
+* Mosaic plots for `Berkley` admissions' dataset is a common example
+    + See: <http://www.theusrus.de/blog/understanding-mosaic-plots/>
+    + An example of Simpson's paradox (where a conclusion appear true for the subsets but then disappears of reverses for the aggregate)
+* Tour de France datasets analysed using Mondrian
+    + Interesting short clip (10mins) of how interactive graphics (esp showcasing parallel coord plots) can be used to identify patterns in context. Good commentary (by Unwin, using data and software from Theus) <http://www.theusrus.de/blog/the-tour-is-over-long-live-the-tour/>
+    + Showcases the applications of changing scale on axes of parallel coord plots.
+        - Aligning times at each stage by the median time allows for comparison with the main bunch of riders, the peloton.
+        - Comparing w the winner's times identifies which stages other riders gained on him.
+        - In `ggparcoord` the arg `scale="center"` allows for scaling of each var's axes individually (eg. based on each var's median), so would need to manually center the data first (subtract the median time from the values), then plot (leaving `scale="globalminmax"`). (See p.115 and 116 for more info on scaling) 
+    + Links to download and tutorial for Mondrian software
+        - <http://www.theusrus.de/Mondrian/>
+
 ## Reading list
 * Wickham, Hadley, Michael Lawrence, Dianne Cook, Andreas Buja, Heike Hofmann, and Deborah F Swayne. 2010. “The Plumbing of Interactive Graphics.” Computational Statistics, April, 1–7.
 
 * Anthony Unwin’s Graphical Data Analysis with R (CRC Press 2015)
+
+* GGobiMeetsR (2001)
+<https://www.r-project.org/conferences/DSC-2001/Proceedings/TempleLangSwayne.pdf>
+    + Code may be outdated but some good ideas
+
+* IntroGGobi
+<http://www.ggobi.org/rggobi/introduction.pdf>
+    + Not sure about how up-to-date this is but seems to be a general intro (directly from the rggobi site)
+
+* ExtendingGGobi (2008)
+<https://link-springer-com.ezproxy.auckland.ac.nz/article/10.1007/s00180-008-0115-y>
+    + Most recent publication (I have found so far) on rggobi
+
+* Cook and Swayne book website
+<http://www.ggobi.org/book/index.html>
+    + Code used in book and can get datasets from here
+
+* Other courses
+    + See Dropbox: Using_Interactive_Graphics_to_Teach_Multivariate_D.pdf
