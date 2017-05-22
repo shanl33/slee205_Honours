@@ -8,13 +8,22 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Questions
-* Do I have to cite a specific source when making "common statements"?
-    + eg. Order of vars for a parallel coord point is impt?
-    + Choice of file type for image (raster vs scalable)
+* Is `cranvas` worth investigating.
+    + See <http://cranvas.org/>  
+    + *aims to be the next generation of GGobi*
+    + BUT not on CRAN and last update seems to be 2013
+    + Demos shows brush linking, zooming, alpha blending.
+    + `qparallel()` specifically for parallel coord plots
+    + Installation of `Qt` required
     
 ### Answered
 * `Acinonyx` R package is a possible successor for `iplots`? YES
 * `rggobi` and `iplots` packages are installed on postgrad uni lab machines.
+    + Cannot install `iplots` on my personal laptop (cashes RStudio) 
+    + NO `Describe Display` plugin in GGobi on the uni machines.
+* Do I have to cite a specific source when making "common statements"? quote from someone or from a study (or via a demonstration)
+    + eg. Order of vars for a parallel coord point is impt?
+    + Choice of file type for image (raster vs scalable)
 
 ## To do's
 * Large ds and applications 
@@ -234,7 +243,7 @@ observeEvent(input$new, {
 * plot_ly() interacts more directly with plotly.js and hence generally not as ‘expensive’ as ggplotly(). Maybe faster with large ds?
   
 ### Advantages
-1. Easy to convert ggplot2 plots into plotly objects using ggplotly().
+1. Easy to convert ggplot2 plots (including plots from `GGally` package) into plotly objects using ggplotly().
     + With ggplot2 brings the flexibility of creating a wide range of plots. plot_ly() not as extensive in graphics, but interacts more directly with plotly's javascript library.
 2. Aesthetically appealing output (publish-ready).
 3. Defaults: Tooltip identification of aesthetics, scaling.
@@ -250,7 +259,8 @@ observeEvent(input$new, {
     + Lasso/click drag selection very slow and hard to control, difficult to use for exploration.
 3. Tooltip default for comparing values can only compare a maximum of 4 obs?
 4. Tooltip identification for area plots (bar charts) a bit hit and miss? Esp with ggplot2 plots? Does not take all categorical labels with it when passed thru ggplotly()?
-5. Tooltip can only identify aesthetics of the plot 
+5. Cannot brush (select) edges or nodes of parallel plots.
+    + Can "click" on nodes but only records one observation
 
 ## Crosstalk (htmlwidgets, highchartr?)
 * https://rstudio.github.io/crosstalk/using.html
