@@ -8,15 +8,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Questions
-* Is `cranvas` worth investigating.
-    + See <http://cranvas.org/>  
-    + *aims to be the next generation of GGobi*
-    + BUT not on CRAN and last update seems to be 2013
-    + Demos shows brush linking, zooming, alpha blending.
-    + `qparallel()` specifically for parallel coord plots
-    + Installation of `Qt` required
-    
+
 ### Answered
+* Is `cranvas` worth investigating? 
+    + NO, difficult to install and appears to be not in development anymore.
+    + Will not exceed ggobi's capabilities.
 * `Acinonyx` R package is a possible successor for `iplots`? YES
 * `rggobi` and `iplots` packages are installed on postgrad uni lab machines.
     + Cannot install `iplots` on my personal laptop (cashes RStudio) 
@@ -32,12 +28,10 @@ knitr::opts_chunk$set(echo = TRUE)
     + 'capture' an useful view or brushed selection
 * Shiny sliders:
     + cycling of combinations of possible vars for scatterplot and mosaic plots (2 to 3 vars only)
-* Tableau <https://public.tableau.com/s/>
-    - See if there are any interaction techniques that have not been demonstrated using other tools (esp ggobi)
 * Use interactive environments in Shiny to record interactions and send them back to R (and back again?). 
     + See *Interactive environments in Shiny* section
 
-### Focus on making/finding examples that..
+##### Focus on making/finding examples that..
 * Connect with statistical analysis or some part of EDA. For example:
     + Interactive graphics for examining missingness
 * Bridge R/Shiny and "EDA/GDA-focused interactive software" to demonstrate how the transition from interactive graphics for exploratory analysis to presenting can be "effortless" and hence encourage ppl to use more interactive graphics in all stages of data analysis.
@@ -47,6 +41,88 @@ knitr::opts_chunk$set(echo = TRUE)
         - Send these optimal views to `R` via `rggobi`
         - Re-create the principal component plots (?) in `R` to use in a `Shiny` app to PRESENT results of the grand tour.
         - NOT focus on trying to replicate a grand 2D tour in another tool (ie.`R` and/or `Shiny`).
+
+## Virtual Machine
+* Software to have on VM:
+    + R (RStudio if possible?) with the following packages:
+        - rggobi
+        - DescribeDisplay
+        - shiny
+        - plotly (requires ggplot2)
+        - crosstalk: devtools::install_github("rstudio/crosstalk")
+        - iplots (?)
+        - dplyr
+        - tidyr
+        - ggally (requires ggplot2)
+    + ggobi
+    + Mondrian
+    + Manet
+* Installation:
+    + Download VirtualBox from <https://www.virtualbox.org/>
+    + MAC: If stuck on verifying see: <http://osxdaily.com/2016/07/26/fix-stuck-pkg-verifying-installer-mac-os-x/>
+    + Transfer files from USB.
+    + BEFORE starting a session in VirtualBox change the "Shared Folder" directory to where you saved the USB files.
+    + Start session in VirtualBox (search for Terminal etc)
+
+* ggobi/rggobi
+    + ggobi control window is on the Terminal option menu (rather than a separate window)
+    + `DescribeDisplay` ggobi plugin is installed but R package yet to be installed.
+
+## Tableau
+* See: <http://onlinehelp.tableau.com/current/pro/desktop/en-us/actions.html>
+* Tableau interactive visualisation can be shared via it's web application framework ('Tableau Public` <https://public.tableau.com/s/>)
+* `URL Action` (hyperlink w results from other actions) is an additional technique that other tools may not have.
+
+### Interactive techniques ("Actions" in Tableau)
+
+```{r table1, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+tabl <- "
+| Technique | Tableau |
+|-----------|-------------------------------------------------------------|
+| Identification | Y |
+| Scaling | Y (zoom, pan) |
+| Subset selection | Y (Filter action) |
+| Drag points |  |
+| Brushing | Y (Highlight action) |
+| Linking |Y (between mutliple views within a dashboard) |
+| Specify URL | Insert hyperlinks with interactive results in parts of the url address (URL action)<br>eg. Filter result as the search keyword for a website |
+"
+cat(tabl)
+```
+
+## Alteryx
+* See <https://community.alteryx.com/t5/Analytics-Blog/Interactive-Visualizations-for-Predictive-Analytics-with-Alteryx/ba-p/3605>
+* Drag-and-drop interface
+* Difficult to share with non-Alteryx users: 
+    + The examples on the internet are all static images or videos, viewer can't "play" with the interactive visualisation without having the Alteryx software
+* Connect with `Tableau`.
+* "Added interactive dashboard outputs" to specific `Predictive Analytics` tools. 
+    + Each interactive dashboard is different depending on the tool at hand.
+        - Seems like the interactive techniques are designed very specifically for the specific type of "predictive analysis" tool.
+        - So an interactive technique that is possible in one dashboard may not be available in another dashboard.
+     + The 9.5 version focused on 4 dashboards: <https://www.slideshare.net/Alteryx/inspire-2015-interactive-visualizations>
+    + The 10.0 version focused on the dashboards of the following:
+        - `Field Summary` tool
+        - `Time Series` tool
+        - `Network Analysis` tool
+    + The latest version 11.0 doesn't seem to have any additional interactivity, but otherwise they seem to be adding techniques on as they see the need arise.
+
+### Interactive techniques (for dashboards of specific "tools" in Alteryx)
+
+```{r table2, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+tabl <- "
+| Technique | Alteryx |
+|-----------|-------------------------------------------------------------|
+| Identification | Y |
+| Scaling | Y (eg. Time Series tool)|
+| Subset selection | Y (filter and sort)|
+| Drag points | Y (Network Analysis tool) |
+| Brushing | Y |
+| Linking |Y (between mutliple views within a dashboard) |
+"
+cat(tabl)
+```
+
 
 ## ggobi/rggobi
 * See <http://www.ggobi.org/docs/>
@@ -82,7 +158,7 @@ knitr::opts_chunk$set(echo = TRUE)
         - Need to save to file in ggobi first and then load into R 
         - Can re-create using either plot() or ggplot()
 
-```{r}
+```{r, eval=FALSE}
 library(rggobi)
 # Transfering data between R and ggobi.
 ## Initiates ggobi and transfers mtcars data set from R
@@ -144,6 +220,7 @@ brushing." and "Basic plot control"
         - Advanced options (eg. using ASH)
         - Easily drag to change order of axes
         - Brush node to select (or edge)
+        - BUT cannot do some Mondrian interactions (see disadvantages) 
 
 #### Advantages
 * Very fast and flexible
@@ -161,6 +238,8 @@ brushing." and "Basic plot control"
 * Very specialised, only useful if you know what you are doing!
 * Easy to publish? Export options? Sharing options?
     + Movie clips seem to be one of the main ways of documenting visual interactions in ggobi (see website demos). Raster images, pre-recordered, cannot be interactive "again" during presentation.
+* Parallel coord plots: 
+    + Cannot change axes scaling (eg. use global max min for scaling, or align to median)
 
 ## Shiny
 * http://shiny.rstudio.com/reference/shiny/latest/
@@ -183,7 +262,7 @@ brushing." and "Basic plot control"
 * Possible differences between `eventReactive()` and `observeEvent()` (used below):
     - `eventReactive()` delays code running while `observeEvent()`'s code in second argument is triggered straight away by the `input$___` (first arg).
     - Hence `eventReactive()` can be assigned as a var and executed in another chunk of server output code (ie. it becomes a "reactive expression"/global variable)
-```{r}
+```{r, eval=FALSE}
 # You can define a plotly_click event as a reactive expression and then use s() and a() to create (multiple) Shiny outputs
   s <- reactive({event_data("plotly_click", source = "obs")})
   a <- reactive({poisdp(s()$x, mu(), prior(), plot = FALSE)})
@@ -316,25 +395,6 @@ observeEvent(input$new, {
     + Comment at bottom of page on using geom_mosaic with Plotly has been masked
     + It uses the  productplot package but seems to disable the productplot package with errors (resolved by installing productplot from CRAN again). The version of productplot used in ggmosaic outdated?
     + Currently cannot get ggmosaic working
-```{r}
-install.packages("productplots")
-library(productplots)
-library(ggplot2)
-library(plotly)
-data("happy")
-prodplot(happy, ~ marital + happy, c("vspine", "hspine"), na.rm = TRUE) + aes(fill=marital)
-mosaic2_coords <- prodcalc(happy, ~ marital + happy, c("vspine", "hspine"), na.rm = TRUE)
-str(mosaic2_coords) # level = 1 or 2 since 2 vars involved. Need to plot only level 2
-p <- ggplot(mosaic2_coords[mosaic2_coords$level==2,]) + 
-  geom_rect(aes(xmin=l, xmax=r, ymin=b, ymax=t, fill=marital, color=happy)) +
-  scale_color_discrete (c=0, l=100) +
-  theme(panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        axis.title = element_blank(),
-        axis.text.y = element_text(),
-        axis.text.x = element_blank())
-ggplotly(p, tooltip = c("fill", "color")) 
-```
 
 ### Advantages
 1. plotly_click allows for aggregate brushing for discrete vars. BUT can be extended to aggregate plots of real-valued variables? (eg. histograms, hexbins?)

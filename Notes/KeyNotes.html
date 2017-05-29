@@ -120,36 +120,470 @@ $(document).ready(function () {
 </div>
 
 
+<div id="questions" class="section level2">
+<h2>Questions</h2>
+<div id="answered" class="section level3">
+<h3>Answered</h3>
+<ul>
+<li>Is <code>cranvas</code> worth investigating?
+<ul>
+<li>NO, difficult to install and appears to be not in development anymore.</li>
+<li>Will not exceed ggobi’s capabilities.</li>
+</ul></li>
+<li><code>Acinonyx</code> R package is a possible successor for <code>iplots</code>? YES</li>
+<li><code>rggobi</code> and <code>iplots</code> packages are installed on postgrad uni lab machines.
+<ul>
+<li>Cannot install <code>iplots</code> on my personal laptop (cashes RStudio)</li>
+<li>NO <code>Describe Display</code> plugin in GGobi on the uni machines.</li>
+</ul></li>
+<li>Do I have to cite a specific source when making “common statements”? quote from someone or from a study (or via a demonstration)
+<ul>
+<li>eg. Order of vars for a parallel coord point is impt?</li>
+<li>Choice of file type for image (raster vs scalable)</li>
+</ul></li>
+</ul>
+</div>
+</div>
 <div id="to-dos" class="section level2">
 <h2>To do’s</h2>
 <ul>
-<li>How to access ggplot() + geom_mosaic(): <a href="https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html" class="uri">https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html</a></li>
+<li>Large ds and applications</li>
+<li>Look at other data visualisation courses (see Reading List section)</li>
+<li>Look at documenting interactions when used for exploration
+<ul>
+<li>‘capture’ an useful view or brushed selection</li>
+</ul></li>
+<li>Shiny sliders:
+<ul>
+<li>cycling of combinations of possible vars for scatterplot and mosaic plots (2 to 3 vars only)</li>
+</ul></li>
+<li>Use interactive environments in Shiny to record interactions and send them back to R (and back again?).
+<ul>
+<li>See <em>Interactive environments in Shiny</em> section</li>
+</ul></li>
+</ul>
+<div id="focus-on-makingfinding-examples-that.." class="section level5">
+<h5>Focus on making/finding examples that..</h5>
+<ul>
+<li>Connect with statistical analysis or some part of EDA. For example:
+<ul>
+<li>Interactive graphics for examining missingness</li>
+</ul></li>
+<li>Bridge R/Shiny and “EDA/GDA-focused interactive software” to demonstrate how the transition from interactive graphics for exploratory analysis to presenting can be “effortless” and hence encourage ppl to use more interactive graphics in all stages of data analysis.
+<ul>
+<li>ie. Use the popularity of Shiny to encourage use of other interactive software, like <code>ggobi</code>.</li>
+<li><code>ggobi</code> and <code>rggobi</code> in <code>R</code> to <code>Shiny</code>:
+<ul>
+<li>EDA in <code>ggobi</code>: Use grand 2D tour to identify views where clusters are most clearly defined.</li>
+<li>Send these optimal views to <code>R</code> via <code>rggobi</code></li>
+<li>Re-create the principal component plots (?) in <code>R</code> to use in a <code>Shiny</code> app to PRESENT results of the grand tour.</li>
+<li>NOT focus on trying to replicate a grand 2D tour in another tool (ie.<code>R</code> and/or <code>Shiny</code>).</li>
+</ul></li>
+</ul></li>
 </ul>
 </div>
-<div id="r-base-graphics" class="section level2">
-<h2>R Base graphics</h2>
+</div>
+<div id="virtual-machine" class="section level2">
+<h2>Virtual Machine</h2>
 <ul>
-<li>Some interaction techniques are possible. See example from Paul (email attachment)</li>
-</ul>
-<div id="disadvantages" class="section level3">
-<h3>Disadvantages</h3>
+<li>Software to have on VM:
 <ul>
-<li>Relatively slow at drawing graphics compared to a browser platform, but base plots will be faster at rendering plots in R than grid plots, like ggplot2 (see runtime.R).</li>
-<li>Possible, but difficult to locate interaction (ie. click location) since raster images are used.</li>
+<li>R (RStudio if possible?) with the following packages:
+<ul>
+<li>rggobi</li>
+<li>DescribeDisplay</li>
+<li>shiny</li>
+<li>plotly (requires ggplot2)</li>
+<li>crosstalk: devtools::install_github(“rstudio/crosstalk”)</li>
+<li>iplots (?)</li>
+<li>dplyr</li>
+<li>tidyr</li>
+<li>ggally (requires ggplot2)</li>
+</ul></li>
+<li>ggobi</li>
+<li>Mondrian</li>
+<li>Manet</li>
+</ul></li>
+<li>Installation:
+<ul>
+<li>Download VirtualBox from <a href="https://www.virtualbox.org/" class="uri">https://www.virtualbox.org/</a></li>
+<li>MAC: If stuck on verifying see: <a href="http://osxdaily.com/2016/07/26/fix-stuck-pkg-verifying-installer-mac-os-x/" class="uri">http://osxdaily.com/2016/07/26/fix-stuck-pkg-verifying-installer-mac-os-x/</a></li>
+<li>Transfer files from USB.</li>
+<li>BEFORE starting a session in VirtualBox change the “Shared Folder” directory to where you saved the USB files.</li>
+<li>Start session in VirtualBox (search for Terminal etc)</li>
+</ul></li>
+<li>ggobi/rggobi
+<ul>
+<li>ggobi control window is on the Terminal option menu (rather than a separate window)</li>
+<li><code>DescribeDisplay</code> ggobi plugin is installed but R package yet to be installed.</li>
+</ul></li>
 </ul>
+</div>
+<div id="tableau" class="section level2">
+<h2>Tableau</h2>
+<ul>
+<li>See: <a href="http://onlinehelp.tableau.com/current/pro/desktop/en-us/actions.html" class="uri">http://onlinehelp.tableau.com/current/pro/desktop/en-us/actions.html</a></li>
+<li>Tableau interactive visualisation can be shared via it’s web application framework (’Tableau Public` <a href="https://public.tableau.com/s/" class="uri">https://public.tableau.com/s/</a>)</li>
+<li><code>URL Action</code> (hyperlink w results from other actions) is an additional technique that other tools may not have.</li>
+</ul>
+<div id="interactive-techniques-actions-in-tableau" class="section level3">
+<h3>Interactive techniques (“Actions” in Tableau)</h3>
+<table>
+<colgroup>
+<col width="16%"></col>
+<col width="83%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Technique</th>
+<th>Tableau</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Identification</td>
+<td>Y</td>
+</tr>
+<tr class="even">
+<td>Scaling</td>
+<td>Y (zoom, pan)</td>
+</tr>
+<tr class="odd">
+<td>Subset selection</td>
+<td>Y (Filter action)</td>
+</tr>
+<tr class="even">
+<td>Drag points</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Brushing</td>
+<td>Y (Highlight action)</td>
+</tr>
+<tr class="even">
+<td>Linking</td>
+<td>Y (between mutliple views within a dashboard)</td>
+</tr>
+<tr class="odd">
+<td>Specify URL</td>
+<td>Insert hyperlinks with interactive results in parts of the url address (URL action)<br>eg. Filter result as the search keyword for a website</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="alteryx" class="section level2">
+<h2>Alteryx</h2>
+<ul>
+<li>See <a href="https://community.alteryx.com/t5/Analytics-Blog/Interactive-Visualizations-for-Predictive-Analytics-with-Alteryx/ba-p/3605" class="uri">https://community.alteryx.com/t5/Analytics-Blog/Interactive-Visualizations-for-Predictive-Analytics-with-Alteryx/ba-p/3605</a></li>
+<li>Drag-and-drop interface</li>
+<li>Difficult to share with non-Alteryx users:
+<ul>
+<li>The examples on the internet are all static images or videos, viewer can’t “play” with the interactive visualisation without having the Alteryx software</li>
+</ul></li>
+<li>Connect with <code>Tableau</code>.</li>
+<li>“Added interactive dashboard outputs” to specific <code>Predictive Analytics</code> tools.
+<ul>
+<li>Each interactive dashboard is different depending on the tool at hand.
+<ul>
+<li>Seems like the interactive techniques are designed very specifically for the specific type of “predictive analysis” tool.</li>
+<li>So an interactive technique that is possible in one dashboard may not be available in another dashboard.</li>
+</ul></li>
+<li>The 9.5 version focused on 4 dashboards: <a href="https://www.slideshare.net/Alteryx/inspire-2015-interactive-visualizations" class="uri">https://www.slideshare.net/Alteryx/inspire-2015-interactive-visualizations</a></li>
+<li>The 10.0 version focused on the dashboards of the following:
+<ul>
+<li><code>Field Summary</code> tool</li>
+<li><code>Time Series</code> tool</li>
+<li><code>Network Analysis</code> tool</li>
+</ul></li>
+<li>The latest version 11.0 doesn’t seem to have any additional interactivity, but otherwise they seem to be adding techniques on as they see the need arise.</li>
+</ul></li>
+</ul>
+<div id="interactive-techniques-for-dashboards-of-specific-tools-in-alteryx" class="section level3">
+<h3>Interactive techniques (for dashboards of specific “tools” in Alteryx)</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Technique</th>
+<th>Alteryx</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Identification</td>
+<td>Y</td>
+</tr>
+<tr class="even">
+<td>Scaling</td>
+<td>Y (eg. Time Series tool)</td>
+</tr>
+<tr class="odd">
+<td>Subset selection</td>
+<td>Y (filter and sort)</td>
+</tr>
+<tr class="even">
+<td>Drag points</td>
+<td>Y (Network Analysis tool)</td>
+</tr>
+<tr class="odd">
+<td>Brushing</td>
+<td>Y</td>
+</tr>
+<tr class="even">
+<td>Linking</td>
+<td>Y (between mutliple views within a dashboard)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="ggobirggobi" class="section level2">
+<h2>ggobi/rggobi</h2>
+<ul>
+<li>See <a href="http://www.ggobi.org/docs/" class="uri">http://www.ggobi.org/docs/</a>
+<ul>
+<li>Teaching ideas (stats concepts linked w demo of how ggobi can be used to explore, reinforce those concepts). Lots of good ideas but need to pick which to focus on.</li>
+<li>Datasets and code from Cook &amp; Swayne book.</li>
+<li>Bibtex references for ggobi readings</li>
+</ul></li>
+<li>ggobi may set the benchmark of interactive techniques possible and help identify gaps.</li>
+<li>Developments to connect with R seem to be active (blog up to 2010). Recently?</li>
+</ul>
+<div id="rggobi" class="section level3">
+<h3>rggobi</h3>
+<ul>
+<li>Code of basics in <code>rGGobi_intro.R</code> (following the <code>introductionRGGobi.pdf</code> from website)</li>
+<li>Transfering data between R and ggobi.
+<ul>
+<li><code>ggobi()</code> function:
+<ul>
+<li>Initiates ggobi in R, by transfering R data to ggobi</li>
+<li>Creates a <code>GGobiData</code> object</li>
+</ul></li>
+<li>In R can retrieve <code>GGobiData</code> objects that are linked to GGobi</li>
+<li>’ggobi_find_file()` function: (??)
+<ul>
+<li>Initiates ggobi in R, by accessing ggobi’s “data” library</li>
+<li>Tried: ggobi(ggobi_find_file(“data”, “olives.csv”))</li>
+<li>Returns blank ggobi control window</li>
+</ul></li>
+</ul></li>
+<li>Control ggobi displays/interactions from R using commands. (TBC)
+<ul>
+<li><code>display()</code> function:
+<ul>
+<li>Inputs: <code>GGobiData</code>, “Name of plot”</li>
+</ul></li>
+<li><code>variables()</code> function: Two forms
+<ol style="list-style-type: decimal">
+<li>Returns the ggobi X, Y, Z values of its argument, the <code>display()</code>.</li>
+<li>Sets the attribute: <code>variables() &lt;-</code> allows you to assign values to control interaction via R commands.</li>
+</ol></li>
+</ul></li>
+<li>Recording interactions in ggobi (and transfering record to R). (TBC)
+<ul>
+<li>ggobi allows interactions to be recorded (independent of R) and exported as movie clips (see Disadvantages)</li>
+<li><code>ggobi_display_save_picture()</code> captures ggobi display as a raster image on file.</li>
+<li><code>DescribeDisplay</code> ggobi plugin and R package (TBC)
+<ul>
+<li>See <a href="http://www.ggobi.org/describe-display/" class="uri">http://www.ggobi.org/describe-display/</a></li>
+<li>Create “R versions” of ggobi plots</li>
+<li>Need to save to file in ggobi first and then load into R</li>
+<li>Can re-create using either plot() or ggplot()</li>
+</ul></li>
+</ul></li>
+</ul>
+<pre class="r"><code>library(rggobi)
+# Transfering data between R and ggobi.
+## Initiates ggobi and transfers mtcars data set from R
+g &lt;- ggobi(mtcars)
+# Get this data back to R (either will work)
+g[[1]]
+g[[&quot;mtcars&quot;]]
+
+# Control GGobi displays/interactions from R using commands.
+# Parallel coordinate plots  ----------------------------------------------------------
+d &lt;- display(g[1], &quot;Parallel Coordinates Display&quot;)
+# Interaction: subsets and re-orders the variables on the axes of plot 
+# Will order subset of vars in ascending number order 
+d &lt;- display(g[1], &quot;Parallel Coordinates Display&quot;) #Displays all vars
+variables(d) 
+variables(d) &lt;- list(X=c(2, 8, 1)) # Displays mpg(1), cyl(2), vs(8)
+# Wanted: cyl(2), vs(8), mpg(1)
+# To try:
+variables(d) &lt;- list(X=c(&quot;mpg&quot;, &quot;cyl&quot;, &quot;vs&quot;))
+
+# The order in which you call up the variables() &lt;- assignments results in different orderings of the axes
+# Sometimes order of (X=#:#) matters 
+d &lt;- display(g[1], &quot;Parallel Coordinates Display&quot;)
+variables(d)
+variables(d) &lt;- list(X=8:6) # Subset: Displays wt(6), qsec(7), vs(8)
+variables(d) &lt;- list(X=8:1) # Reorders
+# If use (X=1:8) above, the final result is 6, 7, 8, 1, 2, 3, .., 5.
+variables(d) # Displays wt(6), qsec(7), vs(8), then drat(5), vs(4), .., mpg(1)</code></pre>
+<div id="thoughts-in-progress-on-rggobi" class="section level4">
+<h4>Thoughts in progress (on rggobi)</h4>
+<ul>
+<li>Focus on: <em>Recording interactions in ggobi (and transfering record to R)</em>, rather than, <em>Control ggobi displays/interactions</em>
+<ul>
+<li>Parallel coordinate plots interaction seems un-intuitive. Re-ordering of axes is possible but tricky since order defaults to ascending the numeric value the var is associated with.
+<ul>
+<li>Check if calling by var name works.</li>
+</ul></li>
+<li>The <code>introductionRGGobi.pdf</code> suggests this area could be limited:
+<ul>
+<li>“Modifying observation-level attributes, or automatic brushing.” and “Basic plot control”</li>
+<li>BUT this document could be dated.</li>
+</ul></li>
+<li>Regardless may be good to focus on how to get a “code record” of interaction via ggobi GUI out, rather than focus on controlling interaction via R commands?
+<ul>
+<li>This would allow us to build on TOP of the teaching ideas offered by ggobi, rather than just write code to replicate the interactions.</li>
+<li>Instead focus on processing the “code record” of interaction that we would get from ggobi and how to analyse that further in R or present it with Shiny and/or other interactive tools.</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="ggobi" class="section level3">
+<h3>ggobi</h3>
+<ul>
+<li>Interaction choices vary according to the type of plot in the active view (eg. the plot you want to brush on)
+<ul>
+<li>All have at least: scale, brush, identify</li>
+<li>Identify:
+<ul>
+<li>Either by hover or display info in console</li>
+<li>Can display any variable value (even those not in plot)</li>
+</ul></li>
+<li>Scatterplots have more interaction options:
+<ul>
+<li>Edit edges: add points or edges</li>
+<li>Move points</li>
+<li>Cycling of pairwise combos for scatterplot axes</li>
+</ul></li>
+<li>Scatter matrix can brush, scale and identify, linking within itself and to other views too</li>
+<li>Bar charts:
+<ul>
+<li>Responds to brushing in other plots by highlighting the proportion brushed (or a highlighted line appears if only one obs brushed)</li>
+<li>More than one bar can be brushed (when initiating interaction from the bar chart)</li>
+</ul></li>
+</ul></li>
+<li>Similarly plot display options vary depending on type of plot
+<ul>
+<li>Parallel coords plot:
+<ul>
+<li>Advanced options (eg. using ASH)</li>
+<li>Easily drag to change order of axes</li>
+<li>Brush node to select (or edge)</li>
+<li>BUT cannot do some Mondrian interactions (see disadvantages)</li>
+</ul></li>
+</ul></li>
+</ul>
+<div id="advantages" class="section level4">
+<h4>Advantages</h4>
+<ul>
+<li>Very fast and flexible
+<ul>
+<li>Can have multiple plots linked at once</li>
+<li>Brushing takes effect immediately using the olive.csv (around 572 obs)</li>
+</ul></li>
+<li>Lots of options for interaction and plot display</li>
+<li>A rich resource for teaching ideas (see website link)</li>
+<li>A wide range of in-house interactions (ie. it is a complete pipeline and does not need add-ons to achieve the interactive techniques).</li>
+<li>Some statistical analyses available that can be applied directly to interaction.</li>
+<li>Currently, probably the best interactive tool for handling large ds.</li>
+</ul>
+</div>
+<div id="disadvantages" class="section level4">
+<h4>Disadvantages</h4>
+<ul>
+<li>Open source but difficult to install due to specific software requirements.
+<ul>
+<li>Ease of installing software (X11 problem on macs only?)</li>
+</ul></li>
+<li>Very specialised, only useful if you know what you are doing!</li>
+<li>Easy to publish? Export options? Sharing options?
+<ul>
+<li>Movie clips seem to be one of the main ways of documenting visual interactions in ggobi (see website demos). Raster images, pre-recordered, cannot be interactive “again” during presentation.</li>
+</ul></li>
+<li>Parallel coord plots:
+<ul>
+<li>Cannot change axes scaling (eg. use global max min for scaling, or align to median)</li>
+</ul></li>
+</ul>
+</div>
 </div>
 </div>
 <div id="shiny" class="section level2">
 <h2>Shiny</h2>
 <ul>
 <li><a href="http://shiny.rstudio.com/reference/shiny/latest/" class="uri">http://shiny.rstudio.com/reference/shiny/latest/</a></li>
+<li>reactive({}) ‘reactive conductors’ (See: <a href="http://rstudio.github.io/shiny/tutorial/#reactivity-overview" class="uri">http://rstudio.github.io/shiny/tutorial/#reactivity-overview</a>)
+<ul>
+<li>reactive conductors sit between reactivity source(s) and endpoints (eg. between a sliderInput and the plotOutputs it updates). This allows any objects defined by reactive({}) to be called as a function in the code for the output plots.</li>
+<li>reactive({}) has the same effect as defining the object as a function (and calling it up as a function in the code for output plots).</li>
+<li>Shiny+Plotly: Using function(){} rather than reactive({}) seems to be better if the object is defined by complicated computations of inputs. Using reactive({}) seems to slow down the tooltip and plotly_click reactivity. (See poisdp.R but need further investigation)</li>
+</ul></li>
+<li>plotOutput() interactivity arguments in ui code:
+<ul>
+<li><a href="https://shiny.rstudio.com/articles/plot-interaction.html" class="uri">https://shiny.rstudio.com/articles/plot-interaction.html</a></li>
+<li>Four interaction arguments: click = “plot_click”, dblclick = “plot_dblclick”, hover = “plot_hover”, brush = “plot_brush”.</li>
+<li>“Results” of interaction are displayed off-plot in text form in the examples on the website, but doesn’t have to be?</li>
+<li>Might not be useful since needs to link up with nearPoints() and brushedPoints() functions in server code which all use pixel approximations (see Disadvantages below)</li>
+</ul></li>
 </ul>
-<div id="advantages" class="section level3">
+<div id="interactive-environments-in-shiny" class="section level3">
+<h3>Interactive environments in Shiny</h3>
+<ul>
+<li>Possible use: Documenting interaction back to R</li>
+<li><code>eventReactive()</code> in Shiny with a <code>actionButton</code>?</li>
+<li>Tips: Double arrow assignment allows you to assign value to a global variable from within a ‘local’ environment
+<ul>
+<li>eg. posterior.global &lt;&lt;- a (where a is a value from within ONE of the output chunks in the server code for the Shiny app)</li>
+</ul></li>
+<li><code>isolate()</code> useful in a reactive environment when you want certain vars to remain the same (unaffected by interaction)</li>
+<li>Possible differences between <code>eventReactive()</code> and <code>observeEvent()</code> (used below):
+<ul>
+<li><code>eventReactive()</code> delays code running while <code>observeEvent()</code>’s code in second argument is triggered straight away by the <code>input$___</code> (first arg).</li>
+<li>Hence <code>eventReactive()</code> can be assigned as a var and executed in another chunk of server output code (ie. it becomes a “reactive expression”/global variable)</li>
+</ul></li>
+</ul>
+<pre class="r"><code># You can define a plotly_click event as a reactive expression and then use s() and a() to create (multiple) Shiny outputs
+  s &lt;- reactive({event_data(&quot;plotly_click&quot;, source = &quot;obs&quot;)})
+  a &lt;- reactive({poisdp(s()$x, mu(), prior(), plot = FALSE)})
+  
+# Updates with a Shiny button
+## ui
+# Button to submit posterior as the &quot;new&quot; prior distn
+actionButton(&quot;new&quot;, &quot;Update posterior as prior&quot;)
+
+## server
+prior &lt;- reactiveValues() # set by user input initially, then it will be updated by posterior.
+  posterior.global &lt;- reactiveValues() # to keep the posterior values for the next round.
+  newButton.reactive &lt;- reactiveValues() # to redraw heatmap by pressing button 
+
+# Uses the initial prior (from the user input text box) if the &quot;update button&quot; has not been used
+if(is.null(posterior.global$posterior)) {
+          prior$obj &lt;- as.numeric(unlist(strsplit(input$prior, &quot;,&quot;)))
+}
+  
+# Using a ______$___ creates a var to attach to a reactiveValues() object. 
+observeEvent(input$new, {
+      if(!is.null(posterior.global$posterior)) {
+          prior$obj &lt;- posterior.global$posterior # update prior (reactive variable) with posterior values in the previouse round.
+          newButton.reactive$obj &lt;- Sys.time() # Once newButton.reactive values is updated, it will draw heatmap again.    
+      } else {
+          # Do nothing
+      }
+  })</code></pre>
+</div>
+<div id="advantages-1" class="section level3">
 <h3>Advantages</h3>
 <ol style="list-style-type: decimal">
 <li>Talks back to R.</li>
 <li>Easy to learn and set up. Good online tutorials.</li>
 <li>Aesthetically appealing output (publish-ready).</li>
+<li>It is possible to make any bitmap/raster image interactive using nearPoints() etc, but user will need to transform pixel units to something useful in the data. (This is done for you when the bitmap images are from R base plots or ggplot2). See: <a href="https://shiny.rstudio.com/articles/plot-interaction-advanced.html" class="uri">https://shiny.rstudio.com/articles/plot-interaction-advanced.html</a></li>
 </ol>
 </div>
 <div id="disadvantages-1" class="section level3">
@@ -157,7 +591,15 @@ $(document).ready(function () {
 <ol style="list-style-type: decimal">
 <li>Needs to be combined with another package in order to achieve the ‘classical’ interaction techniques described by Cook and Swayne. In order to make the plot region interactive.</li>
 <li>Encounters problems for plots with a large data file? (AQ flights parallel coordinate plot will no upload on Shiny server <em>Error: ‘AQ’ object not found</em>. Similarly when used in RMarkdown. See: Shiny -&gt; Subset_radiobutton.R and MidSem1Report.Rmd).</li>
-<li>Interactions are limited to “off-plot” inputs.</li>
+<li>Good for “off-plot” interactions but not “on-plot” (see below).</li>
+<li>nearPoints() and brushedPoints() uses a mapping from the pixels of the raster/bitmap R plots from base R or ggplot2, to observation numbers in the data frame to link the brushing. This will be ineffective (impossible?) for large data sets due to over-plotting. Seems inefficient compared to interacting ‘directly’ with a SVG.
+<ul>
+<li>See: <a href="https://shiny.rstudio.com/articles/selecting-rows-of-data.html" class="uri">https://shiny.rstudio.com/articles/selecting-rows-of-data.html</a></li>
+<li>nearPoints() and brushedPoints() has a default of capturing within 5 pixels of the mouse event, but can change to be more or less.</li>
+<li>nearPoints() and brushedPoints() are really the same.</li>
+<li>Can brush on facet plots in ggplot2.</li>
+</ul></li>
+<li>Cannot use R Console when running a Shiny app.</li>
 </ol>
 </div>
 </div>
@@ -171,23 +613,27 @@ $(document).ready(function () {
 <ul>
 <li>‘ggplot() + geom_<em>()’ = ’plot_ly() %&gt;% add_</em>()’</li>
 </ul></li>
+<li>ggplotly() translates each layer of ggplot2 into one or more plotly.js traces. Assumptions about trace attributes not always appropriate, can modify. See: <a href="https://cpsievert.github.io/plotly_book/extending-ggplotly.html" class="uri">https://cpsievert.github.io/plotly_book/extending-ggplotly.html</a> (Extending ggplotly).</li>
+<li>plot_ly() interacts more directly with plotly.js and hence generally not as ‘expensive’ as ggplotly(). Maybe faster with large ds?</li>
 </ul>
-<div id="advantages-1" class="section level3">
+<div id="advantages-2" class="section level3">
 <h3>Advantages</h3>
 <ol style="list-style-type: decimal">
-<li>Easy to convert ggplot2 plots into plotly objects using ggplotly().
+<li>Easy to convert ggplot2 plots (including plots from <code>GGally</code> package) into plotly objects using ggplotly().
 <ul>
 <li>With ggplot2 brings the flexibility of creating a wide range of plots. plot_ly() not as extensive in graphics, but interacts more directly with plotly’s javascript library.</li>
 </ul></li>
 <li>Aesthetically appealing output (publish-ready).</li>
 <li>Defaults: Tooltip identification of aesthetics, scaling.</li>
-<li>Persistent brushing easily achieved by an argument: highlight(persistent=TRUE)</li>
+<li>Persistent brushing easily achieved by an argument: pipe plotly object to a ‘highlight()’ layer with ‘persistent=F/T’ and ‘dynamic=F/T’ arguments. Limitations to ‘memorising selections’ and currently a limited number of modes to choose from (cannot support AND), rewinding selections? (See Hofmann and Theus (1998))</li>
+<li>plotly objects can have more than aes mapping data attached to them, such as statistical output that was generated in R by ggplot2 when creating the plot. Eg. with goem_smooth() See: <a href="https://cpsievert.github.io/plotly_book/extending-ggplotly.html" class="uri">https://cpsievert.github.io/plotly_book/extending-ggplotly.html</a> (Extending ggplotly)</li>
+<li>Can still use R console when interacting with the plot.</li>
 </ol>
 </div>
 <div id="disadvantages-2" class="section level3">
 <h3>Disadvantages</h3>
 <ol style="list-style-type: decimal">
-<li>Does NOT talk back to R.</li>
+<li>Does NOT talk back to R: cannot re-execute statistical procedures in response to user event since can’t talk back to R (currently loses the inverse function required to get from the graphic back to the data object when the results are pushed to a web browser).</li>
 <li>When data points &gt; 50 000 (eg. AQ delay data):
 <ul>
 <li>Delay in creating ‘zoom in’ default scaling of plot.</li>
@@ -196,12 +642,69 @@ $(document).ready(function () {
 </ul></li>
 <li>Tooltip default for comparing values can only compare a maximum of 4 obs?</li>
 <li>Tooltip identification for area plots (bar charts) a bit hit and miss? Esp with ggplot2 plots? Does not take all categorical labels with it when passed thru ggplotly()?</li>
-<li>Tooltip can only identify aesthetics of the plot</li>
+<li>Cannot brush (select) edges or nodes of parallel plots.
+<ul>
+<li>Can “click” on nodes but only records one observation</li>
+</ul></li>
 </ol>
 </div>
 </div>
+<div id="crosstalk-htmlwidgets-highchartr" class="section level2">
+<h2>Crosstalk (htmlwidgets, highchartr?)</h2>
+<ul>
+<li><a href="https://rstudio.github.io/crosstalk/using.html" class="uri">https://rstudio.github.io/crosstalk/using.html</a></li>
+<li>Crosstalk creates a ShareData environment for inter-widgets communication.</li>
+<li>? Can still use R console during interaction?</li>
+<li>htmlwidgets for 3D rotation (and more dimensions?): <a href="https://www.r-bloggers.com/a-first-look-at-htmlwidgets/" class="uri">https://www.r-bloggers.com/a-first-look-at-htmlwidgets/</a></li>
+</ul>
+<div id="advantages-3" class="section level3">
+<h3>Advantages</h3>
+<ol style="list-style-type: decimal">
+<li>Talks back to R.</li>
+<li>Purely Javascript, so easy to embed in web pages.</li>
+<li>Achieves similar linked brushing as Plotly by creating a common data set automatically (via ShareData) rather than the user having to manually subset (as with Plotly).</li>
+<li>The Methods in the documentation of ShareData suggests it captures more info than event_data() in Plotly+Shiny.</li>
+<li>Much easier to link plots ‘both ways’. Also possible in Plotly but requires more code. Crosstalk seems to be created specifically for linked brushing, while Plotly more generally for identification (that can then be manipulated for linked brushing).</li>
+<li>There are html widgets which are ‘Shiny-like’ filter inputs that can work in static HTML documents, like Rmarkdown (eg. htmlwidgets frame is like a Shiny sliderInput).</li>
+<li>Has the potential to connect with html widgets of your own choice, but currently has specific requirements in terms of which htmlwidgets Crosstalk is appropriate for.</li>
+<li>Allows linked views between two independent graphing systems (eg. plotly and leaflet maps)</li>
+</ol>
+</div>
+<div id="disadvantages-3" class="section level3">
+<h3>Disadvantages</h3>
+<ol style="list-style-type: decimal">
+<li>Not appropriate for large datasets. Serious delay in interactivity when only around 5000 points are displayed (see Example 3 in MidSem1Report).</li>
+<li>Only appropriate for html widgets where obs are represented individually (ie. not appropriate for aggregate plots).
+<ul>
+<li>Not appropriate for aggregates since cannot ‘dim’ unselected values in a box plot, but with (plotly+shiny) can re-draw with selected points.</li>
+</ul></li>
+<li>No equivalent “plotly_click” type of interaction. Not necessary for scatterplots since can brush just one point, but this may limit Crosstalk interactions (e.g. not possible to create the Plotly correlation heat map type of interaction, <a href="https://plot.ly/r/shinyapp-linked-click/" class="uri">https://plot.ly/r/shinyapp-linked-click/</a>).</li>
+</ol>
+</div>
+</div>
+<div id="shiny-crosstalk" class="section level2">
+<h2>Shiny + Crosstalk</h2>
+<ul>
+<li><a href="https://beta.rstudioconnect.com/jcheng/shiny-crosstalk/" class="uri">https://beta.rstudioconnect.com/jcheng/shiny-crosstalk/</a></li>
+</ul>
+</div>
 <div id="plotly-crosstalk" class="section level2">
 <h2>Plotly + Crosstalk</h2>
+<ul>
+<li>Can talk back to R? (Crosstalk can by Plotly can’t)</li>
+</ul>
+<div id="advantages-4" class="section level3">
+<h3>Advantages</h3>
+<ol style="list-style-type: decimal">
+<li>Can still use R console when interacting with the plots.</li>
+</ol>
+</div>
+<div id="disadvantages-4" class="section level3">
+<h3>Disadvantages</h3>
+<ol style="list-style-type: decimal">
+<li>Not appropriate for large ds (see Crosstalk)</li>
+</ol>
+</div>
 </div>
 <div id="plotly-shiny" class="section level2">
 <h2>Plotly + Shiny</h2>
@@ -214,19 +717,49 @@ $(document).ready(function () {
 </ul></li>
 <li>layout(dragmode=“select”) useful if want to default to brushing when drag to select (rather than scaling)</li>
 </ul>
-<div id="advantages-2" class="section level3">
+<div id="area-plots-ggplot2-plotly-shiny" class="section level3">
+<h3>Area plots: ggplot2 + Plotly + Shiny</h3>
+<ul>
+<li>Linked brushing via click on mosaic plot works (see Brush_mosaic.R in Shiny_Plotly folder).
+<ul>
+<li>VERY slow due to 50 000+ points in scatterplot</li>
+<li>Use a highlighted bar instead, or something more appropriate for categorical data</li>
+<li>See:</li>
+</ul></li>
+<li>Using ggplot2 + geom_bar(): Assign the fill=probability and col=“y factor level” and then use scale_color_discrete(low=“black”, high=“black”). This means the y-variable will also appear in the tooltips.</li>
+<li>productplots package
+<ul>
+<li>The best option so far (see code below, from AreaPlots.R)</li>
+</ul></li>
+<li>ggmosaic package (an add-on to ggplot2) allows you to add a geom_mosaic.
+<ul>
+<li>See: <a href="https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html" class="uri">https://cran.r-project.org/web/packages/ggmosaic/vignettes/ggmosaic.html</a></li>
+<li>Comment at bottom of page on using geom_mosaic with Plotly has been masked</li>
+<li>It uses the productplot package but seems to disable the productplot package with errors (resolved by installing productplot from CRAN again). The version of productplot used in ggmosaic outdated?</li>
+<li>Currently cannot get ggmosaic working</li>
+</ul></li>
+</ul>
+</div>
+<div id="advantages-5" class="section level3">
 <h3>Advantages</h3>
 <ol style="list-style-type: decimal">
 <li>plotly_click allows for aggregate brushing for discrete vars. BUT can be extended to aggregate plots of real-valued variables? (eg. histograms, hexbins?)
 <ul>
+<li>Compare Brush_histogram.R and Brush_bar.R (works fine).</li>
 <li>geom_hexbin:
 <ul>
-<li>‘plotly_click’ records ‘curveNumber’=rank of frequency (ie. all bins with count=1 has curveNumber=0). This could not be used as to group data as it may be possible with using plotly_click with a histogram (see below).</li>
+<li>‘plotly_selected’ records nothing, returns empty list.</li>
+<li>‘plotly_click’ records ‘curveNumber’=rank of frequency (ie. all bins with count=1 has curveNumber=0). This could not be used to group data as it may be possible with using plotly_click with a histogram (see below).</li>
+</ul></li>
+<li>geom_histogram:
+<ul>
+<li>might be possible to use ‘plotly_click’ but need to see how to access the bins that are ‘imported’ into plotly.</li>
+<li>Brush_histogram.R: The highest frequency (count=11302) bin has curveNumber=75. All the bins with frequency = 1 has curveNumber=0.</li>
 </ul></li>
 </ul></li>
 </ol>
 </div>
-<div id="disadvantages-3" class="section level3">
+<div id="disadvantages-5" class="section level3">
 <h3>Disadvantages</h3>
 <ol style="list-style-type: decimal">
 <li>Linked plots can only use variables that were in previous plots or called on by Shiny inputs (unable to use a diff var for colour in output plot of Brush_input).</li>
@@ -237,52 +770,208 @@ $(document).ready(function () {
 </ol>
 </div>
 </div>
-<div id="crosstalk-htmlwidgets-highchartr" class="section level2">
-<h2>Crosstalk + htmlwidgets (highchartr?)</h2>
+<div id="shiny-crosstalk-plotly" class="section level2">
+<h2>Shiny + Crosstalk + Plotly (?)</h2>
 <ul>
-<li>Crosstalk creates a ShareData environment for inter-widgets communication.</li>
+<li>If using Crosstalk w ggplot2 in Shiny, then need Plotly, since ggplot2 plots are not htmlwidgets?</li>
+<li>SharedData environment needs to be activated in R before launching Shiny app. See: <a href="https://github.com/ropensci/plotly/blob/51e159ba825b007657c1d7534825ef25afc7e7af/demo/shiny/basic/app.R" class="uri">https://github.com/ropensci/plotly/blob/51e159ba825b007657c1d7534825ef25afc7e7af/demo/shiny/basic/app.R</a></li>
 </ul>
-<div id="advantages-3" class="section level3">
-<h3>Advantages</h3>
-<ol style="list-style-type: decimal">
-<li>Talks back to R.</li>
-<li>Purely Javascript, so easy to embed in web pages.</li>
-<li>The Methods in the documentation of ShareData suggests it captures more info than event_data() in Plotly+Shiny.</li>
-</ol>
 </div>
-<div id="disadvantages-4" class="section level3">
-<h3>Disadvantages</h3>
-<ol style="list-style-type: decimal">
-<li>Not appropriate for large datasets. Serious delay in interactivity when only around 5000 points are displayed (see Example 3 in MidSem1Report).</li>
-<li>Only appropriate for widgets where obs are represented individually (ie. not appropriate for aggregate plots)</li>
-</ol>
-</div>
-</div>
-<div id="ggobi" class="section level2">
-<h2>GGobi</h2>
+<div id="trelliscopejs" class="section level2">
+<h2>trelliscopejs</h2>
 <ul>
-<li>ggobi may set the benchmark of interactive techniques possible and help identify gaps.</li>
-<li>rggobi R package is useful for getting data in and out of ggobi, but otherwise interaction is all carried out independent of R.</li>
+<li>See <a href="https://hafen.github.io/trelliscopejs/#why" class="uri">https://hafen.github.io/trelliscopejs/#why</a></li>
+<li><code>Trelliscope</code> (the predecessor of <code>trelliscopejs</code>) was focused on catering for large ds and it was built on a different platform (and not a JavaScript library like <code>trelliscopejs</code>).
+<ul>
+<li><code>trelliscopejs</code> currently not catering for very large ds.</li>
+</ul></li>
+<li><code>trelliscopejs</code> talks back to R?
+<ul>
+<li>Yes, one of the aims is for the user to be able to record their interaction for sharing.</li>
+<li>See <em>Viewer improvements…</em> in <a href="https://hafen.github.io/trelliscopejs/#upcoming-work" class="uri">https://hafen.github.io/trelliscopejs/#upcoming-work</a></li>
+<li>BUT I can still use R console while interacting with <code>trelliscopejs</code> in both the viewer AND the pop-out Viewer Zoom window in RStudio.</li>
+</ul></li>
+<li><code>trelliscopejs</code> is like trellis plots with the added interactivity of being able to filter and sort panels of multiple trellis plots based on “cognostic” summaries of the data.
+<ul>
+<li>“cognostic” = diagnostics guided by computers (term proposed by Tukey)</li>
+<li>Cognostics in <code>trelliscopejs</code>: Statistical summaries automatically calculated for the subsets that are created by interactive filtering.</li>
+<li>Defualt cognostics automatically calculated by <code>trelliscopejs</code>:
+<ul>
+<li>Mean for all numeric vars (whether used is current aes or not)</li>
+<li>Value of the categorical vars used in the subsetting/ the “conditioning variables” (will not display the values for other categorical vars that were not used to subset the data and ‘trellis’ the plots, this would require something like a list of counts)</li>
+</ul></li>
+<li>Customised cognostics possible: eg.</li>
+</ul></li>
+<li><code>trelliscopejs</code> produces <em>small multiple plots which can be navigated with respect to the summaries</em></li>
+<li>Interactive options on sidebar:
+<ul>
+<li><code>Grid</code>: # rows and cols of plots for each panel, and order by row or col.</li>
+<li><code>Labels</code>: The cognistic summaries to display below each plot (ie. mean for the subset across all the numeric vars in ds, count for subset and categorical values defining the subset)</li>
+<li><code>Filter</code>: Selection plots to view based on cognistics (same list as in Labels)</li>
+<li><code>Sort</code>: Ordering of plots based on values of cognistics.</li>
+</ul></li>
+<li>Low level functions:
+<ul>
+<li><code>facet_trelliscope()</code>: Use in place of <code>facet_wrap()</code> in <code>ggplot2</code> (turns it into a interactive faceted plot rather than a static one)
+<ul>
+<li><code>path</code> arguments sets the directory where you want the displays to be saved and accessed for viewing</li>
+</ul></li>
+<li><code>trelliscope()</code>: Use when you want to customise cognostics (ie. calculate and display summary stats other than the defaults calculated by <code>facet_trelliscope()</code>)
+<ul>
+<li>Use with a “tidy” workflow: group data for computing summaries for each group (using <code>dplyr</code> or <code>tidyr</code>) and then use <code>trelliscope()</code> to display the summary stats alongside (below) the plots of the subsets</li>
+</ul></li>
+</ul></li>
+<li><code>trelliscopejs</code> is an <code>htmlwidget</code> interface to the JavaScript library by the same name (<code>trelliscopejs-lib</code> - allows for the interactive viewing).</li>
 </ul>
-<div id="advantages-4" class="section level3">
-<h3>Advantages</h3>
-<ol style="list-style-type: decimal">
-<li>Everything is in-house (ie. it is a complete pipeline and does not need add-ons to achieve the interactive techniques).</li>
-<li>Statistical functions that respond directly to interaction.</li>
-</ol>
+<div id="trelliscopejs-and-rbokeh" class="section level3">
+<h3>trelliscopejs and <code>rbokeh</code>:</h3>
+<ul>
+<li>See <a href="https://hafen.github.io/trelliscopejs/#getting-started" class="uri">https://hafen.github.io/trelliscopejs/#getting-started</a></li>
+<li><code>figure()</code> is the equivalent of <code>ggplot()</code> in <code>rbokeh</code>.</li>
+<li><code>ly_points()</code> has <code>hover=</code> argument.</li>
+<li><code>rbokeh</code> similar to <code>plotly</code>? YES
+<ul>
+<li><code>rbokeh</code> requires more code to display hover tips</li>
+<li><code>rbokeh</code> + <code>trelliscopejs</code> has explicit examples, not so with <code>plotly</code> (currently I cannot get working)</li>
+</ul></li>
+<li>Can use <code>plotly</code> instead of <code>rbokeh</code>?</li>
+<li><code>rbokeh</code> less “integrated” to R/Shiny than <code>plotly</code> currently is (Shiny interactive functions for <code>plotly</code>, like <code>event_data()</code>).</li>
+<li><code>bokeh</code> is popular with Python users (Yu Han).</li>
+</ul>
 </div>
-<div id="disadvantages-5" class="section level3">
+<div id="trelliscopejs-and-plotly" class="section level3">
+<h3>trelliscopejs and <code>plotly</code></h3>
+<ul>
+<li>See <a href="https://plot.ly/r/shinyapp-explore-diamonds/" class="uri">https://plot.ly/r/shinyapp-explore-diamonds/</a></li>
+<li>Currently using plotly it’s plotting all of the data in each plot, rather than the subset. See <code>trelliscope_example.R</code>.</li>
+</ul>
+</div>
+<div id="advantages-6" class="section level3">
+<h3>Advantages</h3>
+<ul>
+<li>Intended for exploratory data analysis (easy, quick) and in some ways for presentation/communication of exploration to others (see next point)</li>
+<li>R Console still works while interacting in the RStudio Viewer panel and the pop-out Viewer Zoom window (with different interactions)</li>
+<li>Easy to understand for “non-data-scientists” or domain experts
+<ul>
+<li>A communication tool between data scientists and their audience or those they collaborate with.</li>
+</ul></li>
+<li>Exemplifies <em>small multiples</em> as an interactive technique:
+<ul>
+<li>breaking up the dataset into multiple plots of the subsets - what a trellis plot achieves.</li>
+<li>small multiples = <em>where data are split into groups and a plot is made for each group, with the resulting plots arranged in a grid.</em></li>
+<li>Easy and quick to create small multiple plots, hence well suited for EDA where some may be dead ends and want to reiterate rapidly.</li>
+<li>Tufte, <em>Visual Display of Quantitative Info</em>: Understanding how to read one <em>slice</em> allows the user to access all of the data via the other slices. <em>Allows viewer to focus on changes in the data rather than changes in the graphical design</em>.</li>
+<li>Slicing data to allow for multiple views is useful when there are many vars involved.
+<ul>
+<li>Uses one or more vars to determine how to splice up data.</li>
+<li>For each subset plot the data using one or two vars.</li>
+<li>More effective than 3D visualisation and can scale up higher than 3D.</li>
+</ul></li>
+<li>Resolves problems w overplotting and allows detailed views.</li>
+<li>Scalable since does not require all points to be plotted in one view.
+<ul>
+<li>The “cognostic” panels guide the user to the panels w the “most interesting content”</li>
+</ul></li>
+</ul></li>
+<li>The <em>input combinations represented as cognostics</em> allows for many outcomes to be compared simultaneously.
+<ul>
+<li>As opposed to apps that allows a few inputs and then the plot updates.</li>
+</ul></li>
+<li>Easy to use with <code>ggplot2</code> and <code>lattice</code>.
+<ul>
+<li><code>rbokeh</code> recommended rather than <code>ggplot2</code> since its faster at drawing panels of plots. See <a href="https://hafen.github.io/trelliscopejs/#gapminder_data" class="uri">https://hafen.github.io/trelliscopejs/#gapminder_data</a></li>
+</ul></li>
+<li>Combinations for how the dataset can be subsetted are easily generated in <code>trelliscopejs</code>.</li>
+<li><code>trelliscopejs</code> graphics can be shared as standalone apps or embedded in RMarkdown notebooks.
+<ul>
+<li>For use in RMarkdown: Must set argument <code>self_contained=TRUE</code> (in either <code>facet_trelliscope()</code> or <code>trelliscope()</code> function).
+<ul>
+<li>This loads all of the plot dependencies onto the html page instead of saving in separate files for access as they are viewed. Do NOT set as TRUE otherwise, since this is esp expensive when there are many panels and hence is more efficient to load on demand rather than all at the beginning.</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<div id="disadvantages-6" class="section level3">
 <h3>Disadvantages</h3>
-<ol style="list-style-type: decimal">
-<li>Open source but difficult to install due to specific software requirements.</li>
-<li>Easy to publish? Export options? Sharing options?</li>
-</ol>
+<ul>
+<li>See Hafen’s “to do’s” for <code>trelliscopejs</code> <a href="https://hafen.github.io/trelliscopejs/#upcoming-work" class="uri">https://hafen.github.io/trelliscopejs/#upcoming-work</a></li>
+<li>Underdevelopment still (not so much stackexchange ‘help’ out there)</li>
+<li>Specific to <em>small multiples</em> interaction (filtering and sorting of trellis plots). Uses linked brushing when filtering by a continous var. Limited in scope of interaction or user customisation opportunities. Cannot really ‘get under the hood’.</li>
+<li>Will take a while to load all panels for large ds.
+<ul>
+<li>Focus of <code>trelliscope</code> was for use w large ds.</li>
+<li>Initial/current focus of <code>trelliscopejs</code> is on the interface</li>
+</ul></li>
+<li>Aware of the usefulness of being able to record interaction (see link above on ‘upcoming work’)
+<ul>
+<li><em>We would also like to make the viewer be able to track and share state</em></li>
+</ul></li>
+<li>The target users of <code>trelliscopejs</code> may be limited (landing in between those who want to code and those who don’t). <code>trelliscopejs</code> may be more like the user interfaces provided by commercial software like <code>Tableau</code> but on a much smaller scale (and hence not able to compete)
+<ul>
+<li>It provides a very user-friendly user interface but leaves little room for the user to modify, customise or design their own user interface. This may not appeal to users who can code.</li>
+<li><code>Shiny</code> on the other hand provides the flexibility for customisation of the interaction interface to whatever extent the user’s coding skills allows.</li>
+<li>The user-friendly interface appeals to users who do not want to code or have limited coding skills, but they may be unmotivated to learn the minimal amount of coding that is necessary to use <code>trelliscopejs</code> for just one specific interaction technique (<em>small multiples</em>). Especially if there are more comprehensive (commercial) ready-to-use interaction interfaces available, like <code>Tableau</code>.</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="ggvis" class="section level2">
+<h2>ggvis</h2>
+<ul>
+<li><a href="http://ggvis.rstudio.com/ggvis-basics.html" class="uri">http://ggvis.rstudio.com/ggvis-basics.html</a></li>
+<li>R package that is ike a combination of Shiny and Plotly, under development, likely to change quite a bit.</li>
+<li>Has a similar layer ggplot2/plotly approach to plotting with ~ before vars and piping %&gt;%.</li>
+<li>Comments on tooltip here are useful: <a href="https://github.com/rstudio/ggvis/blob/master/R/interact_tooltip.R" class="uri">https://github.com/rstudio/ggvis/blob/master/R/interact_tooltip.R</a>
+<ul>
+<li>Tooltip identification allows only ONE aes to be identified</li>
+<li>Like plotly, only uses data columns used in the plot BUT can “use a key to line up the item from the plot with a row in the data”.</li>
+</ul></li>
+</ul>
+<div id="disadvantages-7" class="section level3">
+<h3>Disadvantages</h3>
+<ul>
+<li>Cannot use R Console when interacting with a ggvis plot: “every interactive ggvis plot must be connected to a running R session”</li>
+<li>Likely to change.</li>
+<li>Tooltip identification only allows 1 var, but may be able to display a var that is not an aes from the plot (see above).</li>
+</ul>
+</div>
+</div>
+<div id="r-base-graphics" class="section level2">
+<h2>R Base graphics</h2>
+<ul>
+<li>Some interaction techniques are possible. See example from Paul (email attachment)</li>
+</ul>
+<div id="disadvantages-8" class="section level3">
+<h3>Disadvantages</h3>
+<ul>
+<li>Relatively slow at drawing graphics compared to a browser platform, but base plots will be faster at rendering plots in R than grid plots, like ggplot2 (see runtime.R).</li>
+<li>Possible, but difficult to locate interaction (ie. click location) since raster images are used.</li>
+</ul>
 </div>
 </div>
 <div id="large-datasets" class="section level2">
 <h2>Large datasets</h2>
 <ul>
 <li>Current interaction tools can help when there is a large number of variables, through filtering inputs, but when there is a large number of observations, problems with over plotting and time taken to create plots, get in the way of using these tools for meaningful interactions.</li>
+<li>Brushing or “click selecting” on plots using bins would be useful for large ds, since difficult to brush with over plotting.</li>
+<li>Unwin, 2015 “Graphical Data Analysis with R” (p.272):
+<ul>
+<li>Two problem areas for statistical analysis:
+<ul>
+<li>Large # vars = large # tests = more likely to get significant results</li>
+<li>Large # cases = even small effects will be found to be significant in individual tests, but may not be of practical importance</li>
+</ul></li>
+<li><em>Large ds tend to be heterogenenous rather than homogeneous</em>
+<ul>
+<li>Select vars to create a subset of cases to use in the analysis.</li>
+</ul></li>
+<li>The aggregate properties of the whole dataset will be reflected in a random sample.
+<ul>
+<li>Perform statistical analysis on a sample, or repeat analysis on several samples.</li>
+<li>Good for <em>global properties</em> of a dataset, but not good for local properties such as unusual small groups.</li>
+</ul></li>
+</ul></li>
+<li>Zooming in (w an un-zoomed view on the side, so contest is not lost) is esp useful for large ds.</li>
 </ul>
 </div>
 <div id="tips" class="section level2">
@@ -294,10 +983,10 @@ $(document).ready(function () {
 </div>
 <div id="general-comments" class="section level2">
 <h2>General comments</h2>
-<div id="indirect-and-direct-manipulation" class="section level4">
-<h4>Indirect and direct manipulation</h4>
+<div id="indirect-and-direct-manipulation" class="section level3">
+<h3>Indirect and direct manipulation</h3>
 <ul>
-<li>NOT equivalent to off-plot and on-plot interaction?
+<li>NOT equivalent to off-plot and on-plot interaction! “Direct manipulation” is a compsci term, becareful how you use it.
 <ul>
 <li>on-plot: user interaction with the plot region (eg. brushing, hovering on a plot feature).</li>
 <li>off-plot: user interaction with widgets that are not in the plot region (eg. Shiny inputs, htmlwidgets frames). (htmlwidgets will a mixture of on-plot and off-plot interactions)</li>
@@ -309,12 +998,118 @@ $(document).ready(function () {
 </ul></li>
 </ul>
 </div>
+<div id="low-level-and-high-level-programming" class="section level3">
+<h3>Low-level and high-level programming:</h3>
+<pre><code>- low-level: harder to do since the language is 'closer' to the computer's 'native' language.
+- high-level: easier for the common user since the functions or commands will be 'translated' by intermediateries to the language that directly giving instructions to the computer.
+- eg. ggobi has a complex 'native' programming language, through rggobi, R provides a high-level programming language for more users to access the capabilities of ggobi. (Using ggobi via it's GUI does not require programming but you would be using it as a standalone)</code></pre>
+</div>
+<div id="plotlyshiny-vs-plotlycrosstalk" class="section level3">
+<h3>(Plotly+Shiny) vs (Plotly+Crosstalk)</h3>
+<ul>
+<li>Linking requires either (plotly+shiny) or (plotly+crosstalk).
+<ul>
+<li>(plotly+shiny) re-draws whole plot after selection, inefficient if large ds or many graphical elements. eg. For brushed linking of scatterplots the full plot is re-drawn and then the layer for the selected points (in a different colour).</li>
+<li>(plotly+crosstalk) changes the colour attributes of the selected points (dims unselected).</li>
+</ul></li>
+<li>Large ds interaction (plotly+crosstalk) feels even slower than (plotly+shiny). Slowed down by crosstalk (?) which is self-claimed to be inappropriate for large DS. Compare Brush_Large (50 000 points). BUT (plotly+crosstalk) can brush both ways.</li>
+<li>(plotly+crosstalk) cannot use for aggregate values (eg. cannot ‘dim’ unselected values in a box plot), but with (plotly+shiny) can re-draw with selected points.</li>
+<li>Which allows for more flexible interaction or manipulation? Crosstalk uses ShareData to create an ‘environment’ while Plotly uses event_data() to capture default “identifiers” in a list. The Methods in the documentation of ShareData suggests it captures more info than event_data().</li>
+</ul>
+</div>
+<div id="fostering-undergraduate-data-science-review-of-undergrad-course-in-us" class="section level3">
+<h3>Fostering Undergraduate Data Science (Review of Undergrad course in US)</h3>
+<ul>
+<li>Project based, focus on large ds, interdisciplinary. Students given videos and code (flipped classroom). Specific learning targets and open-ended data exploration. One-to-one, hands on interaction during lectures. No pre-req assumed.</li>
+<li>Projects: approx 2 weeks in length, groups of 3 students.</li>
+<li>Start with data sets rather than “introducing a tool without motivation”. Motivation to solve a certain problem with the data set.</li>
+<li>Established skills in extracting, querying, wrangling large ds, laying the foundations for further work with large ds. Mentions visualisation in some parts.</li>
+<li>Picking up ’bad habits’ from overuse of stack exchange etc. (e.g. use of for loops that would be inefficient for large ds).</li>
+</ul>
+</div>
+</div>
+<div id="possible-datasets" class="section level2">
+<h2>Possible datasets</h2>
+<div id="from-unwin-book" class="section level3">
+<h3>From Unwin book:</h3>
+<ul>
+<li>Small datasets for teaching purposes (p.24)
+<ul>
+<li>Statlib at Carnegie Mellon University
+<ul>
+<li><a href="http://lib.stat.cmu.edu/datasets/" class="uri">http://lib.stat.cmu.edu/datasets/</a></li>
+</ul></li>
+<li>UCI’s Machine Learning repository: for studying algorithms
+<ul>
+<li><a href="http://archive.ics.uci.edu/ml/" class="uri">http://archive.ics.uci.edu/ml/</a></li>
+</ul></li>
+</ul></li>
+<li>UC Berkley dataset (p.9)
+<ul>
+<li>3 categorical vars, add Shiny slider to display arrangements for a mosaic plot (reveal levels)</li>
+</ul></li>
+<li>Parallel coord plots: Use <code>iris</code> data set (p.105)
+<ul>
+<li>Brings out the clustering by the 3 species</li>
+<li>Experiment with different scaling of axes, orderings, identify associations (compare with bivariate scatterplot)</li>
+<li>Not possible to see the clustering if just used linked scatterplots? Or scatterplot matrix?</li>
+<li>Compare to a 2D tour?</li>
+<li>Shiny interaction to ‘cycle’ through different orderings of axes. Similarly w diff axes scaling (checkbox input)</li>
+<li>Order vars on axes by amount of difference between groups (F-statistic) (see p.120)</li>
+<li>Order of colouring obs important since the last group will be on top. Selected group should always be last to be plotted, so that it is above the rest.</li>
+</ul></li>
+<li>Changes in NZ Consumer Price Index over the years using paralle coord plots
+<ul>
+<li>See <code>Pcps for indices</code> under <code>Parallel coord plots</code></li>
+<li>Unwin p.113</li>
+</ul></li>
+<li>Mosaic plots for <code>Berkley</code> admissions’ dataset is a common example
+<ul>
+<li>See: <a href="http://www.theusrus.de/blog/understanding-mosaic-plots/" class="uri">http://www.theusrus.de/blog/understanding-mosaic-plots/</a></li>
+<li>An example of Simpson’s paradox (where a conclusion appear true for the subsets but then disappears of reverses for the aggregate)</li>
+</ul></li>
+<li>Tour de France datasets analysed using Mondrian
+<ul>
+<li>Interesting short clip (10mins) of how interactive graphics (esp showcasing parallel coord plots) can be used to identify patterns in context. Good commentary (by Unwin, using data and software from Theus) <a href="http://www.theusrus.de/blog/the-tour-is-over-long-live-the-tour/" class="uri">http://www.theusrus.de/blog/the-tour-is-over-long-live-the-tour/</a></li>
+<li>Showcases the applications of changing scale on axes of parallel coord plots.
+<ul>
+<li>Aligning times at each stage by the median time allows for comparison with the main bunch of riders, the peloton.</li>
+<li>Comparing w the winner’s times identifies which stages other riders gained on him.</li>
+<li>In <code>ggparcoord</code> the arg <code>scale=&quot;center&quot;</code> allows for scaling of each var’s axes individually (eg. based on each var’s median), so would need to manually center the data first (subtract the median time from the values), then plot (leaving <code>scale=&quot;globalminmax&quot;</code>). (See p.115 and 116 for more info on scaling)</li>
+</ul></li>
+<li>Links to download and tutorial for Mondrian software
+<ul>
+<li><a href="http://www.theusrus.de/Mondrian/" class="uri">http://www.theusrus.de/Mondrian/</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
 </div>
 <div id="reading-list" class="section level2">
 <h2>Reading list</h2>
 <ul>
 <li><p>Wickham, Hadley, Michael Lawrence, Dianne Cook, Andreas Buja, Heike Hofmann, and Deborah F Swayne. 2010. “The Plumbing of Interactive Graphics.” Computational Statistics, April, 1–7.</p></li>
 <li><p>Anthony Unwin’s Graphical Data Analysis with R (CRC Press 2015)</p></li>
+<li>GGobiMeetsR (2001) <a href="https://www.r-project.org/conferences/DSC-2001/Proceedings/TempleLangSwayne.pdf" class="uri">https://www.r-project.org/conferences/DSC-2001/Proceedings/TempleLangSwayne.pdf</a>
+<ul>
+<li>Code may be outdated but some good ideas</li>
+</ul></li>
+<li>IntroGGobi <a href="http://www.ggobi.org/rggobi/introduction.pdf" class="uri">http://www.ggobi.org/rggobi/introduction.pdf</a>
+<ul>
+<li>Not sure about how up-to-date this is but seems to be a general intro (directly from the rggobi site)</li>
+</ul></li>
+<li>ExtendingGGobi (2008) <a href="https://link-springer-com.ezproxy.auckland.ac.nz/article/10.1007/s00180-008-0115-y" class="uri">https://link-springer-com.ezproxy.auckland.ac.nz/article/10.1007/s00180-008-0115-y</a>
+<ul>
+<li>Most recent publication (I have found so far) on rggobi</li>
+</ul></li>
+<li>Cook and Swayne book website <a href="http://www.ggobi.org/book/index.html" class="uri">http://www.ggobi.org/book/index.html</a>
+<ul>
+<li>Code used in book and can get datasets from here</li>
+</ul></li>
+<li>Other courses
+<ul>
+<li>See Dropbox: Using_Interactive_Graphics_to_Teach_Multivariate_D.pdf</li>
+</ul></li>
 </ul>
 </div>
 
