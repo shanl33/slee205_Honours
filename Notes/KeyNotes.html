@@ -162,26 +162,6 @@ $(document).ready(function () {
 <li>See <em>Interactive environments in Shiny</em> section</li>
 </ul></li>
 </ul>
-<div id="focus-on-makingfinding-examples-that.." class="section level5">
-<h5>Focus on making/finding examples that..</h5>
-<ul>
-<li>Connect with statistical analysis or some part of EDA. For example:
-<ul>
-<li>Interactive graphics for examining missingness</li>
-</ul></li>
-<li>Bridge R/Shiny and “EDA/GDA-focused interactive software” to demonstrate how the transition from interactive graphics for exploratory analysis to presenting can be “effortless” and hence encourage ppl to use more interactive graphics in all stages of data analysis.
-<ul>
-<li>ie. Use the popularity of Shiny to encourage use of other interactive software, like <code>ggobi</code>.</li>
-<li><code>ggobi</code> and <code>rggobi</code> in <code>R</code> to <code>Shiny</code>:
-<ul>
-<li>EDA in <code>ggobi</code>: Use grand 2D tour to identify views where clusters are most clearly defined.</li>
-<li>Send these optimal views to <code>R</code> via <code>rggobi</code></li>
-<li>Re-create the principal component plots (?) in <code>R</code> to use in a <code>Shiny</code> app to PRESENT results of the grand tour.</li>
-<li>NOT focus on trying to replicate a grand 2D tour in another tool (ie.<code>R</code> and/or <code>Shiny</code>).</li>
-</ul></li>
-</ul></li>
-</ul>
-</div>
 </div>
 <div id="virtual-machine" class="section level2">
 <h2>Virtual Machine</h2>
@@ -983,6 +963,61 @@ observeEvent(input$new, {
 </div>
 <div id="general-comments" class="section level2">
 <h2>General comments</h2>
+<div id="the-role-of-interactive-visualisation" class="section level3">
+<h3>The role of interactive visualisation</h3>
+<div id="advantages-arguments-for" class="section level4">
+<h4>Advantages (arguments for)</h4>
+<ul>
+<li>Parallel plots largely unuseful without interactivity (see Unwin and/or Cook)</li>
+<li>Mosaic plots are much easier to understand with tooltip identification
+<ul>
+<li>Overcomes the labeling challenges of a static mosaic visual.</li>
+<li>BUT nesting too many factors would still be difficult to interpret.</li>
+<li>Shiny slider w ‘level=1’, ‘level=2’ for plots from <code>productplots</code> package would allow better understanding as well as exploration of low-dimensions first (as recommended by Cook etc)</li>
+</ul></li>
+<li>Graphics is the only medium for communicating and interpreting results from ‘flexible transformations’ such as splines. (See 762 Handout 1, ‘What is regrssion for?’ and splines lab, Thomas Lumley).
+<ul>
+<li>With tooltip identification you can interpret the coefficient(s) of interest after applying a linear spline adjustment on the confounder.</li>
+</ul></li>
+</ul>
+</div>
+<div id="disadvantages-arguments-against" class="section level4">
+<h4>Disadvantages (arguments against)</h4>
+<ul>
+<li>Conclusion drawn from visualisations, interactive or static, seem objective (compared to the subjectivity of analytical and/or numeric output).
+<ul>
+<li>Different people will ‘see’ different patterns and hence draw different conclusions.
+<ul>
+<li>BUT the ‘different conclusions’ may be within the range of reasonable solutions (ie. not differ drastically, a bit like within a CI for point predictions from different samples of the same population)</li>
+</ul></li>
+<li>Similar challenges to accepting conclusions from empirical data.
+<ul>
+<li>See Efron: ‘resistance to empiricism’ (in the context of bootstrap methods?)</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<div id="focus-on-makingfinding-examples-that.." class="section level4">
+<h4>Focus on making/finding examples that..</h4>
+<ul>
+<li>Connect with statistical analysis or some part of EDA. For example:
+<ul>
+<li>Interactive graphics for examining missingness</li>
+</ul></li>
+<li>Bridge R/Shiny and “EDA/GDA-focused interactive software” to demonstrate how the transition from interactive graphics for exploratory analysis to presenting can be “effortless” and hence encourage ppl to use more interactive graphics in all stages of data analysis.
+<ul>
+<li>ie. Use the popularity of Shiny to encourage use of other interactive software, like <code>ggobi</code>.</li>
+<li><code>ggobi</code> and <code>rggobi</code> in <code>R</code> to <code>Shiny</code>:
+<ul>
+<li>EDA in <code>ggobi</code>: Use grand 2D tour to identify views where clusters are most clearly defined.</li>
+<li>Send these optimal views to <code>R</code> via <code>rggobi</code></li>
+<li>Re-create the principal component plots (?) in <code>R</code> to use in a <code>Shiny</code> app to PRESENT results of the grand tour.</li>
+<li>NOT focus on trying to replicate a grand 2D tour in another tool (ie.<code>R</code> and/or <code>Shiny</code>).</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</div>
 <div id="indirect-and-direct-manipulation" class="section level3">
 <h3>Indirect and direct manipulation</h3>
 <ul>

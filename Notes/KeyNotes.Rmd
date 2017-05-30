@@ -31,17 +31,6 @@ knitr::opts_chunk$set(echo = TRUE)
 * Use interactive environments in Shiny to record interactions and send them back to R (and back again?). 
     + See *Interactive environments in Shiny* section
 
-##### Focus on making/finding examples that..
-* Connect with statistical analysis or some part of EDA. For example:
-    + Interactive graphics for examining missingness
-* Bridge R/Shiny and "EDA/GDA-focused interactive software" to demonstrate how the transition from interactive graphics for exploratory analysis to presenting can be "effortless" and hence encourage ppl to use more interactive graphics in all stages of data analysis.
-    + ie. Use the popularity of Shiny to encourage use of other interactive software, like `ggobi`.
-    + `ggobi` and `rggobi` in `R` to `Shiny`: 
-        - EDA in `ggobi`: Use grand 2D tour to identify views where clusters are most clearly defined.
-        - Send these optimal views to `R` via `rggobi`
-        - Re-create the principal component plots (?) in `R` to use in a `Shiny` app to PRESENT results of the grand tour.
-        - NOT focus on trying to replicate a grand 2D tour in another tool (ie.`R` and/or `Shiny`).
-
 ## Virtual Machine
 * Software to have on VM:
     + R (RStudio if possible?) with the following packages:
@@ -540,6 +529,34 @@ https://github.com/ropensci/plotly/blob/51e159ba825b007657c1d7534825ef25afc7e7af
 * Colour #RRGGBB__: http://sape.inf.usi.ch/quick-reference/ggplot2/colour
 
 ## General comments 
+### The role of interactive visualisation
+#### Advantages (arguments for)
+* Parallel plots largely unuseful without interactivity (see Unwin and/or Cook)
+* Mosaic plots are much easier to understand with tooltip identification
+    + Overcomes the labeling challenges of a static mosaic visual.
+    + BUT nesting too many factors would still be difficult to interpret.
+    + Shiny slider w 'level=1', 'level=2' for plots from `productplots` package would allow better understanding as well as exploration of low-dimensions first (as recommended by Cook etc) 
+* Graphics is the only medium for communicating and interpreting results from 'flexible transformations' such as splines. (See 762 Handout 1, 'What is regrssion for?' and splines lab, Thomas Lumley).
+    + With tooltip identification you can interpret the coefficient(s) of interest after applying a linear spline adjustment on the confounder.
+
+#### Disadvantages (arguments against)
+* Conclusion drawn from visualisations, interactive or static, seem objective (compared to the subjectivity of analytical and/or numeric output).
+    + Different people will 'see' different patterns and hence draw different conclusions.
+        - BUT the 'different conclusions' may be within the range of reasonable solutions (ie. not differ drastically, a bit like within a CI for point predictions from different samples of the same population)
+    + Similar challenges to accepting conclusions from empirical data.
+        - See Efron: 'resistance to empiricism' (in the context of bootstrap methods?)
+
+#### Focus on making/finding examples that..
+* Connect with statistical analysis or some part of EDA. For example:
+    + Interactive graphics for examining missingness
+* Bridge R/Shiny and "EDA/GDA-focused interactive software" to demonstrate how the transition from interactive graphics for exploratory analysis to presenting can be "effortless" and hence encourage ppl to use more interactive graphics in all stages of data analysis.
+    + ie. Use the popularity of Shiny to encourage use of other interactive software, like `ggobi`.
+    + `ggobi` and `rggobi` in `R` to `Shiny`: 
+        - EDA in `ggobi`: Use grand 2D tour to identify views where clusters are most clearly defined.
+        - Send these optimal views to `R` via `rggobi`
+        - Re-create the principal component plots (?) in `R` to use in a `Shiny` app to PRESENT results of the grand tour.
+        - NOT focus on trying to replicate a grand 2D tour in another tool (ie.`R` and/or `Shiny`).
+        
 ### Indirect and direct manipulation
 * NOT equivalent to off-plot and on-plot interaction! "Direct manipulation" is a compsci term, becareful how you use it.
     + on-plot: user interaction with the plot region (eg. brushing, hovering on a plot feature).
