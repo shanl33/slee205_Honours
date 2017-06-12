@@ -57,11 +57,18 @@ knitr::opts_chunk$set(echo = TRUE)
     + ggobi control window is on the Terminal option menu (rather than a separate window)
     + `DescribeDisplay` ggobi plugin is installed but R package yet to be installed.
 
+### NZQA data
+* See: <http://www.nzqa.govt.nz/studying-in-new-zealand/secondary-school-and-ncea/find-information-about-a-school/secondary-school-statistics/consolidated-files/data-files-for-2016/>
+
 ## Tableau
 * See: <http://onlinehelp.tableau.com/current/pro/desktop/en-us/actions.html>
 * Tableau interactive visualisation can be shared via it's web application framework ('Tableau Public` <https://public.tableau.com/s/>)
 * `URL Action` (hyperlink w results from other actions) is an additional technique that other tools may not have.
-
+### Tableau Public (Free App version)
+* Drag and drop to create plot.
+    + Certain plot choices are available depending on type of vars selected.
+* Create a `dashboard` to display plots side-by-side (for brushed linking etc)
+* Create a `story` seems to be like a slide show.
 ### Interactive techniques ("Actions" in Tableau)
 
 ```{r table1, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}

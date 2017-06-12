@@ -1,8 +1,6 @@
 library(shiny)
-devtools::install_github("ropensci/plotly")
 library(plotly)
 library(Bolstad)
-install.packages("productplots")
 library(productplots)
 
 mu <- 1:6
