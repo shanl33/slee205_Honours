@@ -30,6 +30,10 @@ knitr::opts_chunk$set(echo = TRUE)
     + cycling of combinations of possible vars for scatterplot and mosaic plots (2 to 3 vars only)
 * Use interactive environments in Shiny to record interactions and send them back to R (and back again?). 
     + See *Interactive environments in Shiny* section
+*'googleVis' bought Hans Rosling's stuff. 
+    + R package to connect w it.
+*`ggiraph` R package, a bit like plotly but allows more custom control over interactive techniques.
+    + Adds interactive techniques to ggplot2 plots.
 
 ## Virtual Machine
 * Software to have on VM:
@@ -537,6 +541,10 @@ https://github.com/ropensci/plotly/blob/51e159ba825b007657c1d7534825ef25afc7e7af
 
 ## General comments 
 ### The role of interactive visualisation
+* Lots of recent examples where interactive visualisation leverages the way we communicate findings and/or make data more accessible to others (see Shiny gallery, etc) BUT is it effective as a explorative tool? Does it have the rigor to be applied alongside theoretical analysis techniques? 
+Does *interactivity* provide extra leverage that a static graphic cannot in EDA? Could this lead to more use of interactive visuals in 'theoretical' analysis?
+* Would we one day have an interactive plot as part of the output of functions? (eg. Bayesian: Instead of a table of likelihoods and joint probs, have an interactive graphic with tooltip identification)
+
 #### Advantages (arguments for)
 * Parallel plots largely unuseful without interactivity (see Unwin and/or Cook)
 * Mosaic plots are much easier to understand with tooltip identification
