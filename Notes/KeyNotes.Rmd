@@ -8,11 +8,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Questions
-* How do a make a data file (csv) available for the VirtualBox session?
-    + Error in file(file, "rt") : cannot open the connection
-    + Working directory is a temporary guest folder (eg. "/tmp/guest-rEwsjw")
-    + Saved data file in the "Shared folder" used in the settings but still can't access.
-* At first I was able to 'pop in and out' of the VirtualBox window but now cannot after adding a file to stat787_1 folder (adding to stat787 folder seemed to be ok)
+
     
 ### Answered
 * Is `cranvas` worth investigating? 
@@ -27,6 +23,7 @@ knitr::opts_chunk$set(echo = TRUE)
     + Choice of file type for image (raster vs scalable)
 
 ## To do's
+* See if can clone only sub-directory in Git (and push and pull)
 * Large ds and applications 
 * Look at other data visualisation courses (see Reading List section)
 * Look at documenting interactions when used for exploration
