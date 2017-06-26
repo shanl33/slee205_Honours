@@ -24,6 +24,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## To do's
 * Create a dendrogram in ggobi that can be brushed (see Paul's notes from 20 June). Brushed linking of line segments with parallel plot demonstrated in Cook p.110.
+* "Export" the linear combination coordinates from tours using DescribeDisplay. (This is most likely in the dd_object, I just haven't figured out how to access it).
+    + Allow for comparison with numerical methods.
 * Large ds and applications 
 * Look at other data visualisation courses (see Reading List section)
 * Look at documenting interactions when used for exploration
@@ -73,10 +75,21 @@ knitr::opts_chunk$set(echo = TRUE)
     + ggobi control window is on the Terminal option menu (rather than a separate window)
     + `DescribeDisplay` ggobi plugin is installed but R package yet to be installed.
 
-### NZQA data
+### NCEA data
 * See: <http://www.nzqa.govt.nz/studying-in-new-zealand/secondary-school-and-ncea/find-information-about-a-school/secondary-school-statistics/consolidated-files/data-files-for-2016/>
+* Bi-modal distribution in L3 (and slightly L2).
+    + Investigate clustering based on L3 alone?
+* Aim: Partition student achievement data according to the decile of the school.
+* Cluster analysis: Use a numerical method to model clusters, then use visualisation to interpret and analyse clusters.
+    + Heirarchical clustering algorithm using Euclidean distances and average linkage identified 4 clusters and two overlapping clusters. The smaller cluster was relatively low-achieving and consisted of the lower tail of the univariate distributions for each level of achievement. All schools except 1 in this cluster was from decile 6 or below. There is no clear separation between the two clusters in any univariate distribution and the 2D tours looked at so far.
 
-#### Cluster anaylysis
+### To do:
+* Check for equal variance between decile groups and see if can use LDA or another parametric method (rather than algorithmic).
+* Use correlation distance instead of Euclidean to identify clusters that a similar in structure.
+* Investigate bi-modal distn in L3.
+
+## Statistical methods
+### Cluster analysis
 * Cook (p.126): Uses of graphics in cluster analysis to...
     + Identify clusters graphically (sometimes a graphical approach alone may be sufficient)
         - Works well when groups are clearly separated.
@@ -93,6 +106,7 @@ knitr::opts_chunk$set(echo = TRUE)
         - For self-organising maps: Tours can help identify problems with the fit (that would not be picked up in a 2D map view eg. when map wraps in on itself and makes points close to each other seem apart),
         - Confusion table with linked brushing to plots (such as a tour projection) allow mismatches and agreements between methods to be explored.
 * Cluster analysis 'tends to produce hypotheses rather than testing them' (p.107). Hence cluster analysis is an exploratory technique, that may lack 'formal validation' but it is powerful in data simplification. 
+
 
 ## Tableau
 * See: <http://onlinehelp.tableau.com/current/pro/desktop/en-us/actions.html>
@@ -152,7 +166,6 @@ tabl <- "
 "
 cat(tabl)
 ```
-
 
 ## ggobi/rggobi
 * See <http://www.ggobi.org/docs/>
@@ -261,6 +274,7 @@ brushing." and "Basic plot control"
 * A wide range of in-house interactions (ie. it is a complete pipeline and does not need add-ons to achieve the interactive techniques). 
 * Some statistical analyses available that can be applied directly to interaction.
 * Currently, probably the best interactive tool for handling large ds.
+* Able to brush, link and identify when using parallel coordinate plots BUT difficult to isolate individual cases if there are many similar cases close together (check brushing ease of brushing edges again)
 
 #### Disadvantages
 * Open source but difficult to install due to specific software requirements.
