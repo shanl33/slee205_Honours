@@ -54,11 +54,21 @@ knitr::opts_chunk$set(echo = TRUE)
     + Manet
 * Installation:
     + Download VirtualBox from <https://www.virtualbox.org/>
-    + MAC: If stuck on verifying see: <http://osxdaily.com/2016/07/26/fix-stuck-pkg-verifying-installer-mac-os-x/>
+    + MAC: If stuck on verifying, see: <http://osxdaily.com/2016/07/26/fix-stuck-pkg-verifying-installer-mac-os-x/>
     + Transfer files from USB.
     + BEFORE starting a session in VirtualBox change the "Shared Folder" directory to where you saved the USB files.
     + Start session in VirtualBox (search for Terminal etc)
-
+    
+* Using GIT with VM:
+    + Setup (do only once) to pull, merge and commit to a subdirectory, see: <https://lakehanne.github.io/git-sparse-checkout> (typo in .git/info/sparse-checkout no speech mark at the end)
+        - This fetches all files in remote repo but does not checkout all of them (ie. clone with a sparse checkout)
+    + START of every work session: Check if you have the 'current' version from the remote (git) repo.
+        - Command: git pull origin master
+        - gitGUI: Sync button
+    + END of every work session: Commit any changes
+        - Command: git status (Clean?)
+        - If not git add ., git commit -m "...", git push.
+        - gitGUI: Commit & Sync button
 * ggobi/rggobi
     + ggobi control window is on the Terminal option menu (rather than a separate window)
     + `DescribeDisplay` ggobi plugin is installed but R package yet to be installed.

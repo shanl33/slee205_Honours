@@ -9,8 +9,6 @@ summary(tdf2013)
 colnames(tdf2013)
 t <- ggobi(tdf2013)
 # Cannot scale axes for parallelplots in GGobi
-# This works in VM fine.
-# Trial pull to VM.
 
 library(GGally)
 library(plotly)
