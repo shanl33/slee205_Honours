@@ -61,13 +61,12 @@ achieved$UE <- zeros(achieved$UE)
 # Remove schools with 'small cohort' warning (obscures pattern in non-small cohorts).
 achieved <- achieved[achieved$Small_sch=="",] #437 school left
 achieved <- achieved[, -8]
-write.csv(achieved, "/Users/shanlee/Desktop/Project/slee205_Honours/Datasets/achieved.csv", row.names = F)
-
-# Visuals analysis ----------------------------------------------------------------
-load("/Users/shanlee/Desktop/Project/slee205_Honours/Datasets/achieved.csv")
-# achieved.csv contains schools with ONE or more % achievement rate (by participation)
+# 'achieved' contains schools with ONE or more % achievement rate (by participation)
 # NA's used otherwise
 # Small cohort schools removed
+
+# Static visuals analysis ----------------------------------------------------------------
+
 # Static pairwise plot
 plot(achieved)
 plot(achieved[,c(2:6)])
@@ -75,13 +74,18 @@ plot(achieved[,c(2:6)])
 # Box plots for Decile and Region
 # Facet wrap
 
+# Defining similarity
+# Euclidean distance between cases
+# Correlation distance between cases: Identifies similarities in structure (smaller correlation distance)
+
 # Unsupervised cluster analysis: 
 # Explore whether Decile and/or Region explains any structure that is 'naturally' present
-# Remove obs with any NA values (Otherwise errors in dist())
+# Remove obs with any NA values (Otherwise errors in hclust())
 ach_narm <- achieved[complete.cases(achieved),] #407 schools left
 library(MASS)
-# NB: method="complete": Dissimilarity clusters = MAXIMUM of dissimilarities between members
+# NB: Default method="complete": Dissimilarity clusters = MAXIMUM of dissimilarities between members
 # Dissimilarity clusters = AVERAGE of dissimilarities between members
+# Dendrogram using Euclidean distance
 h <- hclust(dist(ach_narm[,2:4]), method = "average")
 plot(h)
 # Two schools are clearly separated from the rest (65 and 339?)

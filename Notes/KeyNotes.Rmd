@@ -23,7 +23,7 @@ knitr::opts_chunk$set(echo = TRUE)
     + Choice of file type for image (raster vs scalable)
 
 ## To do's
-* See if can clone only sub-directory in Git (and push and pull)
+* Create a dendrogram in ggobi that can be brushed (see Paul's notes from 20 June). Brushed linking of line segments with parallel plot demonstrated in Cook p.110.
 * Large ds and applications 
 * Look at other data visualisation courses (see Reading List section)
 * Look at documenting interactions when used for exploration
@@ -75,6 +75,24 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### NZQA data
 * See: <http://www.nzqa.govt.nz/studying-in-new-zealand/secondary-school-and-ncea/find-information-about-a-school/secondary-school-statistics/consolidated-files/data-files-for-2016/>
+
+#### Cluster anaylysis
+* Cook (p.126): Uses of graphics in cluster analysis to...
+    + Identify clusters graphically (sometimes a graphical approach alone may be sufficient)
+        - Works well when groups are clearly separated.
+        - No need for assumptions about equality of variance or linear boundaries.
+        - Does not work well when clusters overlap or purpose is to partition data (regardless of whether clusters exist).
+        - Numerical methods are preferable if partitioning is the goal and then graphics can be used to interpret and evaluate the model (see below).
+    + Interpret models resulting from (numerical) algorithms, by colouring with cluster membership and using scatterplots, parallel coordinate plots, area plots and dendograms, to check the clustering is sensible.
+        - How many clusters are there? How big are the clusters?
+        - What shape are the clusters? Do they overlap?
+        - Which variables contribute the most to the clustering?
+        - Can the clusters be qualitatively described?
+    + Assess (or compare and/or refine) models from algorithms.
+        - Check assumptions about distributions 
+        - For self-organising maps: Tours can help identify problems with the fit (that would not be picked up in a 2D map view eg. when map wraps in on itself and makes points close to each other seem apart),
+        - Confusion table with linked brushing to plots (such as a tour projection) allow mismatches and agreements between methods to be explored.
+* Cluster analysis 'tends to produce hypotheses rather than testing them' (p.107). Hence cluster analysis is an exploratory technique, that may lack 'formal validation' but it is powerful in data simplification. 
 
 ## Tableau
 * See: <http://onlinehelp.tableau.com/current/pro/desktop/en-us/actions.html>
