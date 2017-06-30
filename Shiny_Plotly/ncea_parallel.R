@@ -37,45 +37,35 @@ achieved <- achieved[, -8]
 # 'achieved' contains schools with ONE or more % achievement rate (by participation)
 # NA's used otherwise
 # Small cohort schools removed
-
 achieved$Decile <- factor(achieved$Decile)
+
+
+# Shiny app ---------------------------------------------------------------
 
 ui <- fluidPage(
   mainPanel(
-    plotlyOutput("plot"),
+    sliderInput("decile", "Decile", min=-1, max=10, value = -1, step = 1, 
+                animate = TRUE, width = 500),
     plotlyOutput("pcp"),
     sliderInput("alpha", "Alpha color scale", min=0, max=1, value = 0.5)
   )
 )
 
 server <- function(input, output, session) {
-  output$plot <- renderPlotly({
-    ggplot(achieved) +
-      geom_bar(aes(x=Decile))
-    ggplotly(source = "p")
-  })
   
   output$pcp <- renderPlotly({
-    s <- event_data("plotly_click", source = "p")
-    print(s)
-    # Order by "brushed" grouping so that it gets drawn last
-    if (length(s)) {
-      achieved$brushed <- rep("0", length(achieved$School))
-      for (i in 1:length(achieved$brushed)){
-        if (achieved$Decile[i]==(s$x-1)) {
-          achieved$brushed[i] = "1"
-        }
-      }
+    if (input$decile != -1) {
+      achieved$brushed <- ifelse(test = achieved$Decile == input$decile,
+                                 yes = "1", no = "0")
       ggparcoord(data = achieved, columns = 2:5, scale = "uniminmax", groupColumn = "brushed",
                 alphaLines = input$alpha, showPoints = T) +
         theme(legend.position = "none") +
-        scale_color_manual(values = c("blue", "red"))
+        scale_color_manual(values = c("gray", "red"))
       ggplotly() 
     } else {
-      # ggparcoord(data = achieved, columns = 2:5, scale = "center", scaleSummary = "median",
-      #alphaLines = input$alpha, showPoints = T)
       ggparcoord(data = achieved, columns = 2:5, scale = "uniminmax", 
                  alphaLines = input$alpha, showPoints = T)
+                 #aes(label = School)) 
       ggplotly()
     }
   })

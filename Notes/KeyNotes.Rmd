@@ -588,6 +588,7 @@ https://github.com/ropensci/plotly/blob/51e159ba825b007657c1d7534825ef25afc7e7af
 * Lots of recent examples where interactive visualisation leverages the way we communicate findings and/or make data more accessible to others (see Shiny gallery, etc) BUT is it effective as a explorative tool? Does it have the rigor to be applied alongside theoretical analysis techniques? 
 Does *interactivity* provide extra leverage that a static graphic cannot in EDA? Could this lead to more use of interactive visuals in 'theoretical' analysis?
 * Would we one day have an interactive plot as part of the output of functions? (eg. Bayesian: Instead of a table of likelihoods and joint probs, have an interactive graphic with tooltip identification)
+* When using interactive visualisation for exploration we need the interaction to be 'fast' to be useful, so need to be mindful of writing efficient code. (eg. Use of functions like `ifelse` rather than if and then loops)
 
 #### Advantages (arguments for)
 * Parallel plots largely unuseful without interactivity (see Unwin and/or Cook)
