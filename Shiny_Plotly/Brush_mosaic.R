@@ -1,4 +1,4 @@
-install.packages("productplots")
+#install.packages("productplots")
 library(productplots)
 library(ggplot2)
 library(plotly)
@@ -21,14 +21,14 @@ server <- function(input, output, session) {
                                c("vspine", "hspine"), na.rm = TRUE)
     # level = 1 or 2 since 2 vars involved. Need to plot only level 2
     p <- ggplot(mosaic2_coords[mosaic2_coords$level==2,]) +
-      geom_rect(aes(xmin=l, xmax=r, ymin=b, ymax=t, fill=marital, color=happy)) +
+      geom_rect(aes(xmin=l, xmax=r, ymin=b, ymax=t, fill=marital, label=happy)) +
       scale_color_discrete (c=0, l=100) +
       theme(panel.background = element_blank(),
             axis.ticks = element_blank(),
             axis.title = element_blank(),
             axis.text.y = element_text(),
             axis.text.x = element_blank())
-    ggplotly(p, tooltip = c("fill", "color"), source = "plot1") 
+    ggplotly(p, tooltip = c("fill", "label"), source = "plot1") 
   })
   # Scatterplot2 will display brushed subset from sp1.
   output$scatter <- renderPlotly({
