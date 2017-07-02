@@ -13,9 +13,10 @@ library(tidyr)
 # For numerical cluster analysis method(s)
 library(MASS)
 # For graphical visualisation
-# library(rggobi) 
-# library(DescribeDisplay) # Saving plots to transfer from ggobi to R
+#library(rggobi) 
+#library(DescribeDisplay) # Saving plots to transfer from ggobi to R
 library(ggplot2)
+library(plotly)
 ```
 
 ```{r data_setup, echo=FALSE}
@@ -85,7 +86,7 @@ If you are in an environment that is able to run the two packages and `ggobi` th
 gd <- ggobi(ach_narm)[1]
 # ggobi: Parallel coord plot and scattermatrix
 display(gd, "Parallel Coordinates Display")
-display(gd, "Scattermatrix Display")
+display(gd, "Scatterplot Matrix")
 # Alternate highlighting each cluster yellow 
 glyph_color(gd)[clust5==1] <- 9 # Highlight first cluster (yellow)
 glyph_color(gd)[clust5==1] <- 1 # Reset colour (purple)
@@ -115,10 +116,24 @@ Highlighting each cluster individually identified the following:
 # Save plot in ggobi first (Tools, Save Display Description)
 # Labels for identified points will also be saved
 tour <- dd_load("2Dtour_plot")
-str(tour) 
+str(tour)
 # Plot coordinates and projection matrix for static view (F - need to check)
 tour$plots[[1]]$params$F
 ggplot(tour)
+
+# Pcp
+pcp <- dd_load("pcp_plot")
+ggplot(pcp)
+ggplotly()
+# ID retained in tooltip
+
+# Scatterplot matrix
+scatmat <- dd_load("scatmat_plot")
+ggplot(scatmat)
+# Takes a while to generate in ggplot2.
+# Diagonals no longer ASH univariate plots. Instead density for each group.
+ggplotly()
+# ID not retained but group is (via col)
 ```
 
 ### Findings: NCEA data
