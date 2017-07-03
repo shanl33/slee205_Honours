@@ -8,7 +8,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Questions
-
+* Is it sensible for `plotly` plots to render faster than `ggplot2`?
+    + `plotly` object keeps up better with animation at a faster speed (300 millisecond per animation step)
     
 ### Answered
 * Is `cranvas` worth investigating? 
@@ -107,6 +108,51 @@ knitr::opts_chunk$set(echo = TRUE)
         - Confusion table with linked brushing to plots (such as a tour projection) allow mismatches and agreements between methods to be explored.
 * Cluster analysis 'tends to produce hypotheses rather than testing them' (p.107). Hence cluster analysis is an exploratory technique, that may lack 'formal validation' but it is powerful in data simplification. 
 
+## tourr (R package)
+* See: <https://www.jstatsoft.org/article/view/v040i02/v40i02.pdf>
+* Double arrow operator (<<-) allows assignmnet to parent levels (outside of current function or enviroment). The usual single arrow operator (<-) only allows assignment to current level.
+
+### Tours
+1. Sphere data (transform to principal components)
+    + Recommended since easier to bring out interesting projections, especially when using projection pursuit indices.
+    + Sphering rotates and scales data to remove 'typically obvious correlation' (p.8)
+    + After sphering the data matrix will have a mean vector of zero and variance-covariance as the identity matrix.
+2. Choose the guided (projection pursuit) tour.
+    + In either 1D, 2D or k-D projection (hence choose a display method)
+3. Choose a projection pursuit index (function to optimise).
+    + Holes (`holes`), central mass (`cmass`), LDA (`lda_pp`) or PDA (`pda_pp`).
+    
+* 5 types of tour generators: Everything available in `ggobi` is available in `tourr`, with the addition of being able to "replay" a saved tour (`planned_tour()`)
+    1. grand_tour
+    2. guided_tour: projection pursuit with 4 indices
+        - Holes (`holes`): few points in the center
+        - Central mass (`cmass`): lots of points in center
+        - Linear discriminant analysis, LDA (`lda_pp`): maximised when the centres of pre-defined groups are furtherest apart. Equal variance of groups assumption.
+        - PDA (`pda_pp`): for small n, large p (`ggobi` has PCA in 1D as the fourth index option).
+    3. planned_tour
+    4. dependence_tour
+    5. local_tour: alternates between specified starting position and nearby random projections.
+
+* Multiple display methods depending on projection dimension. Function: `animate(display="")` or `animate_*()`.
+    + 1D: 
+        - `dist`: histogram, ASH, density plot
+        - `image`: image plot
+        - `ts`: time series
+    + 2D:
+        - `xy`: scatterplot (biplot?)
+    + 3D:
+        - `stereo`: anaglyphs (require 3D blue-red glasses to view)
+        - `depth`: 3D depth cues (using size, colour,...)
+    + k-D:
+        - `andrews`: Andrews curves
+        - `faces`: Chernoff faces (not implemented in `ggobi`)
+        - `stars`: star glyphs (not implemented in `ggobi`)
+        - `pcp`: **parallel coord plots**
+        - `scatmat`: **scatterplot matrix**
+    + Arguments
+        - `fps`: frames per second, controls smoothness of transition between frames.
+        - `aps`: angular velocity, speed of tour along tour path.
+* "very easy to hook up to additional method of data display" that is already available in R.
 
 ## Tableau
 * See: <http://onlinehelp.tableau.com/current/pro/desktop/en-us/actions.html>
@@ -200,6 +246,13 @@ cat(tabl)
         - Create "R versions" of ggobi plots
         - Need to save to file in ggobi first and then load into R 
         - Can re-create using either plot() or ggplot()
+* Recording dynamic analysis such as tours.
+    + Sievert (Journal paper draft) uses `vimeo` with no voice over.
+    + Hadley et al. ("...blindfold" paper on `tourr` package) embeds short bites of tours in the pdf document so that the reader can click and view without leaving the pdf document.  
+        - Used `render()` in `tourr` package to save plots as pdf's and then 'glued' the plots together using the `animate` package in Latex.
+        - Should be able to achieve similar with Rmarkdown (html) and `shiny`
+    + Check if `screencast` or something similar will work in VM.
+    
 
 ```{r, eval=FALSE}
 library(rggobi)

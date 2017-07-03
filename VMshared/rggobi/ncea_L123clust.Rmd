@@ -17,6 +17,8 @@ library(MASS)
 #library(DescribeDisplay) # Saving plots to transfer from ggobi to R
 library(ggplot2)
 library(plotly)
+library(tourr)
+library(colorspace)
 ```
 
 ```{r data_setup, echo=FALSE}
@@ -54,6 +56,7 @@ achieved <- achieved[, -8]
 ```
 
 ## Cluster analysis
+#### For L1 to L3 data only (with 5 clusters)
 
 **Aim:** Partition student achievement data according to the decile of the school.
 
@@ -71,11 +74,11 @@ plot(achieved.dend)
 ```
 
 From the plot we decide to cut the dendrogram to produce 5 clusters (around height=0.4).
-We except 2 singleton clusters, 1 cluster w two cases, 1 large cluster (over 0.6 of cases), 1 smaller cluster.
+We except 2 singleton cluster, 1 clusters with a couple of cases, 1 large cluster (over 0.6 of cases), 1 smaller cluster.
 
 ```{r 5clusters_r}
-clust5 <- cutree(achieved.dend, k=5)
-plot(clust5) # Static R plot confirms expected size of clusters
+clust6 <- cutree(achieved.dend, k=6)
+plot(clust6) # Static R plot confirms expected size of clusters
 ```
 
 The following chunks of code requires the `rggobi` and `DescribeDisplay` packages to be loaded (see `setup` chunk above).
@@ -99,7 +102,8 @@ glyph_color(gd)[clust5==2] <- 9
 glyph_color(gd)[clust5!=1 & clust5!=2] <- 1
 ```
 
-#### Exploration using Scattermatrix and Parallel coordinate plot
+#### Exploration using Scattermatrix and Parallel coordinate plot 
+#### For L1 to L3 data only (with 5 clusters)
 Highlighting each cluster individually identified the following:
 
 * Cluster 1 is the bigger main cluster (with generally consistent success. Not necessarily all high achievement but includes many of the 100%).
@@ -123,20 +127,32 @@ ggplot(tour)
 
 # Pcp
 pcp <- dd_load("pcp_plot")
+str(pcp)
+# Values for L1
+head(pcp$plots[[1]]$points$x)
+levels(pcp$plots[[1]]$points$col)
+# 10 colour levels retained (but only 3 used for cluster groups) from decile groupings?
+summary(pcp$plots[[1]]$points)
 ggplot(pcp)
-ggplotly()
-# ID retained in tooltip
+# Conflicts with GGally package.
+# Layering of group colours not the same as in ggobi?
+# ggplot object so compatible w plotly.
+ggplotly(tooltip = c("id", "y", "col"))
+# ID retained in tooltip for pcp but not for scatterplot matrix.
 
 # Scatterplot matrix
 scatmat <- dd_load("scatmat_plot")
+# Creates two lists: 'display' and 'scatmat'
+str(scatmat)
 ggplot(scatmat)
 # Takes a while to generate in ggplot2.
-# Diagonals no longer ASH univariate plots. Instead density for each group.
+# Diagonals no longer ASH univariate plots. Instead density for each cluster group.
 ggplotly()
 # ID not retained but group is (via col)
 ```
 
 ### Findings: NCEA data
+#### For L1 to L3 data only (with 5 clusters)
 **The two main clusters:**
 Apart from one school, all of the remaining schools in the smaller, lower cluster are at decile 6 or below. The smaller cluster generally consists of the lower tail of the distributions of achievement at each level, but there is a lot of overlap between the two clusters.
 
@@ -154,3 +170,28 @@ There appears to be a bi-modal distribution at L3 (and a very slight emergence o
 
 **2D tour:** It was difficult to decide when to pause the tour and hence which projection showed the 'best' separation.
 The NCEA data is possibly difficult to separate visually, since the dendrogram did not indicate clear separation between the two main clusters.
+
+## Interactive visualisation using tourr package
+1. Sphere data (transform to principal components)
+2. Choose the guided (projection pursuit) tour.
+    + In 2D projection (hence scatterplot `xy` display method)
+3. Choose a projection pursuit index (function to optimise).
+    + Central mass (`cmass`): lots of points in center
+
+```{r tourr}
+# Colour by clusters
+pal <- rainbow_hcl(5) # Compute a rainbow of colours (qualitative palette) for the 5 cluster groups
+col <- pal[clust5]
+# Save tour
+t1 <- save_history(ach_narm[,2:4], guided_tour(cmass, d=2, max.tries = 50), sphere = TRUE, max=50)
+animate_xy(ach_narm[,2:4], planned_tour(t1), col=col)
+animate_xy(ach_narm[,2:4], guided_tour(cmass, d=2, max.tries = 100), sphere=TRUE, col=col)
+
+# Central mass index
+ach_sphered <- attr(t1, "data") #(n by p) = (407 by 3)
+# Project data matrix using first basis
+A <- matrix(t1[,,1], ncol=2) # Final basis (p by d) = (3 by 2)
+XA <- ach_sphered%*%A #(n by d) = (407 by 2)
+(sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1]-exp(-dim(XA)[2]/2))/(1-exp(-dim(XA)[2]/2)) # cmass index
+```
+
