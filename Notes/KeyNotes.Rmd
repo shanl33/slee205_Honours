@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Questions
 * Is it sensible for `plotly` plots to render faster than `ggplot2`?
     + `plotly` object keeps up better with animation at a faster speed (300 millisecond per animation step)
+    + Which combination will result in smoother animation: (`plotly`+`shiny`) or (`plotly`+`crosstalk`)?
     
 ### Answered
 * Is `cranvas` worth investigating? 
@@ -25,7 +26,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## To do's
 * Create a dendrogram in ggobi that can be brushed (see Paul's notes from 20 June). Brushed linking of line segments with parallel plot demonstrated in Cook p.110.
-* "Export" the linear combination coordinates from tours using DescribeDisplay. (This is most likely in the dd_object, I just haven't figured out how to access it).
+* "Export" the linear combination coordinates from tours using DescribeDisplay. 
     + Allow for comparison with numerical methods.
 * Large ds and applications 
 * Look at other data visualisation courses (see Reading List section)
@@ -643,7 +644,14 @@ https://github.com/ropensci/plotly/blob/51e159ba825b007657c1d7534825ef25afc7e7af
 * Lots of recent examples where interactive visualisation leverages the way we communicate findings and/or make data more accessible to others (see Shiny gallery, etc) BUT is it effective as a explorative tool? Does it have the rigor to be applied alongside theoretical analysis techniques? 
 Does *interactivity* provide extra leverage that a static graphic cannot in EDA? Could this lead to more use of interactive visuals in 'theoretical' analysis?
 * Would we one day have an interactive plot as part of the output of functions? (eg. Bayesian: Instead of a table of likelihoods and joint probs, have an interactive graphic with tooltip identification)
-* When using interactive visualisation for exploration we need the interaction to be 'fast' to be useful, so need to be mindful of writing efficient code. (eg. Use of functions like `ifelse` rather than if and then loops)
+* When using interactive visualisation for exploration we need the interaction to be 'fast' to be useful, so need to be mindful of writing efficient code. (eg. Use of functions like `ifelse` rather than if and then loops).
+* Using 'modern' visualisation tools like `shiny`/`crosstalk` and `plotly`, for GDA and analysis has the added advantage of being easy to share and document. Also allows for modification, extending and indvidualising to a particular dataset.
+    + Software like `ggobi`(and most likely `mondrian` etc) are powerful but specialised. The user is confined to the pre-determined and fixed visual template of the environment. A template is helpful for guiding initial GDA but being able to extend and modify the template would leverage it.
+    + Tours: Being able to 'rewind' and review the tour and capture interesting views. See `tourr` folder.
+        - `plotly` allows for a static plot to be captured when interacting with the plot (in the "app").
+* Need to be confident and familiar with the statistical processes represented by the visuals in order to interpret appropriately.
+* Transfering visuals (interactive\dynamic or not) from one environment to another (eg. `ggobi` to `R`) generally results in modifications to the visual, which may lead to significant details being lost. Also the transferred object may require some work to make it compatible with other functions in the new environment.
+    + Preferable to stay within `R` environment since there are lots of packages that can be used together.
 
 #### Advantages (arguments for)
 * Parallel plots largely unuseful without interactivity (see Unwin and/or Cook)
