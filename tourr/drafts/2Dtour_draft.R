@@ -1,10 +1,19 @@
 
-
+#intial basis (scatterplot w first two vars)
+t0 <- matrix(c(1, rep(0, 4), 1, rep(0, 2)), ncol = 1)
 t2 <- save_history(ach_narm[,2:5], guided_tour(cmass, d=2, max.tries = 50), sphere=TRUE, max=50)
+t3 <- array(c(t0, t2), d)
+d <- dim(t2)
+d[1] #p = # of Xs
+d[3] <- d[3]+1
+dim(t3) <- d
+attr(t3, "dimnames") <- attr(t2, "dimnames")
+class(t2[[1]])
+matrix(t3[[2]], ncol = 2)
+class(t3[[1]])
 t2interp <- interpolate(t2) 
+dim(t2interp)[3] #Number of projections matrices
 ach_sphere2 <- attr(t2, "data") #(n by p) = (407 by 4)
-max_axis <- 0
-min_axis <- 0
 cmass_tour <- function(basis) {
   # Projected data matrix 
   XA <- ach_sphere2%*%matrix(basis, ncol=2) # (n by d) = (407 by 2)
@@ -13,6 +22,7 @@ cmass_tour <- function(basis) {
 }
 # Apply function to each projection basis
 t2_tour <- apply(t2interp, 3, FUN = cmass_tour) 
+t2_tour[[i]][[1]][,1]
 cmass_index2 <- data.frame(iteration=1:length(t2_tour))
 for(i in 1:length(t2_tour)) {
   cmass_index2$index[i] <- unlist(t2_tour[[i]][2])

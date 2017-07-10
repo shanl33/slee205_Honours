@@ -1,0 +1,306 @@
+---
+title: "2D Projection Pursuit functions"
+author: "Shan-I Lee"
+date: "7/10/2017"
+output: html_document
+---
+
+```{r setup, echo=TRUE}
+knitr::opts_chunk$set(include = FALSE)
+library(ggplot2)
+library(plotly)
+library(tourr)
+library(shiny)
+library(colorspace)
+library(crosstalk)
+data("crabs")
+```
+
+### Function with Shiny app
+```{r shiny}
+# dataset should have rownames as appropriate ID label for each obs
+# pp_index takes the same values as the index arguement in guided_tour
+# cmass, holes, (To do: lda_pp)
+pp2D_shiny <- function (dataset, index="cmass", group=NULL) {
+  # Subset real-valued vars (type="double") for touring
+  num_cols <- sapply(dataset, typeof)=="double"
+  Xdataset <- dataset[, num_cols]
+  # Save tour
+  if (index=="cmass") {
+    t <- save_history(Xdataset, guided_tour(cmass, d=2, max.tries = 50), sphere=TRUE, max=50) 
+  } else if (index=="holes") {
+    t <- save_history(Xdataset, guided_tour(holes, d=2, max.tries = 50), sphere=TRUE, max=50)
+  } else {
+    stop("Invalid 'index' argument. Choose either: cmass or holes")
+  }
+  # Initial projection as scatterplot with first two measures
+  #d <- dim(t) # dimensions: p (# of Xs), dimensions (2), # of bases
+  #t0 <- matrix(c(1, rep(0, d[1]), 1, rep(0, (d[1]-2))), ncol = 1)
+  #t1 <- c(t0, t)
+  #d[3] <- d[3]+1
+  #dim(t1) <- d
+  #tinterp <- interpolate(t1) 
+  tinterp <- interpolate(t) # Uses bases to create smooth tour
+  X_sphere <- attr(t, "data") #(n by p) 
+  # Central mass index and projection pursuit tour function
+  cmass_tour <- function(basis) {
+    # Projected data matrix 
+    XA <- X_sphere%*%matrix(basis, ncol=2) # (n by d)
+    cmass_index <- (sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1]-exp(-dim(XA)[2]/2))/(1-exp(-dim(XA)[2]/2))
+    list(rescale(XA), cmass_index)
+  }
+  # Holes index
+  holes_tour <- function(basis) {
+    XA <- X_sphere%*%matrix(basis, ncol=2) # (n by d)
+    holes_index <- (1-sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1])/(1-exp(-dim(XA)[2]/2))
+    list(rescale(XA), holes_index)
+  }
+  # Apply index function to each projection basis
+  pp_index <- data.frame(iteration=1:length(tinterp))
+  # 3rd component of tinterp is (1 by 2p) containing x-coeffs for each measurement var followed by y-coeffs
+  # matrix(3rd_comp, ncol=2) converts it into a projection matrix, A.
+  if (index=="cmass") {
+    t_tour <- apply(tinterp, 3, FUN = cmass_tour)
+  } else if (index=="holes") {
+    t_tour <- apply(tinterp, 3, FUN = holes_tour)
+  }
+  
+  for(i in 1:length(t_tour)) {
+    pp_index$index[i] <- unlist(t_tour[[i]][2])
+  }
+  # Colour by Group 
+  if (length(group)) {
+    fac <- unlist(subset(dataset, select = group)) %>% unlist() %>% as.factor()
+    pal <- rainbow_hcl(length(levels(fac))) # Compute a rainbow of colours (qualitative palette)
+    colour <- as.factor(pal[as.numeric(fac)])
+    col <- data.frame(col=colour, group=fac)
+  } else {
+    col <- data.frame(col="black", group="NA")
+  }
+  
+  # Shiny app ---------------------------------------------------------------
+  
+  ui <- fluidPage(navbarPage("2D Guided Tour",
+                             tabPanel("Animation",
+                                      mainPanel(
+                                        sliderInput("iteration", "Interation", min = 1, value = 1, step = 1,
+                                                    max = length(t_tour), animate = animationOptions(300), width = 500),
+                                        plotlyOutput("tour")
+                                      )       
+                             ),
+                             tabPanel("Proj Pursuit Index",
+                                      splitLayout(
+                                        plotlyOutput("index"),
+                                        plotlyOutput("tour2")
+                                      )
+                             )
+  ))
+  
+  server <- function(input, output, session) {
+    output$tour <- renderPlotly({
+      proj <- as.data.frame(t_tour[[input$iteration]][[1]])
+      proj$ID <- rownames(dataset)
+      p <- ggplot(proj, aes(x=V1, y=V2, label=ID, col=col$col, label1=col$group)) +
+        geom_point() +
+        scale_x_continuous(limits = c(-0.1, 1.1)) +
+        scale_y_continuous(limits = c(-0.1, 1.1)) +
+        theme_void() +
+        theme(legend.position = "none")
+      tour_p <- ggplotly(p, tooltip = c("label", "label1")) 
+      basis <- as.data.frame(matrix(tinterp[[input$iteration]], ncol = 2))
+      basis$measure <- colnames(Xdataset)
+      basis$magnitude <- (basis$V1)^2+(basis$V2)^2
+      axis_p <- ggplot(basis, aes(x=V1, y=V2)) +
+        geom_segment(aes(xend=0, yend=0, col=magnitude)) +
+        geom_text(aes(label=measure)) +
+        scale_x_continuous(limits = c(-1.1, 1.1)) +
+        scale_y_continuous(limits = c(-1.1, 1.1)) +
+        theme_void() +
+        theme(legend.position = "none") +
+        scale_color_gradient(low = "#56B1F7", high = "#132B43")
+      axis_p <- ggplotly(tooltip = "none")
+      subplot(tour_p, axis_p)
+    })
+    
+    output$index <- renderPlotly({
+      ggplot(pp_index, aes(x=iteration, y=index)) +
+        geom_point() +
+        geom_line() +
+        ggtitle("Projection pursuit index")
+      ggplotly(source = "index_plot")
+    })
+    
+    output$tour2 <- renderPlotly({
+      s <- event_data("plotly_click", source = "index_plot")
+      #print(s)
+      if (length(s)) {
+        iter <- s$x
+      } else {
+        iter <- 1
+      }
+      proj <- as.data.frame(t_tour[[iter]][[1]])
+      proj$ID <- rownames(dataset)
+      p <- ggplot(proj, aes(x=V1, y=V2, label=ID, col=col$col, label1=col$group)) +
+        geom_point() +
+        scale_x_continuous(limits = c(-0.1, 1.1)) +
+        scale_y_continuous(limits = c(-0.1, 1.1)) +
+        theme_void() +
+        theme(legend.position = "none")
+      tour_p <- ggplotly(p, tooltip=c("label", "label1")) 
+      basis <- as.data.frame(matrix(tinterp[[iter]], ncol = 2))
+      basis$measure <- colnames(Xdataset)
+      basis$magnitude <- sqrt((basis$V1)^2+(basis$V2)^2)
+      axis_p <- ggplot(basis, aes(x=V1, y=V2)) +
+        geom_segment(aes(xend=0, yend=0, col=magnitude)) +
+        geom_text(aes(label=measure)) +
+        scale_x_continuous(limits = c(-1.1, 1.1)) +
+        scale_y_continuous(limits = c(-1.1, 1.1)) +
+        theme_void() +
+        theme(legend.position = "none") +
+        scale_color_gradient(low = "#56B1F7", high = "#132B43")
+      axis_p <- ggplotly(tooltip = "none")
+      subplot(tour_p, axis_p)
+    })
+  }
+  shinyApp(ui, server)
+}
+```
+
+#### Testing: 
+```{r test_shiny}
+pp2D_shiny(crabs)
+pp2D_shiny(crabs, group = "sex")
+pp2D_shiny(crabs, index = "holes", group = "sex")
+```
+
+#### Findings for NCEA data
+```{r ncea, include=FALSE}
+# For wrangling data
+library(dplyr)
+library(tidyr)
+nzqa2016 <- read.csv("http://www.nzqa.govt.nz/assets/Studying-in-NZ/Secondary-school-and-NCEA/stats-reports/2016/Qualification-Statistics-School-2016-29032017.csv")
+# Drop vars that will not be used (eg. cumulative achievement)
+nzqa <- nzqa2016[,-c(1,8,10)]
+names(nzqa) <- c("Decile", "Region", "School", "Year", "Qualification", "Achieve_participate", "Achieve_roll", "Small_sch")
+levels(nzqa$Qualification) <- c("L1", "L2", "L3", "UE")
+# Subset to use only Year 11 with Level 1, etc
+nzqa <- nzqa %>% filter(((Qualification=="L1")&(Year==11))|((Year==12) & (Qualification=="L2"))|
+                          ((Year==13) & (Qualification=="L3"))|((Year==13) & (Qualification=="UE")))
+# Reshape so that one row = one school
+# Current.Achievement.Rate.Participation kept for analysis only
+achieved <- nzqa %>% 
+  spread(Qualification, Achieve_participate, fill=0) %>%
+  group_by(School) %>%
+  summarise_at(c("L1", "L2", "L3", "UE"), sum) %>%
+  inner_join(nzqa[, c(1, 2, 3, 8)]) %>% #Add Decile and Region and Small_sch variables
+  distinct() %>% #One row per school
+  filter(!((L1==0)&(L2==0)&(L3==0))) #Remove schools with 0% achievement rate for all levels
+# Function to replace 0% with NA
+zeros <- function(col) {
+  replace(col, col==0, NA)
+}
+achieved$L1 <- zeros(achieved$L1)
+achieved$L2 <- zeros(achieved$L2)
+achieved$L3 <- zeros(achieved$L3)
+achieved$UE <- zeros(achieved$UE)
+# Remove schools with 'small cohort' warning (obscures pattern in non-small cohorts).
+achieved <- achieved[achieved$Small_sch=="",] #437 school left
+achieved <- achieved[, -8]
+# Remove obs with any NA values (Otherwise errors)
+ach_narm <- achieved[complete.cases(achieved),] #407 schools left
+rownames(ach_narm) <- ach_narm$School
+ach_narm$Decile <- as.factor(ach_narm$Decile)
+# Run function
+pp2D_shiny(ach_narm, index = "cmass", group = "Decile")
+pp2D_shiny(ach_narm, index = "cmass", group = "Region")
+pp2D_shiny(ach_narm, index = "holes", group = "Decile")
+pp2D_shiny(ach_narm, index = "holes", group = "Region")
+```
+
+##### Central mass index
+A guided tour optimising the central mass index shows the concentration of decile 10 schools at the centre of the plot. Schools from the remaining deciles are scattered around the central mass along with a handful of decile 10 schools. 
+The central mass index tended to be optimised when `UE` and one other variable was weighted heavier than the remaining variables. (The "other variable" varied between tours).
+    + Double check interpretation with literature/theory 
+    + Is this consistent with the findings from the supervised cluster analysis? (clust6)
+        - Decile 10 schools part of the bigger of the two clusters.
+        - Schools in the bigger cluster were more consistent with each other than the smaller cluster.
+    + Replicate the `pp2D_fns` so that the user can compare the outcomes of repeated tours and compare for consistency.
+
+The higher proportion of Auckland region schools compared to the other regions might be contributing to the visual effect of Auckland schools being at the centre when the central mass index is optimised.
+    + Use opaque colours to address overplotting.
+    + Increase tour plot height and width.
+    
+##### Holes index (Not so useful for NCEA data)
+Optimising the holes index does not appear to provide any useful views. It takes at most a few distinct bases for the index to be optimised and the projections suggest there is no clear separation between schools of different decile or region. 
+
+### Function with Crosstalk
+```{r xtalk, echo=FALSE}
+pp2D_xtalk <- function(dataset, index="cmass", group=NULL) {
+  # Subset real-valued vars (type="double") for touring
+  num_cols <- sapply(dataset, typeof)=="double"
+  Xdataset <- dataset[, num_cols]
+  # Save tour
+  t <- save_history(Xdataset, guided_tour(cmass, d=2, max.tries = 50), sphere=TRUE, max=50)
+  tinterp <- interpolate(t) # Uses basis to create smooth tour
+  X_sphere <- attr(t, "data") #(n by p) 
+  # Central mass index and projection pursuit tour function
+  cmass_tour <- function(basis) {
+    # Projected data matrix 
+    XA <- X_sphere%*%matrix(basis, ncol=2) # (n by d)
+    cmass_index <- (sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1]-exp(-dim(XA)[2]/2))/(1-exp(-dim(XA)[2]/2))
+    list(rescale(XA), cmass_index)
+  }
+  # Apply index function to each projection basis
+  pp_index <- data.frame(iteration=1:length(tinterp))
+  # 3rd component of tinterp is (1 by 2p) containing x-coeffs for each measurement var followed by y-coeffs
+  # matrix(3rd_comp, ncol=2) converts it into a projection matrix, A.
+  t_tour <- apply(tinterp, 3, FUN = cmass_tour)
+  proj <- data.frame(Name=rep(rownames(dataset), dim(tinterp)[3]), step=rep(1:dim(tinterp)[3],each=dim(Xdataset)[1]), x=c(), y=c())
+  for(i in 1:length(t_tour)) {
+    pp_index$index[i] <- unlist(t_tour[[i]][2])
+    proj$x <- c(proj$x, unlist(t_tour[[i]][[1]][,1]))
+    proj$y <- c(proj$x, unlist(t2_tour[[i]][[1]][,2]))
+  }
+  # tour plot
+  tour <- proj %>%
+  SharedData$new(~Name, group = "ncea") %>%
+  plot_ly(x = ~x, y = ~y, frame = ~step, color = I("black"), 
+          height = 450, width = 800) %>%
+  add_markers(text = ~Name, hoverinfo = "text") %>%
+  layout(xaxis = ax, yaxis = ax)
+  
+  tour_p <- ggplotly(p, tooltip = c("label", "label1")) 
+  basis <- as.data.frame(matrix(tinterp[[input$iteration]], ncol = 2))
+  basis$measure <- colnames(Xdataset)
+  basis$magnitude <- (basis$V1)^2+(basis$V2)^2
+  axis_p <- ggplot(basis, aes(x=V1, y=V2)) +
+        geom_segment(aes(xend=0, yend=0, col=magnitude)) +
+        geom_text(aes(label=measure)) +
+        scale_x_continuous(limits = c(-1.1, 1.1)) +
+        scale_y_continuous(limits = c(-1.1, 1.1)) +
+        theme_void() +
+        theme(legend.position = "none") +
+        scale_color_gradient(low = "#56B1F7", high = "#132B43")
+  axis_p <- ggplotly(tooltip = "none")
+  tour <- subplot(tour_p, axes_p, nrows = 1, shareY = T, margin = 0) %>%
+  animation_opts(33) %>% #33 milliseconds between frames
+  hide_legend() %>%
+  layout(dragmode = "select") %>%
+  highlight(persistent = TRUE)
+  
+  html <- tags$div(
+  style = "display: flex; flex-wrap: wrap",
+  tags$div(tour, align = "center", style = "width: 50%; padding: 1em;")
+)
+
+# opens in an interactive session
+res <- html_print(html)
+}
+```
+
+#### Testing: 
+```{r test_xtalk}
+pp2D_xtalk(crabs)
+pp2D_shiny(crabs, group = "sex")
+pp2D_shiny(crabs, index = "holes", group = "sex")
+```

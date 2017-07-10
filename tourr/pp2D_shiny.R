@@ -4,6 +4,7 @@ library(tourr)
 library(shiny)
 library(colorspace)
 
+
 # Projection pursuit 2D guided tour (Function with Shiny app) -------------
 # dataset should have rownames as appropriate ID label for each obs
 # pp_index takes the same values as the index arguement in guided_tour

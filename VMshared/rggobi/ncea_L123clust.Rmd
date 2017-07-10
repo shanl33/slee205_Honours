@@ -196,12 +196,3 @@ A <- matrix(t1[,,1], ncol=2) # Final basis (p by d) = (3 by 2)
 XA <- ach_sphered%*%A #(n by d) = (407 by 2)
 (sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1]-exp(-dim(XA)[2]/2))/(1-exp(-dim(XA)[2]/2)) # cmass index
 ```
-
-### Findings: NCEA data
-#### From guided projection pursuit tours
-
-**Central mass** (Check with literature/theory and clust6 analysis)
-Code: `pp2D_shiny(ach_narm, index=cmass, group = "Decile")`
-A guided tour optimising the central mass index shows the concentration of high decile schools at the centre of the plot. The schools that are further away from the central mass tend to be from lower decile schools but there is a handful of high decile schools scattered beyond the outer boundary of the central mass. 
-The central mass index is optimised when L2 and UE are weighted much heavier than the remaining variables (L1 and L3).
-(This supports the findings from the supervised cluster analysis?)

@@ -45,18 +45,25 @@ ach_narm$Decile <- as.factor(ach_narm$Decile)
 
 # Code from CSievert ------------------------------------------------------
 # Standardise measurement vars
-ncea01 <- rescale(ach_narm[,2:5])
-tour <- new_tour(ncea01, grand_tour(), NULL)
-rownames(ncea01) <- ach_narm$School
+ncea01 <- rescale(ach_narm[,2:5]) # Xs [0,1]
+rownames(ncea01) <- rownames(ach_narm)
+# new_tour interpolates and generates new bases when needed
+tour <- new_tour(ncea01, guided_tour(cmass, d=2, max.tries = 50, scale=FALSE),NULL) 
 
 tour_dat <- function(step_size) {
-  step <- tour(step_size)
-  proj <- center(ncea01 %*% step$proj)
+  step <- tour(step_size) #step is a list of 3 ($proj, $target, $step)
+  # $proj basis is the current proj basis
+  # $target basis stays the same for all tour(#)
+  # $step is a cumulative counter of number of calls to the tour() fn
+  print(step)
+  proj <- center(ncea01 %*% step$proj) # Projected data matrix
+  # df with projected x and y coordinates
   data.frame(x = proj[,1], y = proj[,2], Name = rownames(ncea01))
 }
 
 proj_dat <- function(step_size) {
   step <- tour(step_size)
+  # df with x and y coordinate coeff weights for measurement vars
   data.frame(x = step$proj[,1], y = step$proj[,2], measure = colnames(ncea01))
 }
 
@@ -115,3 +122,7 @@ html <- tags$div(
 # opens in an interactive session
 res <- html_print(html)
 
+# Testing
+step0 <- tour(0)
+XA0 <- center(ncea01%*%step0$proj)
+class(XA0)
