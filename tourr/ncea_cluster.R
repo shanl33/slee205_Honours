@@ -7,7 +7,7 @@ library(plotly)
 library(tourr)
 library(shiny)
 
-# Data setup --------------------------------------------------------------
+# NCEA Data setup --------------------------------------------------------------
 nzqa2016 <- read.csv("http://www.nzqa.govt.nz/assets/Studying-in-NZ/Secondary-school-and-NCEA/stats-reports/2016/Qualification-Statistics-School-2016-29032017.csv")
 # Drop vars that will not be used (eg. cumulative achievement)
 nzqa <- nzqa2016[,-c(1,8,10)]
@@ -42,11 +42,7 @@ achieved <- achieved[, -8]
 # Remove obs with any NA values 
 ach_narm <- achieved[complete.cases(achieved),] #407 schools left
 ach_narm$Decile <- as.factor(ach_narm$Decile)
-ach_narm %>% 
-  group_by(Decile) %>% 
-  summarise(mean=mean(L3), std = sqrt(var(L3)), med = median(L3))
-# Centers are not far apart, LDA not appropriate.
-
+rownames(ach_narm) <- ach_narm$School
 
 # Check with tourr tour ---------------------------------------------------
 library(colorspace)
@@ -54,6 +50,10 @@ library(colorspace)
 pal <- sequential_hcl(11)
 col <- pal[ach_narm$Decile]
 animate_xy(ach_narm[,2:5], planned_tour(t1), col=col)
+# Centers are not far apart, LDA not appropriate.
+ach_narm %>% 
+  group_by(Decile) %>% 
+  summarise(mean=mean(L3), std = sqrt(var(L3)), med = median(L3))
 
 # Tour (Projection Pursuit using cmass) -------------------------------------------------------------------
 # Save tour

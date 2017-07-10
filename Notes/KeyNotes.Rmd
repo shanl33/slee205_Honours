@@ -10,7 +10,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Questions
 * Is it sensible for `plotly` plots to render faster than `ggplot2`?
     + `plotly` object keeps up better with animation at a faster speed (300 millisecond per animation step)
-    + Which combination will result in smoother animation: (`plotly`+`shiny`) or (`plotly`+`crosstalk`)?
+* Which combination will result in smoother animation: (`plotly`+`shiny`) or (`plotly`+`crosstalk`)?
+    + Plots are "pre-loaded" using `plotly`'s `subplot()`. 
+    + Can `subplot()` be used with (`plotly`+`shiny`)?
     
 ### Answered
 * Is `cranvas` worth investigating? 
@@ -764,3 +766,36 @@ Does *interactivity* provide extra leverage that a static graphic cannot in EDA?
 
 * Other courses
     + See Dropbox: Using_Interactive_Graphics_to_Teach_Multivariate_D.pdf
+
+### Carson Sievert's paper (not yet in print)
+* Highlights visualisation of the model in the data space as a key use of visualisation.
+
+* Techniques that he achieved that can be investigated further:
+    + Brushing of nodes on dendrogram to select all observations under that node.
+    + Smoothness of tour animation (due to data set size or otherwise?)
+    + Presentation of variable coefficents for tours (subplot with plot of tour)
+    + Linked brushing of parallel coordinate plots. What if brush on a shared node? (use linked tour plot instead to highlight)
+    + Linked brushing of several plots using `crosstalk`.
+
+* Interesting use of tours with time series.
+    + Components of the timeseries used as the variables in the tour (eg. linearity, seasonal trend,...)
+    + Similar usage as `animate_ts()` in `tourr` package?
+    
+* Refers to 'tasks' of interactive graphic techniques outlied in "Interactive High-Dimensional Data Visualisation" by Cook, Buja and Swayne (1996).
+    + What is "Gestalt"??
+    
+* Sievert highlights in addtion to using graphical techniques for EDA and model diagnosis and interpretation (as suggested already by Cook and Swayne), they are also useful for "presenting results to a wider audience". The latter has been the focus of recent developments in interactive web graphics. He identifies the "lack of tools for iteration in a larger statistical computing enviroment" as a key hinderance for using web based tools for exploring data visually.
+
+* Multiple views of one panel.
+    + Requires a lot of explanation for use? Good to scaffold explanation of part of the panel first then layer on the rest.
+    + Views very tailored to each specific contextual problem? Or are there common themes? ie. Use of data maps, pcp, linked brushing.
+    + How does this approach compare with the law of small multiples?
+
+* Found graphical evidence to support domain knowledge.
+    + Melbourne pedestrian traffic at NYE
+* Found graphical evidence to make a claim about what happened in the context.
+    + Zika virus cases in Columbia being switched from confirmed to suspected.
+    
+* Sievert also used the `tourr` package. Some differences in approach:
+    + He used `rescale()` to standardise the data values rather than the `sphere` argument. 
+    + He used `new_tour()` rather than `save_history()` hence did not need to interpolate from basis to basis (this is initiated within `new_tour()`)
