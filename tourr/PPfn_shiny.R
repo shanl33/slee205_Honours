@@ -4,14 +4,13 @@ library(tourr)
 library(shiny)
 library(colorspace)
 
-
 # Projection pursuit 2D guided tour (Function with Shiny app) -------------
 # dataset should have rownames as appropriate ID label for each obs
 # pp_index takes the same values as the index arguement in guided_tour
-# cmass, holes, lda_pp
+# cmass, holes, (To do: lda_pp)
 pp2D_shiny <- function (dataset, index="cmass", group=NULL) {
-  # Subset numeric vars for touring
-  num_cols <- sapply(dataset, is.numeric)
+  # Subset real-valued vars (type="double") for touring
+  num_cols <- sapply(dataset, typeof)=="double"
   Xdataset <- dataset[, num_cols]
   # Save tour
   if (index=="cmass") {
@@ -51,12 +50,12 @@ pp2D_shiny <- function (dataset, index="cmass", group=NULL) {
   }
   # Colour by Group 
   if (length(group)) {
-    fac <- unlist(subset(dataset, select = group)) %>% unlist() %>% as.numeric() %>% as.factor()
+    fac <- unlist(subset(dataset, select = group)) %>% unlist() %>% as.factor()
     pal <- rainbow_hcl(length(levels(fac))) # Compute a rainbow of colours (qualitative palette)
-    group_col <- as.factor(pal[fac])
-    levels(group_col) <- levels(fac)
+    colour <- as.factor(pal[as.numeric(fac)])
+    col <- data.frame(col=colour, group=fac)
   } else {
-    group_col <- "All"
+    col <- data.frame(col="black", group="NA")
   }
   
   # Shiny app ---------------------------------------------------------------
@@ -81,24 +80,25 @@ pp2D_shiny <- function (dataset, index="cmass", group=NULL) {
     output$tour <- renderPlotly({
       proj <- as.data.frame(t_tour[[input$iteration]][[1]])
       proj$ID <- rownames(dataset)
-      p <- ggplot(proj, aes(x=V1, y=V2, label=ID, col=group_col)) +
+      p <- ggplot(proj, aes(x=V1, y=V2, label=ID, col=col$col, label1=col$group)) +
         geom_point() +
-        scale_x_continuous(limits = c(0, 1)) +
-        scale_y_continuous(limits = c(0, 1)) +
+        scale_x_continuous(limits = c(-0.1, 1.1)) +
+        scale_y_continuous(limits = c(-0.1, 1.1)) +
         theme_void() +
         theme(legend.position = "none")
-      tour_p <- ggplotly(p) 
+      tour_p <- ggplotly(p, tooltip = c("label", "label1")) 
       basis <- as.data.frame(matrix(tinterp[[input$iteration]], ncol = 2))
       basis$measure <- colnames(Xdataset)
-      basis$magnitude <- sqrt((basis$V1)^2+(basis$V2)^2)
+      basis$magnitude <- (basis$V1)^2+(basis$V2)^2
       axis_p <- ggplot(basis, aes(x=V1, y=V2)) +
         geom_segment(aes(xend=0, yend=0, col=magnitude)) +
         geom_text(aes(label=measure)) +
-        scale_x_continuous(limits = c(-1, 1)) +
-        scale_y_continuous(limits = c(-1, 1)) +
+        scale_x_continuous(limits = c(-1.1, 1.1)) +
+        scale_y_continuous(limits = c(-1.1, 1.1)) +
         theme_void() +
         theme(legend.position = "none") +
         scale_color_gradient(low = "#56B1F7", high = "#132B43")
+      axis_p <- ggplotly(tooltip = "none")
       subplot(tour_p, axis_p)
     })
     
@@ -111,7 +111,7 @@ pp2D_shiny <- function (dataset, index="cmass", group=NULL) {
     
     output$tour2 <- renderPlotly({
       s <- event_data("plotly_click", source = "index_plot")
-      print(s)
+      #print(s)
       if (length(s)) {
         iter <- s$x
       } else {
@@ -119,11 +119,26 @@ pp2D_shiny <- function (dataset, index="cmass", group=NULL) {
       }
       proj <- as.data.frame(t_tour[[iter]][[1]])
       proj$ID <- rownames(dataset)
-      ggplot(proj, aes(x=V1, y=V2, label=ID, col=group_col)) +
+      p <- ggplot(proj, aes(x=V1, y=V2, label=ID, col=col$col, label1=col$group)) +
         geom_point() +
-        scale_x_continuous(limits = c(0, 1)) +
-        scale_y_continuous(limits = c(0, 1)) 
-      ggplotly() # Renders faster as a plotyly object rather than ggplot2
+        scale_x_continuous(limits = c(-0.1, 1.1)) +
+        scale_y_continuous(limits = c(-0.1, 1.1)) +
+        theme_void() +
+        theme(legend.position = "none")
+      tour_p <- ggplotly(p, tooltip=c("label", "label1")) 
+      basis <- as.data.frame(matrix(tinterp[[iter]], ncol = 2))
+      basis$measure <- colnames(Xdataset)
+      basis$magnitude <- sqrt((basis$V1)^2+(basis$V2)^2)
+      axis_p <- ggplot(basis, aes(x=V1, y=V2)) +
+        geom_segment(aes(xend=0, yend=0, col=magnitude)) +
+        geom_text(aes(label=measure)) +
+        scale_x_continuous(limits = c(-1.1, 1.1)) +
+        scale_y_continuous(limits = c(-1.1, 1.1)) +
+        theme_void() +
+        theme(legend.position = "none") +
+        scale_color_gradient(low = "#56B1F7", high = "#132B43")
+      axis_p <- ggplotly(tooltip = "none")
+      subplot(tour_p, axis_p)
     })
   }
   shinyApp(ui, server)
@@ -131,6 +146,7 @@ pp2D_shiny <- function (dataset, index="cmass", group=NULL) {
 
 
 # Testing -----------------------------------------------------------------
-pp2D_shiny(ach_narm)
-pp2D_shiny(ach_narm, group = "Decile")
-pp2D_shiny(ach_narm, index = "holes", group = "Decile")
+data("crabs")
+pp2D_shiny(crabs)
+pp2D_shiny(crabs, group = "sex")
+pp2D_shiny(crabs, index = "holes", group = "sex")

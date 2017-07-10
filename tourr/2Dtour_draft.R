@@ -20,11 +20,11 @@ for(i in 1:length(t2_tour)) {
 
 # Colour
 group_t <- "Decile"
-fac_t <- subset(ach_narm, select = group_t) 
-fac_v <- as.factor(as.numeric(unlist(fac_t)))
-pal_t <- rainbow_hcl(length(levels(fac_v))) # Compute a rainbow of colours (qualitative palette)
-group_col_t <- as.factor(pal_t[as.numeric(fac_v)])
-levels(group_col) <- levels(fac_v)
+fac_t <- unlist(subset(ach_narm, select = group_t)) %>% unlist() %>% as.factor()
+levels(fac_t)
+pal_t <- rainbow_hcl(length(levels(fac_t))) # Compute a rainbow of colours (qualitative palette)
+group_col_t <- as.factor(pal_t[as.numeric(fac_t)])
+group_col2 <- data.frame(col=group_col_t, group=fac_t)
 
 # projection axes
 plot_ly(x = ~x, y = ~y, frame = ~step, hoverinfo = "none") %>%

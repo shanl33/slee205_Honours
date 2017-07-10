@@ -54,7 +54,8 @@ animate_xy(ach_narm[,2:5], planned_tour(t1), col=col)
 ach_narm %>% 
   group_by(Decile) %>% 
   summarise(mean=mean(L3), std = sqrt(var(L3)), med = median(L3))
-
+t2 <- save_history(ach_narm[,2:5], guide_tour(holes, max.tries=50), sphere = TRUE, max=50)
+animate_xy(ach_narm[,2:5], planned_tour(t2), col=col)
 # Tour (Projection Pursuit using cmass) -------------------------------------------------------------------
 # Save tour
 t1 <- save_history(ach_narm[,2:5], guided_tour(cmass, d=2, max.tries = 50), sphere=TRUE, max=50)
