@@ -11,7 +11,6 @@ knitr::opts_chunk$set(echo = TRUE)
 * Is it sensible for `plotly` plots to render faster than `ggplot2`?
     + `plotly` object keeps up better with animation at a faster speed (300 millisecond per animation step)
 * Which combination will result in smoother animation: (`plotly`+`shiny`) or (`plotly`+`crosstalk`)?
-    + Plots are "pre-loaded" using `plotly`'s `subplot()`. 
     + Can `subplot()` be used with (`plotly`+`shiny`)?
     
 ### Answered
@@ -27,6 +26,10 @@ knitr::opts_chunk$set(echo = TRUE)
     + Choice of file type for image (raster vs scalable)
 
 ## To do's
+* Tour function (using `tourr` package)
+    + Investigate and visually display the effect of the starting projection matrix on the random tour path, by creating the plot described in the above point, and creating a scatterplot matrix of pairs of PC's as possible starting matrices. Click on scatterplot pair to select as starting matrix and initiates a few random tour paths with the traces of their paths displayed for comparison.
+        - An equivalent to `pairs()` plot in `GGally` or `plotly`? Or just have a static pairs plot and checkboxes on the side?
+    + PCP of linear combination of variables for the PC's used in the tour (Xs on axes, PCs are the obs, coloured by magnitude of PC in projection). The PCP will help to relate the PCs used in tour with the X vars from the context.
 * Create a dendrogram in ggobi that can be brushed (see Paul's notes from 20 June). Brushed linking of line segments with parallel plot demonstrated in Cook p.110.
 * "Export" the linear combination coordinates from tours using DescribeDisplay. 
     + Allow for comparison with numerical methods.
@@ -42,6 +45,19 @@ knitr::opts_chunk$set(echo = TRUE)
     + R package to connect w it.
 *`ggiraph` R package, a bit like plotly but allows more custom control over interactive techniques.
     + Adds interactive techniques to ggplot2 plots.
+
+### NCEA data
+* See: <http://www.nzqa.govt.nz/studying-in-new-zealand/secondary-school-and-ncea/find-information-about-a-school/secondary-school-statistics/consolidated-files/data-files-for-2016/>
+* Bi-modal distribution in L3 (and slightly L2).
+    + Investigate clustering based on L3 alone?
+* Aim: Partition student achievement data according to the decile of the school.
+* Cluster analysis: Use a numerical method to model clusters, then use visualisation to interpret and analyse clusters.
+    + Heirarchical clustering algorithm using Euclidean distances and average linkage identified 4 clusters and two overlapping clusters. The smaller cluster was relatively low-achieving and consisted of the lower tail of the univariate distributions for each level of achievement. All schools except 1 in this cluster was from decile 6 or below. There is no clear separation between the two clusters in any univariate distribution and the 2D tours looked at so far.
+
+#### To do:
+* Re-analyse with the 6 clusters (using L1, 2, 3 AND UE).
+* Use correlation distance instead of Euclidean to identify clusters that a similar in structure.
+* Investigate bi-modal distn in L3.
 
 ## Virtual Machine
 * Software to have on VM:
@@ -79,19 +95,6 @@ knitr::opts_chunk$set(echo = TRUE)
     + ggobi control window is on the Terminal option menu (rather than a separate window)
     + `DescribeDisplay` ggobi plugin is installed but R package yet to be installed.
 
-### NCEA data
-* See: <http://www.nzqa.govt.nz/studying-in-new-zealand/secondary-school-and-ncea/find-information-about-a-school/secondary-school-statistics/consolidated-files/data-files-for-2016/>
-* Bi-modal distribution in L3 (and slightly L2).
-    + Investigate clustering based on L3 alone?
-* Aim: Partition student achievement data according to the decile of the school.
-* Cluster analysis: Use a numerical method to model clusters, then use visualisation to interpret and analyse clusters.
-    + Heirarchical clustering algorithm using Euclidean distances and average linkage identified 4 clusters and two overlapping clusters. The smaller cluster was relatively low-achieving and consisted of the lower tail of the univariate distributions for each level of achievement. All schools except 1 in this cluster was from decile 6 or below. There is no clear separation between the two clusters in any univariate distribution and the 2D tours looked at so far.
-
-### To do:
-* Check for equal variance between decile groups and see if can use LDA or another parametric method (rather than algorithmic).
-* Use correlation distance instead of Euclidean to identify clusters that a similar in structure.
-* Investigate bi-modal distn in L3.
-
 ## Statistical methods
 ### Cluster analysis
 * Cook (p.126): Uses of graphics in cluster analysis to...
@@ -111,13 +114,19 @@ knitr::opts_chunk$set(echo = TRUE)
         - Confusion table with linked brushing to plots (such as a tour projection) allow mismatches and agreements between methods to be explored.
 * Cluster analysis 'tends to produce hypotheses rather than testing them' (p.107). Hence cluster analysis is an exploratory technique, that may lack 'formal validation' but it is powerful in data simplification. 
 
+### 2D Tours
+* `crabs` dataset could be a good example to demonstrate the use of guided tours optimising the holes index to identify group structures in the data.
+    + Using PC1 and PC2 for the starting projectcion basis brings out the gender separation and using PC2 and PC3 (??) highlights the species separation (need to check this) since gender separation is more defined than the species separation?? Also need to check how the separation into 4 (sex-species) groups is seen in the tours.
+    + A good dataset to demonstrate the usefulness of visualising and tracing the random tour paths of several tours. 
+
 ## tourr (R package)
 * See: <https://www.jstatsoft.org/article/view/v040i02/v40i02.pdf>
 * Double arrow operator (<<-) allows assignmnet to parent levels (outside of current function or enviroment). The usual single arrow operator (<-) only allows assignment to current level.
 
 ### Tours
 1. Sphere data (transform to principal components)
-    + Recommended since easier to bring out interesting projections, especially when using projection pursuit indices.
+    + Use of PC's (rather than raw data Xs) chooses a starting point for the (random) tour path that is more likley to lead to interesting views. This results in more consistency between the random tours and increases the chance for the most interesting views to be consistently captured in each random tour.
+    + PCA (Principal Component Analysis): Seeks to find a linear combinaton of X with maximal (or minimal) variance. The ith principal component is the ith linear combination picked that maximises variance and is uncorrelated with the linear combinations that have been picked earlier. ("The first few PCs are often useful to reveal structure in data")
     + Sphering rotates and scales data to remove 'typically obvious correlation' (p.8)
     + After sphering the data matrix will have a mean vector of zero and variance-covariance as the identity matrix.
 2. Choose the guided (projection pursuit) tour.
@@ -135,6 +144,9 @@ knitr::opts_chunk$set(echo = TRUE)
     3. planned_tour
     4. dependence_tour
     5. local_tour: alternates between specified starting position and nearby random projections.
+    
+* Replicate tour function and show trace of the tour paths to display the consistency of the endpoints of the random tours. Also the differences in tour paths when the orthogonal projecton of a different pair of PCs are used as the starting basis.
+    + Visualising the path of a tour requires the use of multidimensional scaling of "principal angles" between planes. When represented on a 2D plot it does NOT represent the path's coverage of the X's-dimensional space, hence is not very useful for illustrating the consistency of tours. (See `visualise_paths.R`)
 
 * Multiple display methods depending on projection dimension. Function: `animate(display="")` or `animate_*()`.
     + 1D: 
@@ -156,6 +168,7 @@ knitr::opts_chunk$set(echo = TRUE)
         - `fps`: frames per second, controls smoothness of transition between frames.
         - `aps`: angular velocity, speed of tour along tour path.
 * "very easy to hook up to additional method of data display" that is already available in R.
+* `tourr` functions are sensitive to the order of vars in the dataframe used since the default 'start' projection basis is the orthogonal projection of the first two variables.
 
 ## Tableau
 * See: <http://onlinehelp.tableau.com/current/pro/desktop/en-us/actions.html>
@@ -643,6 +656,13 @@ https://github.com/ropensci/plotly/blob/51e159ba825b007657c1d7534825ef25afc7e7af
 
 ## General comments 
 ### The role of interactive visualisation
+* Difficult to argue that the use of interactive data visualisation AlONE is sufficient for analysis. BUT graphics should be part of all analyses and INTERACTIVE techniques enable visuals to play an even greater role in revealing insights about data as well as evaluating and understanding results from numerical methods. Interactive visuals are not only useful for communication, but an essential part of any analysis, alongside numerical methods.
+* Aim to make interactive graphical techniques easy to access and apply, to more data analysts, but still allow modification and generalisation.
+    + `ggobi` is rigourous and easy to apply but access to the software is limited (due to installation requirements). Also no room for modification.
+    + `R` is easy to access, use and allows for modification as well as generalisation.
+    + Create a template for using tours for data analysis based on the techniques used by Cook and Swayne. Hopefully this allows relative novices to explore the techniques and develop an understanding of how tours can be applied to a range of problems.
+        - A stepping stone towards developing intuition in applying the interactive techniques.
+        - To try and reduce the learning curve (and/or investment in time and effort required for set up) that may be discouraging ppl from applying or including interactive graphical visualisation techniques in their data analysis.
 * Lots of recent examples where interactive visualisation leverages the way we communicate findings and/or make data more accessible to others (see Shiny gallery, etc) BUT is it effective as a explorative tool? Does it have the rigor to be applied alongside theoretical analysis techniques? 
 Does *interactivity* provide extra leverage that a static graphic cannot in EDA? Could this lead to more use of interactive visuals in 'theoretical' analysis?
 * Would we one day have an interactive plot as part of the output of functions? (eg. Bayesian: Instead of a table of likelihoods and joint probs, have an interactive graphic with tooltip identification)
@@ -670,6 +690,9 @@ Does *interactivity* provide extra leverage that a static graphic cannot in EDA?
         - BUT the 'different conclusions' may be within the range of reasonable solutions (ie. not differ drastically, a bit like within a CI for point predictions from different samples of the same population)
     + Similar challenges to accepting conclusions from empirical data.
         - See Efron: 'resistance to empiricism' (in the context of bootstrap methods?)
+* Novices may be afraid of making wrong decisions (eg. to sphere or not to sphere? Argument settings) and errorneous visual interpretations.
+    + Decisions also need to be made when using numerical methods but numeric methods may seem more formulaic or can be 'taught' in a more formulaic manner. ie. You can follow a worked example to apply the numerical method and interpretation to a new problem. The yardstick used to make a judgement usually involve values that are fixed or comparisons between quantifiable magnitudes. 
+    While graphical analysis may seem more intuitive and subjective, with the approach and interpretation dependent on the specific problem (?). Hence more effort, confidence and experience (?) is required when using visuals in data analysis.
 
 #### Focus on making/finding examples that..
 * Connect with statistical analysis or some part of EDA. For example:

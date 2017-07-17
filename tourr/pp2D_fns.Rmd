@@ -10,9 +10,12 @@ knitr::opts_chunk$set(include = FALSE)
 library(ggplot2)
 library(plotly)
 library(tourr)
-library(shiny)
-library(colorspace)
-library(crosstalk)
+library(abind)
+library(shiny) # For (shiny+plotly) function
+library(GGally) # For PCP using ggparcord()
+library(colorspace) # For colour as an argument
+library(crosstalk) # For (crosstalk+plotly) function
+library(MASS) # For crabs dataset
 data("crabs")
 ```
 
@@ -33,14 +36,14 @@ pp2D_shiny <- function (dataset, index="cmass", group=NULL) {
   } else {
     stop("Invalid 'index' argument. Choose either: cmass or holes")
   }
-  # Initial projection as scatterplot with first two measures
-  #d <- dim(t) # dimensions: p (# of Xs), dimensions (2), # of bases
-  #t0 <- matrix(c(1, rep(0, d[1]), 1, rep(0, (d[1]-2))), ncol = 1)
-  #t1 <- c(t0, t)
-  #d[3] <- d[3]+1
-  #dim(t1) <- d
-  #tinterp <- interpolate(t1) 
-  tinterp <- interpolate(t) # Uses bases to create smooth tour
+  # Start view as orthogonal projection of first two measures
+  # Retain orthogonal projection as initial basis
+  t0 <- t[,,1]
+  t0 <- matrix(c(1, rep(0, dim(Xdataset)[2]), 1, rep(0, (dim(Xdataset)[2]-2))), ncol = 2)
+  t1 <- abind(t0, t, along = 3)
+  class(t1) <- "history_array"
+  tinterp <- interpolate(t1) 
+  #tinterp <- interpolate(t) # Uses bases to create smooth tour
   X_sphere <- attr(t, "data") #(n by p) 
   # Central mass index and projection pursuit tour function
   cmass_tour <- function(basis) {
@@ -108,7 +111,7 @@ pp2D_shiny <- function (dataset, index="cmass", group=NULL) {
         theme(legend.position = "none")
       tour_p <- ggplotly(p, tooltip = c("label", "label1")) 
       basis <- as.data.frame(matrix(tinterp[[input$iteration]], ncol = 2))
-      basis$measure <- colnames(Xdataset)
+      basis$measure <- colnames(X_sphere)
       basis$magnitude <- (basis$V1)^2+(basis$V2)^2
       axis_p <- ggplot(basis, aes(x=V1, y=V2)) +
         geom_segment(aes(xend=0, yend=0, col=magnitude)) +
@@ -148,7 +151,7 @@ pp2D_shiny <- function (dataset, index="cmass", group=NULL) {
         theme(legend.position = "none")
       tour_p <- ggplotly(p, tooltip=c("label", "label1")) 
       basis <- as.data.frame(matrix(tinterp[[iter]], ncol = 2))
-      basis$measure <- colnames(Xdataset)
+      basis$measure <- colnames(X_sphere)
       basis$magnitude <- sqrt((basis$V1)^2+(basis$V2)^2)
       axis_p <- ggplot(basis, aes(x=V1, y=V2)) +
         geom_segment(aes(xend=0, yend=0, col=magnitude)) +

@@ -1,28 +1,40 @@
+library(ggplot2)
+library(plotly)
+library(tourr)
+library(abind)
+library(MASS) # For crabs dataset
+data("crabs")
+
+# Sphere data
+X_sphere <- sphere(crabs[,4:8])
 
 #intial basis (scatterplot w first two vars)
-t0 <- matrix(c(1, rep(0, 4), 1, rep(0, 2)), ncol = 1)
-t2 <- save_history(ach_narm[,2:5], guided_tour(cmass, d=2, max.tries = 50), sphere=TRUE, max=50)
-t3 <- array(c(t0, t2), d)
-d <- dim(t2)
-d[1] #p = # of Xs
-d[3] <- d[3]+1
-dim(t3) <- d
-attr(t3, "dimnames") <- attr(t2, "dimnames")
-class(t2[[1]])
-matrix(t3[[2]], ncol = 2)
-class(t3[[1]])
-t2interp <- interpolate(t2) 
-dim(t2interp)[3] #Number of projections matrices
-ach_sphere2 <- attr(t2, "data") #(n by p) = (407 by 4)
+t2 <- save_history(X_sphere, guided_tour(cmass, d=2, max.tries = 50), max=50)
+t2[1,,]
+t2[,1,]
+t2[,,1]
+
+# Retain orthogonal projection as initial basis
+t0 <- t2[,,1]
+t0[,,1] <- matrix(c(1, rep(0, 5), 1, rep(0, 3)), ncol = 1)
+t3 <- abind(t2, t0, along = 3)
+class(t3) <- "history_array"
+t3[[1]]
+str(t3)
+str(t2)
+
+tinterp <- interpolate(t3)
+
 cmass_tour <- function(basis) {
   # Projected data matrix 
-  XA <- ach_sphere2%*%matrix(basis, ncol=2) # (n by d) = (407 by 2)
+  XA <- X_sphere%*%matrix(basis, ncol=2) # (n by d) = (407 by 2)
   cmass_index <- (sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1]-exp(-dim(XA)[2]/2))/(1-exp(-dim(XA)[2]/2))
   list(rescale(XA), cmass_index)
 }
 # Apply function to each projection basis
-t2_tour <- apply(t2interp, 3, FUN = cmass_tour) 
+t2_tour <- apply(tinterp, 3, FUN = cmass_tour) 
 t2_tour[[i]][[1]][,1]
+
 cmass_index2 <- data.frame(iteration=1:length(t2_tour))
 for(i in 1:length(t2_tour)) {
   cmass_index2$index[i] <- unlist(t2_tour[[i]][2])
@@ -48,3 +60,21 @@ ggplot(proj, aes(x=V1, y=V2, label=ID, col=group_col)) +
   scale_y_continuous(limits = c(-1, 1)) 
 ggplotly(hoverinfo = "none") 
 
+# Using new_tour() function
+X_sphere <- sphere(crabs[,4:8])
+head(X_sphere)
+tour <- new_tour(X_sphere, tour_path = guided_tour(cmass, d=2, max.tries = 50))
+steps <- c(0, rep(1/15, 1000))
+stepz <- cumsum(steps)
+tail(steps)
+
+tour_dat <- function(step_size) {
+  step <- tour(step_size) #step is a list of 3 ($proj, $target, $step)
+  # $proj basis is the current proj basis
+  # $target basis stays the same for all tour(#)
+  # $step is a cumulative counter of number of calls to the tour() fn
+  print(step)
+  proj <- center(X_sphere %*% step$proj) # Projected data matrix
+  # df with projected x and y coordinates
+  data.frame(x = proj[,1], y = proj[,2], Name = rownames(ncea01))
+}
