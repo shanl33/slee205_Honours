@@ -15,6 +15,7 @@ library(shiny) # For (shiny+plotly) function
 library(GGally) # For PCP using ggparcord()
 library(colorspace) # For colour as an argument
 library(crosstalk) # For (crosstalk+plotly) function
+library(htmltools)
 library(MASS) # For crabs dataset
 data("crabs")
 ```
@@ -24,15 +25,15 @@ data("crabs")
 # dataset should have rownames as appropriate ID label for each obs
 # pp_index takes the same values as the index arguement in guided_tour
 # cmass, holes, (To do: lda_pp)
-pp2D_shiny <- function (dataset, index="cmass", group=NULL) {
+pp2D_shiny <- function (dataset, index="cmass", group=NULL,...) {
   # Subset real-valued vars (type="double") for touring
   num_cols <- sapply(dataset, typeof)=="double"
   Xdataset <- dataset[, num_cols]
   # Save tour
   if (index=="cmass") {
-    t <- save_history(Xdataset, guided_tour(cmass, d=2, max.tries = 50), sphere=TRUE, max=50) 
+    t <- save_history(Xdataset, guided_tour(cmass, d=2, max.tries = 50), sphere = TRUE, max=50,...) 
   } else if (index=="holes") {
-    t <- save_history(Xdataset, guided_tour(holes, d=2, max.tries = 50), sphere=TRUE, max=50)
+    t <- save_history(Xdataset, guided_tour(holes, d=2, max.tries = 50), sphere = TRUE, max=50,...)
   } else {
     stop("Invalid 'index' argument. Choose either: cmass or holes")
   }
@@ -86,8 +87,8 @@ pp2D_shiny <- function (dataset, index="cmass", group=NULL) {
   ui <- fluidPage(navbarPage("2D Guided Tour",
                              tabPanel("Animation",
                                       mainPanel(
-                                        sliderInput("iteration", "Interation", min = 1, value = 1, step = 1,
-                                                    max = length(t_tour), animate = animationOptions(300), width = 500),
+                                        sliderInput("iteration", "Iteration", min = 1, value = 1, step = 1,
+                                                    max = length(t_tour), animate = animationOptions(400), width = 500),
                                         plotlyOutput("tour")
                                       )       
                              ),
@@ -220,7 +221,7 @@ pp2D_shiny(ach_narm, index = "holes", group = "Decile")
 pp2D_shiny(ach_narm, index = "holes", group = "Region")
 ```
 
-##### Central mass index
+##### Central mass index (Redo! Refer to PCs not X-vars directly)
 A guided tour optimising the central mass index shows the concentration of decile 10 schools at the centre of the plot. Schools from the remaining deciles are scattered around the central mass along with a handful of decile 10 schools. 
 The central mass index tended to be optimised when `UE` and one other variable was weighted heavier than the remaining variables. (The "other variable" varied between tours).
     + Double check interpretation with literature/theory 
@@ -238,13 +239,26 @@ Optimising the holes index does not appear to provide any useful views. It takes
 
 ### Function with Crosstalk
 ```{r xtalk, echo=FALSE}
-pp2D_xtalk <- function(dataset, index="cmass", group=NULL) {
+pp2D_xtalk <- function(dataset, index="cmass", ...) {
   # Subset real-valued vars (type="double") for touring
   num_cols <- sapply(dataset, typeof)=="double"
   Xdataset <- dataset[, num_cols]
+  p <- length(Xdataset) # Number of real-valued Xs used in tour
   # Save tour
-  t <- save_history(Xdataset, guided_tour(cmass, d=2, max.tries = 50), sphere=TRUE, max=50)
-  tinterp <- interpolate(t) # Uses basis to create smooth tour
+  if (index=="cmass") {
+    t <- save_history(Xdataset, guided_tour(cmass, d=2, max.tries = 50), sphere = TRUE, max=50,...) 
+  } else if (index=="holes") {
+    t <- save_history(Xdataset, guided_tour(holes, d=2, max.tries = 50), sphere = TRUE, max=50,...)
+  } else {
+    stop("Invalid 'index' argument. Choose either: cmass or holes")
+  }
+  # Start view as orthogonal projection of first two measures
+  # Retain orthogonal projection as initial basis
+  t0 <- t[,,1]
+  t0 <- matrix(c(1, rep(0, p), 1, rep(0, (p-2))), ncol = 2)
+  t1 <- abind(t0, t, along = 3)
+  class(t1) <- "history_array"
+  tinterp <- interpolate(t1) 
   X_sphere <- attr(t, "data") #(n by p) 
   # Central mass index and projection pursuit tour function
   cmass_tour <- function(basis) {
@@ -254,46 +268,67 @@ pp2D_xtalk <- function(dataset, index="cmass", group=NULL) {
     list(rescale(XA), cmass_index)
   }
   # Apply index function to each projection basis
-  pp_index <- data.frame(iteration=1:length(tinterp))
-  # 3rd component of tinterp is (1 by 2p) containing x-coeffs for each measurement var followed by y-coeffs
-  # matrix(3rd_comp, ncol=2) converts it into a projection matrix, A.
   t_tour <- apply(tinterp, 3, FUN = cmass_tour)
-  proj <- data.frame(Name=rep(rownames(dataset), dim(tinterp)[3]), step=rep(1:dim(tinterp)[3],each=dim(Xdataset)[1]), x=c(), y=c())
+  pp_index <- data.frame(iteration=1:length(tinterp))
+  x <- c()
+  y <- c()
+  PC_x <- c()
+  PC_y <- c()
   for(i in 1:length(t_tour)) {
     pp_index$index[i] <- unlist(t_tour[[i]][2])
-    proj$x <- c(proj$x, unlist(t_tour[[i]][[1]][,1]))
-    proj$y <- c(proj$x, unlist(t2_tour[[i]][[1]][,2]))
+    x <- c(x, unlist(t_tour[[i]][[1]][,1]))
+    y <- c(y, unlist(t_tour[[i]][[1]][,2]))
+    # Take first 'p' values to be x-coords for PCs
+    PC_x <- c(PC_x, unlist(tinterp[[i]][1:p])) 
+    # Take remaining 'p' values to be y-coords for PCs
+    PC_y <- c(PC_y, unlist(tinterp[[i]][(p+1):(p+p)])) 
   }
+  proj <- data.frame(Name=rep(rownames(dataset), length(tinterp)), 
+                   step=rep(1:length(tinterp),each=dim(Xdataset)[1]), x=x, y=y)
+  basis <- data.frame(measure=rep(colnames(X_sphere), length(tinterp)),
+                   step=rep(1:length(tinterp),each=p), 
+                   magnitude=PC_x^2+PC_y^2, x=PC_x, y=PC_y)
+  
+  # Axes for tour plot ("tour") and measurement var coeffs plot ("axes")
+tx <- list(
+  title = "", range = c(-0.1, 1.1), 
+  zeroline = F, showticklabels = F
+)
+
+ax <- list(
+  title = "", range = c(-1.1, 1.1), 
+  zeroline = F, showticklabels = F
+)
   # tour plot
   tour <- proj %>%
-  SharedData$new(~Name, group = "ncea") %>%
+  SharedData$new(~Name, group = "2Dtour") %>%
   plot_ly(x = ~x, y = ~y, frame = ~step, color = I("black"), 
           height = 450, width = 800) %>%
   add_markers(text = ~Name, hoverinfo = "text") %>%
-  layout(xaxis = ax, yaxis = ax)
+  layout(xaxis = tx, yaxis = tx)
   
-  tour_p <- ggplotly(p, tooltip = c("label", "label1")) 
-  basis <- as.data.frame(matrix(tinterp[[input$iteration]], ncol = 2))
-  basis$measure <- colnames(Xdataset)
-  basis$magnitude <- (basis$V1)^2+(basis$V2)^2
-  axis_p <- ggplot(basis, aes(x=V1, y=V2)) +
-        geom_segment(aes(xend=0, yend=0, col=magnitude)) +
-        geom_text(aes(label=measure)) +
-        scale_x_continuous(limits = c(-1.1, 1.1)) +
-        scale_y_continuous(limits = c(-1.1, 1.1)) +
-        theme_void() +
-        theme(legend.position = "none") +
-        scale_color_gradient(low = "#56B1F7", high = "#132B43")
-  axis_p <- ggplotly(tooltip = "none")
-  tour <- subplot(tour_p, axes_p, nrows = 1, shareY = T, margin = 0) %>%
+  axes <- basis %>%
+  plot_ly(x = ~x, y = ~y, frame = ~step, hoverinfo = "none") %>%
+    add_segments(xend = 0, yend = 0, color = I("gray85"), size = I(1)) %>%
+    # Color segments don't work
+  #add_segments(xend = 0, yend = 0, color = ~magnitude, size = I(1), showlegend=FALSE) %>%
+  add_text(text = ~measure, color=I("black")) %>%
+  layout(xaxis = ax, yaxis = ax)
+  # Doesn't work if use ggplot() for axes plot
+  
+  # very important these animation options are specified _after_ subplot()
+# since they call plotly_build(., registerFrames = T)
+# (Took a few minutes to run)
+  tour <- subplot(tour, axes, nrows = 1, margin = 0) %>%
   animation_opts(33) %>% #33 milliseconds between frames
   hide_legend() %>%
   layout(dragmode = "select") %>%
-  highlight(persistent = TRUE)
+  highlight(on="plotly_select", off= "plotly_deselect", color = "blue", persistent = TRUE)
   
   html <- tags$div(
   style = "display: flex; flex-wrap: wrap",
   tags$div(tour, align = "center", style = "width: 50%; padding: 1em;")
+  #tags$div(brush_group, align = "center", style = "width: 50%; padding: 1em;")
 )
 
 # opens in an interactive session
@@ -304,6 +339,5 @@ res <- html_print(html)
 #### Testing: 
 ```{r test_xtalk}
 pp2D_xtalk(crabs)
-pp2D_shiny(crabs, group = "sex")
-pp2D_shiny(crabs, index = "holes", group = "sex")
+pp2D_xtalk(crabs, index = "holes")
 ```

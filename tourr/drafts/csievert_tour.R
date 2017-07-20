@@ -5,66 +5,31 @@ library(htmltools)
 library(dplyr)
 library(tidyr)
 library(tourr)
-
+library(MASS) # crabs dataset
+data("crabs")
 # See if tour is smoother using Crosstalk+Plotly rather than Shiny+Plotly
-# NCEA Data setup --------------------------------------------------------------
-nzqa2016 <- read.csv("http://www.nzqa.govt.nz/assets/Studying-in-NZ/Secondary-school-and-NCEA/stats-reports/2016/Qualification-Statistics-School-2016-29032017.csv")
-# Drop vars that will not be used (eg. cumulative achievement)
-nzqa <- nzqa2016[,-c(1,8,10)]
-names(nzqa) <- c("Decile", "Region", "School", "Year", "Qualification", "Achieve_participate", "Achieve_roll", "Small_sch")
-levels(nzqa$Qualification) <- c("L1", "L2", "L3", "UE")
-# Subset to use only Year 11 with Level 1, etc
-nzqa <- nzqa %>% filter(((Qualification=="L1")&(Year==11))|((Year==12) & (Qualification=="L2"))|
-                          ((Year==13) & (Qualification=="L3"))|((Year==13) & (Qualification=="UE")))
-# Reshape so that one row = one school
-# Current.Achievement.Rate.Participation kept for analysis only
-achieved <- nzqa %>% 
-  spread(Qualification, Achieve_participate, fill=0) %>%
-  group_by(School) %>%
-  summarise_at(c("L1", "L2", "L3", "UE"), sum) %>%
-  inner_join(nzqa[, c(1, 2, 3, 8)]) %>% #Add Decile and Region and Small_sch variables
-  distinct() %>% #One row per school
-  filter(!((L1==0)&(L2==0)&(L3==0))) #Remove schools with 0% achievement rate for all levels
-# Function to replace 0% with NA
-zeros <- function(col) {
-  replace(col, col==0, NA)
-}
-achieved$L1 <- zeros(achieved$L1)
-achieved$L2 <- zeros(achieved$L2)
-achieved$L3 <- zeros(achieved$L3)
-achieved$UE <- zeros(achieved$UE)
-# Remove schools with 'small cohort' warning (obscures pattern in non-small cohorts).
-achieved <- achieved[achieved$Small_sch=="",] #437 school left
-achieved <- achieved[, -8]
-# 'achieved' contains schools with ONE or more % achievement rate (by participation)
-# NA's used otherwise
-# Small cohort schools removed
-# Remove obs with any NA values 
-ach_narm <- achieved[complete.cases(achieved),] #407 schools left
-ach_narm$Decile <- as.factor(ach_narm$Decile)
 
 # Code from CSievert ------------------------------------------------------
 # Standardise measurement vars
-ncea01 <- rescale(ach_narm[,2:5]) # Xs [0,1]
-rownames(ncea01) <- rownames(ach_narm)
+Xdataset <- rescale(crabs[,4:8]) # Xs [0,1]
+rownames(Xdataset) <- rownames(crabs)
 # new_tour interpolates and generates new bases when needed
-tour <- new_tour(ncea01, guided_tour(cmass, d=2, max.tries = 50, scale=FALSE),NULL) 
+tour <- new_tour(Xdataset, grand_tour(), NULL) 
 
 tour_dat <- function(step_size) {
   step <- tour(step_size) #step is a list of 3 ($proj, $target, $step)
   # $proj basis is the current proj basis
   # $target basis stays the same for all tour(#)
   # $step is a cumulative counter of number of calls to the tour() fn
-  print(step)
-  proj <- center(ncea01 %*% step$proj) # Projected data matrix
+  proj <- center(Xdataset %*% step$proj) # Projected data matrix
   # df with projected x and y coordinates
-  data.frame(x = proj[,1], y = proj[,2], Name = rownames(ncea01))
+  data.frame(x = proj[,1], y = proj[,2], Name = rownames(Xdataset))
 }
 
 proj_dat <- function(step_size) {
   step <- tour(step_size)
   # df with x and y coordinate coeff weights for measurement vars
-  data.frame(x = step$proj[,1], y = step$proj[,2], measure = colnames(ncea01))
+  data.frame(x = step$proj[,1], y = step$proj[,2], measure = colnames(Xdataset))
 }
 
 steps <- c(0, rep(1/15, 1000))
@@ -74,7 +39,6 @@ stepz <- cumsum(steps)
 tour_dats <- lapply(steps, tour_dat)
 tour_datz <- Map(function(x, y) cbind(x, step = y), tour_dats, stepz)
 tour_dat <- dplyr::bind_rows(tour_datz)
-tour_dat$Decile <- rep_len(ach_narm$Decile, dim(tour_dat)[1])
 
 # tidy version of tour projection data
 proj_dats <- lapply(steps, proj_dat)
@@ -90,7 +54,7 @@ ax <- list(
 options(digits = 3)
 # Tried colour = ~Decile but does not register and extends processing time for subplot() later on
 tour <- tour_dat %>%
-  SharedData$new(~Name, group = "ncea") %>%
+  SharedData$new(~Name, group = "crabs") %>%
   plot_ly(x = ~x, y = ~y, frame = ~step, color = I("black"), 
           height = 450, width = 800) %>%
   add_markers(text = ~Name, hoverinfo = "text") %>%
@@ -124,5 +88,5 @@ res <- html_print(html)
 
 # Testing
 step0 <- tour(0)
-XA0 <- center(ncea01%*%step0$proj)
+XA0 <- center(Xdataset%*%step0$proj)
 class(XA0)

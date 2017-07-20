@@ -10,9 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Questions
 * Is it sensible for `plotly` plots to render faster than `ggplot2`?
     + `plotly` object keeps up better with animation at a faster speed (300 millisecond per animation step)
-* Which combination will result in smoother animation: (`plotly`+`shiny`) or (`plotly`+`crosstalk`)?
-    + Can `subplot()` be used with (`plotly`+`shiny`)?
-    
+
 ### Answered
 * Is `cranvas` worth investigating? 
     + NO, difficult to install and appears to be not in development anymore.
@@ -118,6 +116,12 @@ knitr::opts_chunk$set(echo = TRUE)
 * `crabs` dataset could be a good example to demonstrate the use of guided tours optimising the holes index to identify group structures in the data.
     + Using PC1 and PC2 for the starting projectcion basis brings out the gender separation and using PC2 and PC3 (??) highlights the species separation (need to check this) since gender separation is more defined than the species separation?? Also need to check how the separation into 4 (sex-species) groups is seen in the tours.
     + A good dataset to demonstrate the usefulness of visualising and tracing the random tour paths of several tours. 
+* Which combination will result in smoother animation: (`plotly`+`shiny`) or (`plotly`+`crosstalk`)?
+    + They appear to be the same 'speed' but the tour plot and slider are more in sync and smoother, when using (`plotly`+`crosstalk`). 
+    + For `crosstalk`: `animation_opts(33)` seems to be the same speed as `animation_opts(10)`. Maybe since speed maximised.
+    + For `shiny`: Can adjust `animate = animationOptions(400)` argument for input slider, to be more in sync.
+    + Can `subplot()` be used with (`plotly`+`shiny`)? YES
+* (`plotly`+`crosstalk`): Use Firefox browser if have multiple linked plots. Some other browsers may not show all plots.
 
 ## tourr (R package)
 * See: <https://www.jstatsoft.org/article/view/v040i02/v40i02.pdf>
@@ -125,6 +129,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Tours
 1. Sphere data (transform to principal components)
+    + `sphere=T` (and `rescale=T` default) arguments rescales the data (to range [0,1]) THEN spheres it. Order matters.  The resulting PCs identifies more group structure than only sphere-ing. Better for `holes` pp but not much difference for `cmass`.
     + Use of PC's (rather than raw data Xs) chooses a starting point for the (random) tour path that is more likley to lead to interesting views. This results in more consistency between the random tours and increases the chance for the most interesting views to be consistently captured in each random tour.
     + PCA (Principal Component Analysis): Seeks to find a linear combinaton of X with maximal (or minimal) variance. The ith principal component is the ith linear combination picked that maximises variance and is uncorrelated with the linear combinations that have been picked earlier. ("The first few PCs are often useful to reveal structure in data")
     + Sphering rotates and scales data to remove 'typically obvious correlation' (p.8)
@@ -133,6 +138,7 @@ knitr::opts_chunk$set(echo = TRUE)
     + In either 1D, 2D or k-D projection (hence choose a display method)
 3. Choose a projection pursuit index (function to optimise).
     + Holes (`holes`), central mass (`cmass`), LDA (`lda_pp`) or PDA (`pda_pp`).
+    + `cmass` = 1 - `holes` index
     
 * 5 types of tour generators: Everything available in `ggobi` is available in `tourr`, with the addition of being able to "replay" a saved tour (`planned_tour()`)
     1. grand_tour
@@ -426,6 +432,11 @@ observeEvent(input$new, {
 5. Cannot use R Console when running a Shiny app.
 
 ## Plotly
+* Code for yet to be published journal paper:
+<https://github.com/cpsievert/pedestrians/tree/master/docs>
+* 2017 Webinar: <https://plotcon17.cpsievert.me/webinar/#1>
+    + Brushed linking examples (without use of `Shiny`)
+    + `SharedData` and `highlight()` (with `crosstalk`)
 * https://plot.ly/r/reference/
 * Book (Phd thesis?) by author of plotly: https://cpsievert.github.io/plotly_book/
 * Create interactive plots using either: plot_ly() or ggplot2 %>% ggplotly().
@@ -444,7 +455,10 @@ observeEvent(input$new, {
 3. Defaults: Tooltip identification of aesthetics, scaling.
 4. Persistent brushing easily achieved by an argument: pipe plotly object to a ‘highlight()’ layer with ‘persistent=F/T’ and ‘dynamic=F/T’ arguments. Limitations to ‘memorising selections’ and currently a limited number of modes to choose from (cannot support AND), rewinding selections? (See Hofmann and Theus (1998))
 5. plotly objects can have more than aes mapping data attached to them, such as statistical output that was generated in R by ggplot2 when creating the plot. Eg. with goem_smooth() See: https://cpsievert.github.io/plotly_book/extending-ggplotly.html (Extending ggplotly)
-6. Can still use R console when interacting with the plot.
+6. Can still use R console when interacting with the plot (if using `plotly`+`crosstalk`).
+7. Discussion on use with `shiny` and/or `crosstalk`:
+<https://community.plot.ly/t/plotly-crosstalk-issue/3810/2>
+    + "The goal is to produce standalone html" (Sievert, 2017 webinar)
 
 ### Disadvantages
 1. Does NOT talk back to R: cannot re-execute statistical procedures in response to user event since can’t talk back to R (currently loses the inverse function required to get from the graphic back to the data object when the results are pushed to a web browser). 
@@ -459,8 +473,10 @@ observeEvent(input$new, {
 ## Crosstalk (htmlwidgets, highchartr?)
 * https://rstudio.github.io/crosstalk/using.html
 * Crosstalk creates a ShareData environment for inter-widgets communication.
-* ? Can still use R console during interaction?
+* Can still use R console during interaction? YES, it appears so with `plotly`.
 * htmlwidgets for 3D rotation (and more dimensions?): https://www.r-bloggers.com/a-first-look-at-htmlwidgets/
+* `SharedData` environment
+    + Each `SharedData$new(... group="..")` call makes a new `group` of widgets that link to each other.
 
 ### Advantages
 1. Talks back to R.
