@@ -261,14 +261,14 @@ ax <- list(
   #sd <- SharedData$new(proj, ~Name, group = "2Dtour")
   tour <- proj %>%
   SharedData$new(~Name, group = "2Dtour") %>%
-    plot_ly(sd, x = ~x, y = ~y, frame = ~step, color = I("black"), 
+    plot_ly(x = ~x, y = ~y, frame = ~step, color = I("black"), 
           height = 450, width = 800) %>%
   add_markers(text = ~Name, hoverinfo = "text") %>%
   layout(xaxis = tx, yaxis = tx)
   
   axes <- basis %>%
   plot_ly(x = ~x, y = ~y, frame = ~step, hoverinfo = "none") %>%
-    add_segments(xend = 0, yend = 0, color = I("gray85"), size = I(1)) %>%
+    add_segments(xend = 0, yend = 0, color = I("gray"), size = I(1)) %>%
     # Color segments don't work
   #add_segments(xend = 0, yend = 0, color = ~magnitude, size = I(1), showlegend=FALSE) %>%
   add_text(text = ~measure, color=I("black")) %>%
