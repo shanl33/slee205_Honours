@@ -9,7 +9,7 @@ str(crabs)
 
 # Brush to select by group ------------------------------------------------
 # Mosaic plot (would need shiny click?) or facet_wrap of scatterplots (crosstalk only)
-# facet_wrap would allow up to 4 factors to be crossed into groups
+# facet_grid would allow up to 4 factors to be crossed into groups
 # Subset categorical vars
 fac_cols <- sapply(crabs, class)=="factor"
 Fdataset <- crabs[, fac_cols]
@@ -49,18 +49,8 @@ if (fac_n==1) {
 #Use persistent brush
 #need to make all plots plotly objects ie. ggplotly()
 
-ggplot(Fdataset, aes(x=Fdataset[,1], y=All)) + 
-  geom_jitter(width = 0.25, height = 0.25) + 
-  labs(x=colnames(Fdataset)[1]) +
-  facet_grid(.~Fdataset[,2])
-
-ggplot(Fdataset, aes(x=Fdataset[,1], y=Fdataset[,2])) +
-  geom_jitter(width = 0.25, height = 0.25) + 
-  labs(x=colnames(Fdataset)[1], y=colnames(Fdataset)[2], 
-       title="Only the first 4 factors have been displayed")
-
-
 # Assgin SharedData as an object
+# m is a dataset
 d <- SharedData$new(m, ~rowname)
 m[d$selection(),]
 

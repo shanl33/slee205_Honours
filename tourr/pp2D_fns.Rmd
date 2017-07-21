@@ -178,50 +178,8 @@ pp2D_shiny(crabs, index = "holes", group = "sex")
 ```
 
 #### Findings for NCEA data
-```{r ncea, include=FALSE}
-# For wrangling data
-library(dplyr)
-library(tidyr)
-nzqa2016 <- read.csv("http://www.nzqa.govt.nz/assets/Studying-in-NZ/Secondary-school-and-NCEA/stats-reports/2016/Qualification-Statistics-School-2016-29032017.csv")
-# Drop vars that will not be used (eg. cumulative achievement)
-nzqa <- nzqa2016[,-c(1,8,10)]
-names(nzqa) <- c("Decile", "Region", "School", "Year", "Qualification", "Achieve_participate", "Achieve_roll", "Small_sch")
-levels(nzqa$Qualification) <- c("L1", "L2", "L3", "UE")
-# Subset to use only Year 11 with Level 1, etc
-nzqa <- nzqa %>% filter(((Qualification=="L1")&(Year==11))|((Year==12) & (Qualification=="L2"))|
-                          ((Year==13) & (Qualification=="L3"))|((Year==13) & (Qualification=="UE")))
-# Reshape so that one row = one school
-# Current.Achievement.Rate.Participation kept for analysis only
-achieved <- nzqa %>% 
-  spread(Qualification, Achieve_participate, fill=0) %>%
-  group_by(School) %>%
-  summarise_at(c("L1", "L2", "L3", "UE"), sum) %>%
-  inner_join(nzqa[, c(1, 2, 3, 8)]) %>% #Add Decile and Region and Small_sch variables
-  distinct() %>% #One row per school
-  filter(!((L1==0)&(L2==0)&(L3==0))) #Remove schools with 0% achievement rate for all levels
-# Function to replace 0% with NA
-zeros <- function(col) {
-  replace(col, col==0, NA)
-}
-achieved$L1 <- zeros(achieved$L1)
-achieved$L2 <- zeros(achieved$L2)
-achieved$L3 <- zeros(achieved$L3)
-achieved$UE <- zeros(achieved$UE)
-# Remove schools with 'small cohort' warning (obscures pattern in non-small cohorts).
-achieved <- achieved[achieved$Small_sch=="",] #437 school left
-achieved <- achieved[, -8]
-# Remove obs with any NA values (Otherwise errors)
-ach_narm <- achieved[complete.cases(achieved),] #407 schools left
-rownames(ach_narm) <- ach_narm$School
-ach_narm$Decile <- as.factor(ach_narm$Decile)
-# Run function
-pp2D_shiny(ach_narm, index = "cmass", group = "Decile")
-pp2D_shiny(ach_narm, index = "cmass", group = "Region")
-pp2D_shiny(ach_narm, index = "holes", group = "Decile")
-pp2D_shiny(ach_narm, index = "holes", group = "Region")
-```
-
-##### Central mass index (Redo! Refer to PCs not X-vars directly)
+**Redo! Refer to PCs not X-vars directly**
+##### Central mass index 
 A guided tour optimising the central mass index shows the concentration of decile 10 schools at the centre of the plot. Schools from the remaining deciles are scattered around the central mass along with a handful of decile 10 schools. 
 The central mass index tended to be optimised when `UE` and one other variable was weighted heavier than the remaining variables. (The "other variable" varied between tours).
     + Double check interpretation with literature/theory 
@@ -300,9 +258,10 @@ ax <- list(
   zeroline = F, showticklabels = F
 )
   # tour plot
+  #sd <- SharedData$new(proj, ~Name, group = "2Dtour")
   tour <- proj %>%
   SharedData$new(~Name, group = "2Dtour") %>%
-  plot_ly(x = ~x, y = ~y, frame = ~step, color = I("black"), 
+    plot_ly(sd, x = ~x, y = ~y, frame = ~step, color = I("black"), 
           height = 450, width = 800) %>%
   add_markers(text = ~Name, hoverinfo = "text") %>%
   layout(xaxis = tx, yaxis = tx)
@@ -328,7 +287,6 @@ ax <- list(
   html <- tags$div(
   style = "display: flex; flex-wrap: wrap",
   tags$div(tour, align = "center", style = "width: 50%; padding: 1em;")
-  #tags$div(brush_group, align = "center", style = "width: 50%; padding: 1em;")
 )
 
 # opens in an interactive session
