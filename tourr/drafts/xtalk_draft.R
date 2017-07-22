@@ -8,8 +8,9 @@ library(crosstalk) # For (crosstalk+plotly) function
 library(htmltools)
 library(MASS) # For crabs dataset
 data("crabs")
-
-pp2D_xtalk <- function(dataset, index="cmass", ...) {
+# 'factors=n' argument specifies number of factors to include in the plot for brushing groups
+# The first 'n' factors will be used.
+pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
   # Subset real-valued vars (type="double") for touring
   num_cols <- sapply(dataset, typeof)=="double"
   Xdataset <- dataset[, num_cols]
@@ -53,7 +54,7 @@ pp2D_xtalk <- function(dataset, index="cmass", ...) {
     # Take remaining 'p' values to be y-coords for PCs
     PC_y <- c(PC_y, unlist(tinterp[[i]][(p+1):(p+p)])) 
   }
-  proj <- data.frame(Name=rep(rownames(dataset), length(tinterp)), 
+  proj <- data.frame(ID=rep(rownames(dataset), length(tinterp)), 
                      step=rep(1:length(tinterp),each=dim(Xdataset)[1]), x=x, y=y)
   basis <- data.frame(measure=rep(colnames(X_sphere), length(tinterp)),
                       step=rep(1:length(tinterp),each=p), 
@@ -70,12 +71,11 @@ pp2D_xtalk <- function(dataset, index="cmass", ...) {
     zeroline = F, showticklabels = F
   )
   # tour plot
-  #sd <- SharedData$new(proj, ~Name, group = "2Dtour")
   tour <- proj %>%
-    SharedData$new(~Name, group = "2Dtour") %>%
-    plot_ly(sd, x = ~x, y = ~y, frame = ~step, color = I("black"), 
+    SharedData$new(~ID, group = "2Dtour") %>%
+    plot_ly(x = ~x, y = ~y, frame = ~step, color = I("black"), 
             height = 450, width = 800) %>%
-    add_markers(text = ~Name, hoverinfo = "text") %>%
+    add_markers(text = ~ID, hoverinfo = "text") %>%
     layout(xaxis = tx, yaxis = tx)
   
   axes <- basis %>%
@@ -99,46 +99,65 @@ pp2D_xtalk <- function(dataset, index="cmass", ...) {
   # Subset categorical vars
   fac_cols <- sapply(dataset, class)=="factor"
   Fdataset <- dataset[, fac_cols]
-  fac_n <- length(Fdataset)
-  Fdataset$Name <- rownames(dataset)
+  #fac_n <- length(Fdataset)
+  if (factors <= length(Fdataset)) {
+    fac_n <- factors
+  } else if (length(Fdataset) >= 2) {
+    fac_n = 2 # Use default if 'factors' arg not sensible
+    warning("'factors' argument exceeds number of factors in data.")
+  } else {
+    fac_n = length(Fdataset)
+    warning("'factors' argument exceeds number of factors in data.")
+  }
+  nms <- colnames(Fdataset)
+  Fdataset$ID <- rownames(dataset)
   Fdataset$All <- factor(rep("1", nrow(dataset)))
-  print(head(Fdataset))
   # facet_grid would allow up to 4 factors to be crossed into groups
   p <- Fdataset %>%
-    SharedData$new(key=~Name, group = "2Dtour") %>%
+    SharedData$new(key=~ID, group = "2Dtour") %>%
     ggplot()
   if (fac_n==1) {
     p2 <- p +
-      geom_jitter(aes(x=Fdataset[,1], y=Fdataset$All), width = 0.25, height = 0.25) +
-      labs(x=colnames(Fdataset)[1]) 
+      geom_jitter(aes(x=Fdataset[,1], y=Fdataset$All, label=ID,
+                      text=paste(nms[1], ":", Fdataset[,1])), 
+                  width = 0.25, height = 0.25) +
+      labs(x=nms[1], title="The first factor is displayed") 
   } else if (fac_n==2) {
     p2 <- p +
-      geom_jitter(aes(x=Fdataset[,1], y=Fdataset[,2]), width = 0.25, height = 0.25) +
-      labs(x=colnames(Fdataset)[1], y=colnames(Fdataset)[2])
+      geom_jitter(aes(x=Fdataset[,1], y=Fdataset[,2], label=ID,
+                      text=paste(nms[1], ":", Fdataset[,1],
+                                 "<br>", nms[2], ":", Fdataset[,2])), 
+                  width = 0.25, height = 0.25) +
+      labs(x=nms[1], y=nms[2], title="The first 2 factors are displayed") 
   } else if (fac_n==3) {
     p2 <- p + 
-      geom_jitter(aes(x=Fdataset[,1], y=Fdataset[,2]), width = 0.25, height = 0.25) + 
-      labs(x=colnames(Fdataset)[1], y=colnames(Fdataset)[2]) +
+      geom_jitter(aes(x=Fdataset[,1], y=Fdataset[,2], label=ID,
+                      text=paste(nms[1], ":", Fdataset[,1],
+                                 "<br>", nms[2], ":", Fdataset[,2],
+                                 "<br>", nms[3], ":", Fdataset[,3])), 
+                  width = 0.25, height = 0.25) + 
+      labs(x=nms[1], y=nms[2], title="The first 3 factors are displayed") +
       facet_grid(.~Fdataset[,3])
-  } else if (fac_n==4) {
+  } else if (fac_n>3) {
     p2 <- p + 
-      geom_jitter(aes(x=Fdataset[,1], y=Fdataset[,2]), width = 0.25, height = 0.25) + 
-      labs(x=colnames(Fdataset)[1], y=colnames(Fdataset)[2]) +
-      facet_grid(Fdataset[,4]~Fdataset[,3])
-  } else if (fac_n>4) {
-    p2 <- p + 
-      geom_jitter(aes(x=Fdataset[,1], y=Fdataset[,2]), width = 0.25, height = 0.25) + 
-      labs(x=colnames(Fdataset)[1], y=colnames(Fdataset)[2], title="Only the first 4 factors have been displayed") +
+      geom_jitter(aes(x=Fdataset[,1], y=Fdataset[,2], label=ID,
+                      text=paste(nms[1], ":", Fdataset[,1],
+                                 "<br>", nms[2], ":", Fdataset[,2],
+                                 "<br>", nms[3], ":", Fdataset[,3],
+                                 "<br>", nms[4], ":", Fdataset[,4])), 
+                  width = 0.25, height = 0.25) + 
+      labs(x=nms[1], y=nms[2], title="The first 4 factors are displayed") +
       facet_grid(Fdataset[,4]~Fdataset[,3])
   }
   
   if (fac_n==0) { # fac_n=0 No factors in dataset
     brush_group <- plotly_empty()
+    warning("There are no variables that are factors in the data set.")
   } else {
-    brush_group <- ggplotly(p2) %>%
+    brush_group <- ggplotly(p2, tooltip=c("label", "text")) %>%
       layout(dragmode="select") %>%
       hide_legend() %>%
-      highlight(on="plotly_select", off= "plotly_deselect", color = "red", persistent=T)
+      highlight(on="plotly_select", off= "plotly_deselect", color = "blue", persistent=T)
   }
   
   html <- tags$div(
@@ -151,7 +170,13 @@ pp2D_xtalk <- function(dataset, index="cmass", ...) {
   res <- html_print(html)
 }
 
-# results in following error msg:
-# Error in FUN(X[[i]], ...) : 
-#'options' must be a fully named list, or have no names (NULL)
-# Error seems to be related to html_print()
+# Testing
+pp2D_xtalk(crabs, index = "holes")
+
+data("mtcars")
+str(mtcars) #cyl, vs, am, gear, carb are all factors
+summary(mtcars)
+mtcars[, c(2,8,9,10,11)] <- lapply(mtcars[, c(2,8,9,10,11)], factor)
+pp2D_xtalk(mtcars, factors = 4)
+
+# Bug? Plotly tooltips not accurate when using facet_grid.

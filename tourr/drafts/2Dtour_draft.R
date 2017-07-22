@@ -40,14 +40,27 @@ if (fac_n==1) {
     geom_jitter(width = 0.25, height = 0.25) + 
     labs(x=colnames(sd)[1], y=colnames(sd)[2], 
          title="Only the first 4 factors have been displayed") +
-    facet_grid(sd[,4]~sd[,3])
+    facet_grid(sd[,4]~sd[,3], labeller = label_both)
 } else {
   p <- plotly_empty() # fac_n=0 No factors in dataset
 }
 
-# TO DO: 
-#Use persistent brush
-#need to make all plots plotly objects ie. ggplotly()
+fac_cols <- sapply(mtcars, class)=="factor"
+sd <- mtcars[, fac_cols]
+nms <- colnames(sd)
+sd$Name <- rownames(mtcars)
+ggplot(sd, aes(x=sd[,1], y=sd[,2], label=Name,
+               text=paste(nms[1], ":", sd[,1],
+                          "<br>", nms[2], ":", sd[,2],
+                          "<br>", nms[3], ":", sd[,3],
+                          "<br>", nms[4], ":", sd[,4]))) +
+  geom_jitter(width = 0.25, height = 0.25) + 
+  labs(x=nms[1], y=nms[2], 
+       title="Only the first 4 factors have been displayed") +
+  facet_grid(sd[,4]~sd[,3]) 
+ggplotly(tooltip = c("text", "label"))
+
+
 
 # Assgin SharedData as an object
 # m is a dataset
