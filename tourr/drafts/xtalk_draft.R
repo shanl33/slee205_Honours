@@ -2,14 +2,17 @@ library(ggplot2)
 library(plotly)
 library(tourr)
 library(abind)
-library(GGally) # For PCP using ggparcord()
 library(colorspace) # For colour as an argument
 library(crosstalk) # For (crosstalk+plotly) function
 library(htmltools)
 library(MASS) # For crabs dataset
+library(tidyr) # For PCs reshaping output for plot
+library(GGally) # For ggpairs plot of PCs
 data("crabs")
+
 # 'factors=n' argument specifies number of factors to include in the plot for brushing groups
 # The first 'n' factors will be used.
+# Variables will be sphere'd so that principal coordinates are used in the analysis
 pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
   # Subset real-valued vars (type="double") for touring
   num_cols <- sapply(dataset, typeof)=="double"
@@ -17,9 +20,9 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
   p <- length(Xdataset) # Number of real-valued Xs used in tour
   # Save tour
   if (index=="cmass") {
-    t <- save_history(Xdataset, guided_tour(cmass, d=2, max.tries = 50), sphere = TRUE, max=50,...) 
+    t <- save_history(Xdataset, guided_tour(cmass, d=2, max.tries = 50), sphere=TRUE, max=50, ...) 
   } else if (index=="holes") {
-    t <- save_history(Xdataset, guided_tour(holes, d=2, max.tries = 50), sphere = TRUE, max=50,...)
+    t <- save_history(Xdataset, guided_tour(holes, d=2, max.tries = 50), sphere=TRUE, max=50, ...)
   } else {
     stop("Invalid 'index' argument. Choose either: cmass or holes")
   }
@@ -80,7 +83,7 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
   
   axes <- basis %>%
     plot_ly(x = ~x, y = ~y, frame = ~step, hoverinfo = "none") %>%
-    add_segments(xend = 0, yend = 0, color = I("gray85"), size = I(1)) %>%
+    add_segments(xend = 0, yend = 0, color = I("gray"), size = I(1)) %>%
     # Color segments don't work
     #add_segments(xend = 0, yend = 0, color = ~magnitude, size = I(1), showlegend=FALSE) %>%
     add_text(text = ~measure, color=I("black")) %>%
@@ -109,61 +112,70 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
     fac_n = length(Fdataset)
     warning("'factors' argument exceeds number of factors in data.")
   }
-  nms <- colnames(Fdataset)
   Fdataset$ID <- rownames(dataset)
   Fdataset$All <- factor(rep("1", nrow(dataset)))
+  
   # facet_grid would allow up to 4 factors to be crossed into groups
-  p <- Fdataset %>%
-    SharedData$new(key=~ID, group = "2Dtour") %>%
-    ggplot()
+  sd <- SharedData$new(Fdataset, key=~ID, group = "2Dtour") 
   if (fac_n==1) {
-    p2 <- p +
-      geom_jitter(aes(x=Fdataset[,1], y=Fdataset$All, label=ID,
-                      text=paste(nms[1], ":", Fdataset[,1])), 
+    p <- ggplot(sd, aes_string(x=names(Fdataset)[1])) +
+      geom_jitter(aes(y=Fdataset$All, label=ID), 
                   width = 0.25, height = 0.25) +
-      labs(x=nms[1], title="The first factor is displayed") 
+      labs(title="The first factor is displayed") 
   } else if (fac_n==2) {
-    p2 <- p +
-      geom_jitter(aes(x=Fdataset[,1], y=Fdataset[,2], label=ID,
-                      text=paste(nms[1], ":", Fdataset[,1],
-                                 "<br>", nms[2], ":", Fdataset[,2])), 
+    p <- ggplot(sd, aes_string(x=names(Fdataset)[1], y=names(Fdataset)[2])) +
+      geom_jitter(aes(label=ID), 
                   width = 0.25, height = 0.25) +
-      labs(x=nms[1], y=nms[2], title="The first 2 factors are displayed") 
+      labs(title="The first 2 factors are displayed") 
   } else if (fac_n==3) {
-    p2 <- p + 
-      geom_jitter(aes(x=Fdataset[,1], y=Fdataset[,2], label=ID,
-                      text=paste(nms[1], ":", Fdataset[,1],
-                                 "<br>", nms[2], ":", Fdataset[,2],
-                                 "<br>", nms[3], ":", Fdataset[,3])), 
-                  width = 0.25, height = 0.25) + 
-      labs(x=nms[1], y=nms[2], title="The first 3 factors are displayed") +
+    p <- ggplot(sd, aes_string(x=names(Fdataset)[1], y=names(Fdataset)[2],
+                               label1=names(Fdataset)[3])) +
+      geom_jitter(aes(label=ID), 
+                  width = 0.2, height = 0.2) +
+      labs(title="The first 2 factors are displayed") +
       facet_grid(.~Fdataset[,3])
   } else if (fac_n>3) {
-    p2 <- p + 
-      geom_jitter(aes(x=Fdataset[,1], y=Fdataset[,2], label=ID,
-                      text=paste(nms[1], ":", Fdataset[,1],
-                                 "<br>", nms[2], ":", Fdataset[,2],
-                                 "<br>", nms[3], ":", Fdataset[,3],
-                                 "<br>", nms[4], ":", Fdataset[,4])), 
-                  width = 0.25, height = 0.25) + 
-      labs(x=nms[1], y=nms[2], title="The first 4 factors are displayed") +
-      facet_grid(Fdataset[,4]~Fdataset[,3])
+    p <- ggplot(sd, aes_string(x=names(Fdataset)[1], y=names(Fdataset)[2],
+                               label1=names(Fdataset)[3],
+                               label2=names(Fdataset)[4])) +
+      geom_jitter(aes(label=ID), 
+                  width = 0.2, height = 0.2) +
+      labs(title="The first 2 factors are displayed") +
+      facet_grid(Fdataset[,4]~Fdataset[,3], scales = "free", space = "free")
   }
   
   if (fac_n==0) { # fac_n=0 No factors in dataset
     brush_group <- plotly_empty()
     warning("There are no variables that are factors in the data set.")
   } else {
-    brush_group <- ggplotly(p2, tooltip=c("label", "text")) %>%
+    brush_group <- ggplotly(p, tooltip=c("x", "y", "label", "label1", "label2")) %>%
       layout(dragmode="select") %>%
       hide_legend() %>%
-      highlight(on="plotly_select", off= "plotly_deselect", color = "blue", persistent=T)
+      highlight(on="plotly_select", off= "plotly_deselect", color = "blue", 
+                persistent=T, dynamic=T)
   }
+  # tourr has rescale=T (so rescale first)
+  pc_rescale <- prcomp(rescale(crabs[,4:8]))
+  loads <- as.data.frame(pc_rescale$rotation)
+  # Note: signs of coeffs are random.
+  # We are interested in the magnitude of differences between the coefficients
+  # This reflects which var(s) the PC is contrasting between (see p357 MASS bk)
+  coeffs <- gather(loads, PC, coeff)
+  coeffs$X <- rep_len(rownames(loads), nrow(coeffs))
+  coeffs$sd <- rep(pc_rescale$sdev, each=5)
+  # Plot for coeffs
+  pc <- ggplot(coeffs, aes(x=PC, y=coeff, colour=sd, size=abs(coeff))) + 
+    geom_point(aes(label=X)) +
+    theme(legend.position = "none") +
+    scale_color_gradient(low = "#56B1F7", high = "#132B43") +
+    scale_size_area(max_size = 3) 
+  pc_coeffs <- ggplotly(pc, tooltip = c("x", "y", "colour", "label"))
   
   html <- tags$div(
     style = "display: flex; flex-wrap: wrap",
     tags$div(tour, align = "center", style = "width: 50%; padding: 1em;"),
-    tags$div(brush_group, align = "center", style = "width: 50%; padding: 1em;")
+    tags$div(brush_group, align = "center", style = "width: 50%; padding: 1em;"),
+    tags$div(pc_coeffs, align = "center", style = "width: 50%; padding: 1em;")
   )
   
   # opens in an interactive session
@@ -173,10 +185,16 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
 # Testing
 pp2D_xtalk(crabs, index = "holes")
 
+lcrabs <- crabs
+lcrabs[,4:8] <- log(lcrabs[,4:8])
+pp2D_xtalk(lcrabs, index = "holes")
+
 data("mtcars")
 str(mtcars) #cyl, vs, am, gear, carb are all factors
 summary(mtcars)
 mtcars[, c(2,8,9,10,11)] <- lapply(mtcars[, c(2,8,9,10,11)], factor)
 pp2D_xtalk(mtcars, factors = 4)
 
-# Bug? Plotly tooltips not accurate when using facet_grid.
+# Plotly tooltips not accurate when using facet_grid.
+# This happens when one cell does not contain any data
+# See <https://github.com/tidyverse/ggplot2/issues/165>

@@ -12,7 +12,6 @@ library(plotly)
 library(tourr)
 library(abind)
 library(shiny) # For (shiny+plotly) function
-library(GGally) # For PCP using ggparcord()
 library(colorspace) # For colour as an argument
 library(crosstalk) # For (crosstalk+plotly) function
 library(htmltools)

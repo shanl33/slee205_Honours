@@ -3,6 +3,7 @@ library(plotly)
 library(tourr)
 library(abind)
 library(MASS) # For crabs dataset
+library(tidyr)
 
 data("crabs")
 str(crabs)
@@ -17,55 +18,45 @@ fac_n <- length(Fdataset)
 Fdataset$Names <- rownames(crabs)
 Fdataset$All <- factor(rep("1", length(Fdataset$Names)))
 sd <- SharedData$new(data=Fdataset, key=~Names, group="2Dtour")
-if (fac_n==1) {
-  p <- ggplot(sd, aes(x=sd[,1], y=All)) +
-    geom_jitter(width = 0.25, height = 0.25) + 
-    labs(x=colnames(sd)[1])
-} else if (fac_n==2) {
-  p <- ggplot(sd, aes(x=sd[,1], y=sd[,2])) +
-    geom_jitter(width = 0.25, height = 0.25) + 
-    labs(x=colnames(sd)[1], y=colnames(sd)[2])
-} else if (fac_n==3) {
-  p <- ggplot(sd, aes(x=sd[,1], y=sd[,2])) +
-    geom_jitter(width = 0.25, height = 0.25) + 
-    labs(x=colnames(sd)[1], y=colnames(sd)[2]) +
-    facet_grid(.~sd[,3])
-} else if (fac_n==4) {
-  p <- ggplot(sd, aes(x=sd[,1], y=sd[,2])) +
-    geom_jitter(width = 0.25, height = 0.25) + 
-    labs(x=colnames(sd)[1], y=colnames(sd)[2]) +
-    facet_grid(sd[,4]~sd[,3])
-} else if (fac_n>4) {
-  p <- ggplot(sd, aes(x=sd[,1], y=sd[,2])) +
-    geom_jitter(width = 0.25, height = 0.25) + 
-    labs(x=colnames(sd)[1], y=colnames(sd)[2], 
-         title="Only the first 4 factors have been displayed") +
-    facet_grid(sd[,4]~sd[,3], labeller = label_both)
-} else {
-  p <- plotly_empty() # fac_n=0 No factors in dataset
-}
 
 fac_cols <- sapply(mtcars, class)=="factor"
 sd <- mtcars[, fac_cols]
-nms <- colnames(sd)
-sd$Name <- rownames(mtcars)
-ggplot(sd, aes(x=sd[,1], y=sd[,2], label=Name,
+sd$ID <- rownames(sd)
+ggplot(sd, aes(x=sd[,1], y=sd[,2], label=ID,
                text=paste(nms[1], ":", sd[,1],
                           "<br>", nms[2], ":", sd[,2],
                           "<br>", nms[3], ":", sd[,3],
                           "<br>", nms[4], ":", sd[,4]))) +
-  geom_jitter(width = 0.25, height = 0.25) + 
+  geom_jitter(width = 0.2, height = 0.2) + 
+  #geom_point() +
   labs(x=nms[1], y=nms[2], 
        title="Only the first 4 factors have been displayed") +
-  facet_grid(sd[,4]~sd[,3]) 
+  facet_grid(sd[,4]~sd[,3], scales = "free", space = "free") 
 ggplotly(tooltip = c("text", "label"))
 
+ggplot(sd, aes_string(x=names(sd)[1], y=names(sd)[2],
+                      label1=names(sd)[3],
+                      label2=names(sd)[4])) +
+  geom_jitter(aes(label=ID), width = 0.2, height = 0.2) + 
+  labs(title="Only the first 4 factors have been displayed") +
+  facet_grid(sd[,4]~sd[,3], scales = "free", space = "free") 
+ggplotly(tooltip = c("x", "y", "label", "label1", "label2"))
 
+sd$All <- factor(rep("1", nrow(sd)))
+ggplot(sd, aes_string(x=names(sd)[1])) +
+  geom_jitter(aes(y=sd$All, label=ID), width = 0.2, height = 0.2) 
+  #labs(title="Only the first 4 factors have been displayed") +
+  #facet_grid(sd[,4]~sd[,3], scales = "free", space = "free") 
+ggplotly(tooltip = c("x", "label"))
 
-# Assgin SharedData as an object
-# m is a dataset
-d <- SharedData$new(m, ~rowname)
-m[d$selection(),]
+ggplot(sd, aes(x=cyl, y=vs)) +
+  geom_jitter(aes(label=ID, label1=am, label2=gear), 
+              width = 0.2, height = 0.2) + 
+  #geom_point() +
+  #labs(x=nms[1], y=nms[2], 
+  #     title="Only the first 4 factors have been displayed") +
+  facet_grid(gear~am, scales = "free", space = "free") 
+ggplotly(tooltip = c("x", "y", "label", "label1", "label2"))
 
 # Crosstalk n Plotly fn ---------------------------------------------------
 # Start view as orthogonal projection of first two measures
@@ -108,12 +99,62 @@ basis <- data.frame(measure=rep(colnames(X_sphere), length(tinterp)),
 M_sphere <- sphere(crabs[,4:8])
 # Rescaled then sphere'd data (preferred)
 t <- save_history(crabs[,4:8], guided_tour(cmass, d=2, max.tries = 50), max=50, sphere = TRUE)
-X_sphere <- attr(t, "data")
+X_sphere <- as.data.frame(attr(t, "data"))
 head(t_sphere)
 head(X_sphere)
 head(sphere(rescale(crabs[,4:8]))) # save_history = t_sphere is RESCALEd THEN sphered.
 pairs(X_sphere) 
 pairs(t_sphere) # More defined groups visible. RESCALE then sphere (order matters!)
+
+
+# Plot for principal components coefficients -----------------------------
+# tourr has rescale=T (so rescale first)
+pc_rescale <- prcomp(rescale(crabs[,4:8]))
+loads <- as.data.frame(pc_rescale$rotation)
+# NOTE in prcomp(): For 'loads' above
+#The signs of the columns of the rotation matrix are arbitrary, 
+#and so may differ between different programs for PCA.
+# We are interested in the magnitude of differences between the coefficients
+# This reflects which var(s) the PC is contrasting between (see p357 MASS bk)
+coeffs <- gather(loads, PC, coeff)
+coeffs$X <- rep_len(rownames(loads), nrow(coeffs))
+coeffs$sd <- rep(pc_rescale$sdev, each=5)
+#plot
+ggplot(coeffs, aes(x=PC, y=coeff, colour=sd, size=abs(coeff))) + 
+  geom_point(aes(label=X)) +
+  theme(legend.position = "none") +
+  scale_color_gradient(low = "#56B1F7", high = "#132B43") +
+  scale_size_area(max_size = 3)
+ggplotly(tooltip = c("x", "y", "colour", "label"))
+
+X_df <- as.data.frame(X_sphere)
+# Scatterplot matrix for selecting intial proj ----------------------------
+d <- SharedData$new(data=X_df, key=~colnames(X_df), group="PC")
+PC_plot <- ggpairs(d)
+ggplotly(PC_plot)
+# PROBLEM: This does NOT capture which PC matrix was clicked on
+# Initial matrix
+t0 <- matrix(c(1, rep(0, p), 1, rep(0, (p-2))), ncol = 2)
+X_sphere[d$selection(),]
+# Assgin SharedData as an object
+# m is a dataset
+d <- SharedData$new(m, ~rowname)
+m[d$selection(),]
+
+
+# pc and pc_center 
+pc <- princomp(crabs[,4:8])
+pc_center <- princomp(center(crabs[,4:8]))
+# pc and pc_center are the same
+pc$loadings
+pc_center$loadings
+head(pc$scores)
+head(pc_center$scores)
+# same as
+head(as.matrix(center(crabs[,4:8]))%*%A)
+A <- matrix(unlist(pc$loadings[1:5,]), ncol = 5)
+A_center <- matrix(unlist(pc_center$loadings[1:5,]), ncol = 5)
+
 
 # Initial orthog projection -----------------------------------------------
 #intial basis (scatterplot w first two vars)

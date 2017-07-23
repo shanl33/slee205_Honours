@@ -112,6 +112,11 @@ knitr::opts_chunk$set(echo = TRUE)
         - Confusion table with linked brushing to plots (such as a tour projection) allow mismatches and agreements between methods to be explored.
 * Cluster analysis 'tends to produce hypotheses rather than testing them' (p.107). Hence cluster analysis is an exploratory technique, that may lack 'formal validation' but it is powerful in data simplification. 
 
+### Principal Components
+* `princomp()` and `prcomp()` are two functions in R for obtaining PCs. `tourr` package uses the latter. The signs of the components are random. We are interested in the differences in size of coefficients, where direction of difference doesn't matter. 
+* When coeffs are close to zero they are dropped in some methods (eg. `princomp(crabs[,4:8])` drops some coeffs while `prcomp()` will return a coeff for all vars even when close to zero. A threshold can be entered as an argument).
+* See MASS book pg.357 for a good example of how to interpret the coeffs of PCs.
+
 ### 2D Tours
 * `crabs` dataset could be a good example to demonstrate the use of guided tours optimising the holes index to identify group structures in the data.
     + Using PC1 and PC2 for the starting projectcion basis brings out the gender separation and using PC2 and PC3 (??) highlights the species separation (need to check this) since gender separation is more defined than the species separation?? Also need to check how the separation into 4 (sex-species) groups is seen in the tours.
