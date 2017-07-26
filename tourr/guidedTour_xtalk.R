@@ -2,13 +2,13 @@ library(ggplot2)
 library(plotly)
 library(tourr)
 library(abind)
-library(colorspace) # For colour as an argument
 library(crosstalk) # For (crosstalk+plotly) function
 library(htmltools)
 library(MASS) # For crabs dataset
 library(tidyr) # For PCs reshaping output for plot
 library(GGally) # For ggpairs plot of PCs
 data("crabs")
+# CS's code: <https://github.com/cpsievert/pedestrians/blob/master/docs/stl-tour.R>
 
 # 'factors=n' argument specifies number of factors to include in the plot for brushing groups
 # The first 'n' factors will be used.
@@ -41,8 +41,18 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
     cmass_index <- (sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1]-exp(-dim(XA)[2]/2))/(1-exp(-dim(XA)[2]/2))
     list(rescale(XA), cmass_index)
   }
+  # Holes index
+  holes_tour <- function(basis) {
+    XA <- X_sphere%*%matrix(basis, ncol=2) # (n by d)
+    holes_index <- (1-sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1])/(1-exp(-dim(XA)[2]/2))
+    list(rescale(XA), holes_index)
+  }
   # Apply index function to each projection basis
-  t_tour <- apply(tinterp, 3, FUN = cmass_tour)
+  if (index=="cmass") {
+    t_tour <- apply(tinterp, 3, FUN = cmass_tour)
+  } else if (index=="holes") {
+    t_tour <- apply(tinterp, 3, FUN = holes_tour)
+  }
   pp_index <- data.frame(iteration=1:length(tinterp))
   x <- c()
   y <- c()
@@ -58,9 +68,9 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
     PC_y <- c(PC_y, unlist(tinterp[[i]][(p+1):(p+p)])) 
   }
   proj <- data.frame(ID=rep(rownames(dataset), length(tinterp)), 
-                     step=rep(1:length(tinterp),each=dim(Xdataset)[1]), x=x, y=y)
+                     iteration=rep(1:length(tinterp),each=dim(Xdataset)[1]), x=x, y=y)
   basis <- data.frame(measure=rep(colnames(X_sphere), length(tinterp)),
-                      step=rep(1:length(tinterp),each=p), 
+                      iteration=rep(1:length(tinterp),each=p), 
                       magnitude=PC_x^2+PC_y^2, x=PC_x, y=PC_y)
   
   # Axes for tour plot ("tour") and measurement var coeffs plot ("axes")
@@ -70,30 +80,36 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
   )
   
   ax <- list(
-    title = "", range = c(-1.1, 1.1), 
+    title = "", range = c(-1.1, 1.2), 
     zeroline = F, showticklabels = F
   )
   # tour plot
   tour <- proj %>%
     SharedData$new(~ID, group = "2Dtour") %>%
-    plot_ly(x = ~x, y = ~y, frame = ~step, color = I("black"), 
-            height = 450, width = 800) %>%
+    plot_ly(x = ~x, y = ~y, frame = ~iteration, color = I("black")) %>%
     add_markers(text = ~ID, hoverinfo = "text") %>%
     layout(xaxis = tx, yaxis = tx)
   
   axes <- basis %>%
-    plot_ly(x = ~x, y = ~y, frame = ~step, hoverinfo = "none") %>%
-    add_segments(xend = 0, yend = 0, color = I("gray"), size = I(1)) %>%
+    plot_ly(x = ~x, y = ~y, frame = ~iteration, hoverinfo = "none") %>%
+    add_segments(xend = 0, yend = 0, color = I("darkgray"), size = I(1)) %>%
     # Color segments don't work
     #add_segments(xend = 0, yend = 0, color = ~magnitude, size = I(1), showlegend=FALSE) %>%
     add_text(text = ~measure, color=I("black")) %>%
     layout(xaxis = ax, yaxis = ax)
   # Doesn't work if use ggplot() for axes plot
+  # Proj pursuit index plot
+  index <- pp_index %>% 
+    plot_ly(x=~iteration, y=~index) %>%
+    add_markers(color=I("darkgray")) %>%
+    add_markers(color=I("red"), frame=~iteration) %>%
+    layout(yaxis = list(title="Projection pursuit index"))
+           
   
   # very important these animation options are specified _after_ subplot()
   # since they call plotly_build(., registerFrames = T)
   # (Took a few minutes to run)
-  tour <- subplot(tour, axes, nrows = 1, margin = 0) %>%
+  tour <- subplot(tour, axes, index, titleY = T) %>%
     animation_opts(33) %>% #33 milliseconds between frames
     hide_legend() %>%
     layout(dragmode = "select") %>%
@@ -148,7 +164,7 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
     brush_group <- plotly_empty()
     warning("There are no variables that are factors in the data set.")
   } else {
-    brush_group <- ggplotly(p, tooltip=c("x", "y", "label", "label1", "label2")) %>%
+    brush_group <- ggplotly(p, tooltip=c("x", "y", "label", "label1", "label2"), height=400) %>%
       layout(dragmode="select") %>%
       hide_legend() %>%
       highlight(on="plotly_select", off= "plotly_deselect", color = "blue", 
@@ -166,16 +182,20 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
   # Plot for coeffs
   pc <- ggplot(coeffs, aes(x=PC, y=coeff, colour=sd, size=abs(coeff))) + 
     geom_point(aes(label=X)) +
+    geom_hline(yintercept = 0, colour="gray", lty=2) +
     theme(legend.position = "none") +
     scale_color_gradient(low = "#56B1F7", high = "#132B43") +
-    scale_size_area(max_size = 3) 
-  pc_coeffs <- ggplotly(pc, tooltip = c("x", "y", "colour", "label"))
+    scale_size_area(max_size = 3) +
+    labs(title="Principal components")
+  pc_coeffs <- ggplotly(pc, tooltip = c("x", "y", "colour", "label"), height=400)
   
   html <- tags$div(
-    style = "display: flex; flex-wrap: wrap",
-    tags$div(tour, align = "center", style = "width: 50%; padding: 1em;"),
-    tags$div(brush_group, align = "center", style = "width: 50%; padding: 1em;"),
-    tags$div(pc_coeffs, align = "center", style = "width: 50%; padding: 1em;")
+    style = "display: block;",
+    tags$div(tour, align = "center", style = "width: 100%; padding: 1em;"),
+    #tags$div(tour, style="width:50%; float:left;"),
+    #tags$div(index, style="width:50%; float:left;"),
+    tags$div(brush_group, style="width:50%; float:left;"),
+    tags$div(pc_coeffs, style = "width: 50%; float:left;")
   )
   
   # opens in an interactive session
@@ -189,12 +209,9 @@ lcrabs <- crabs
 lcrabs[,4:8] <- log(lcrabs[,4:8])
 pp2D_xtalk(lcrabs, index = "holes")
 
+# Testing brush_group plot
 data("mtcars")
 str(mtcars) #cyl, vs, am, gear, carb are all factors
 summary(mtcars)
 mtcars[, c(2,8,9,10,11)] <- lapply(mtcars[, c(2,8,9,10,11)], factor)
 pp2D_xtalk(mtcars, factors = 4)
-
-# Plotly tooltips not accurate when using facet_grid.
-# This happens when one cell does not contain any data
-# See <https://github.com/tidyverse/ggplot2/issues/165>

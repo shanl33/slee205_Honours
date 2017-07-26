@@ -8,6 +8,7 @@ library(tourr)
 library(MASS) # crabs dataset
 data("crabs")
 # See if tour is smoother using Crosstalk+Plotly rather than Shiny+Plotly
+# Code from <https://github.com/cpsievert/pedestrians/blob/master/docs/stl-tour.R>
 
 # Code from CSievert ------------------------------------------------------
 # Standardise measurement vars

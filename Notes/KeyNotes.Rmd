@@ -57,42 +57,6 @@ knitr::opts_chunk$set(echo = TRUE)
 * Use correlation distance instead of Euclidean to identify clusters that a similar in structure.
 * Investigate bi-modal distn in L3.
 
-## Virtual Machine
-* Software to have on VM:
-    + R (RStudio if possible?) with the following packages:
-        - rggobi
-        - DescribeDisplay
-        - shiny
-        - plotly (requires ggplot2)
-        - crosstalk: devtools::install_github("rstudio/crosstalk")
-        - iplots (?)
-        - dplyr
-        - tidyr
-        - ggally (requires ggplot2)
-    + ggobi
-    + Mondrian
-    + Manet
-* Installation:
-    + Download VirtualBox from <https://www.virtualbox.org/>
-    + MAC: If stuck on verifying, see: <http://osxdaily.com/2016/07/26/fix-stuck-pkg-verifying-installer-mac-os-x/>
-    + Transfer files from USB.
-    + BEFORE starting a session in VirtualBox change the "Shared Folder" directory to where you saved the USB files.
-    + Start session in VirtualBox (search for Terminal etc)
-    
-* Using GIT with VM:
-    + Setup (do only once) to pull, merge and commit to a subdirectory, see: <https://lakehanne.github.io/git-sparse-checkout> (typo in .git/info/sparse-checkout no speech mark at the end)
-        - This fetches all files in remote repo but does not checkout all of them (ie. clone with a sparse checkout)
-    + START of every work session: Check if you have the 'current' version from the remote (git) repo.
-        - Command: git pull origin master
-        - gitGUI: Sync button
-    + END of every work session: Commit any changes
-        - Command: git status (Clean?)
-        - If not git add ., git commit -m "...", git push.
-        - gitGUI: Commit & Sync button
-* ggobi/rggobi
-    + ggobi control window is on the Terminal option menu (rather than a separate window)
-    + `DescribeDisplay` ggobi plugin is installed but R package yet to be installed.
-
 ## Statistical methods
 ### Cluster analysis
 * Cook (p.126): Uses of graphics in cluster analysis to...
@@ -158,6 +122,10 @@ knitr::opts_chunk$set(echo = TRUE)
     + When using PCs we are interested in comparing the standard deviations of the PCs. We expect the first PC to have the greatest sd and the variation to decrease for subsequent PCs, but the size of differences in variation is of interest (p.357) [^2].
     + The coefficients of each PC indicate which combinations of variables are being compared with each other (p.357 example of interpreting PCs for `crabs` data) [^2].
     + Tours compliment numerical algorithms that find 'interesting linear combinations of data. These linear combinations might be fed into a tour or re-created directly using manual manipulation, after which their neighborhoods can be explored to see whether some nearby projection is even more informative' (p.34) [^1].
+    + 'The first few principal components are often useful to reveal structure in the data' (p.331). [^2] So we only need to explore pairwise combinations of the first few PCs as starting bases for guided tours (?) BUT we still need to p number of PCs for the tour in order to explore the p-dimnesional data space (NB: p = # of X-vars). ie. Want k=p (see below about k)
+    + PC are rotations of the original variables that best explain the variation in the data. If we only take the first k principal components then 'the subspace they span contains the best k-dimensional view of the data'. Since the covariance matrix is maximised and the residual sum of squares between the original points and their projections is minimised (p331) [^2]
+        - To do: Double-check understanding of biplots as when k=2 (scatterplots with PC1 and PC2), so biplots are best 2D view of the data. Specific static projections of 2D tours are equivalent to biplots with axes rescaled to equal length (see p.35). [^1]
+
 
 ## tourr (R package)
 * See: <https://www.jstatsoft.org/article/view/v040i02/v40i02.pdf> [^4]
@@ -706,6 +674,42 @@ https://github.com/ropensci/plotly/blob/51e159ba825b007657c1d7534825ef25afc7e7af
 * Testing: Assign variable to interaction fn and print() the output.
 * Colour #RRGGBB__: http://sape.inf.usi.ch/quick-reference/ggplot2/colour
 
+### Virtual Machine
+* Software to have on VM:
+    + R (RStudio if possible?) with the following packages:
+        - rggobi
+        - DescribeDisplay
+        - shiny
+        - plotly (requires ggplot2)
+        - crosstalk: devtools::install_github("rstudio/crosstalk")
+        - iplots (?)
+        - dplyr
+        - tidyr
+        - ggally (requires ggplot2)
+    + ggobi
+    + Mondrian
+    + Manet
+* Installation:
+    + Download VirtualBox from <https://www.virtualbox.org/>
+    + MAC: If stuck on verifying, see: <http://osxdaily.com/2016/07/26/fix-stuck-pkg-verifying-installer-mac-os-x/>
+    + Transfer files from USB.
+    + BEFORE starting a session in VirtualBox change the "Shared Folder" directory to where you saved the USB files.
+    + Start session in VirtualBox (search for Terminal etc)
+    
+* Using GIT with VM:
+    + Setup (do only once) to pull, merge and commit to a subdirectory, see: <https://lakehanne.github.io/git-sparse-checkout> (typo in .git/info/sparse-checkout no speech mark at the end)
+        - This fetches all files in remote repo but does not checkout all of them (ie. clone with a sparse checkout)
+    + START of every work session: Check if you have the 'current' version from the remote (git) repo.
+        - Command: git pull origin master
+        - gitGUI: Sync button
+    + END of every work session: Commit any changes
+        - Command: git status (Clean?)
+        - If not git add ., git commit -m "...", git push.
+        - gitGUI: Commit & Sync button
+* ggobi/rggobi
+    + ggobi control window is on the Terminal option menu (rather than a separate window)
+    + `DescribeDisplay` ggobi plugin is installed but R package yet to be installed.
+
 ## General comments 
 ### The role of interactive visualisation
 * Difficult to argue that the use of interactive data visualisation AlONE is sufficient for analysis. BUT graphics should be part of all analyses and INTERACTIVE techniques enable visuals to play an even greater role in revealing insights about data as well as evaluating and understanding results from numerical methods. Interactive visuals are not only useful for communication, but an essential part of any analysis, alongside numerical methods.
@@ -843,6 +847,7 @@ Does *interactivity* provide extra leverage that a static graphic cannot in EDA?
     + See Dropbox: Using_Interactive_Graphics_to_Teach_Multivariate_D.pdf
 
 ### Carson Sievert's paper (not yet in print)
+* For code: <https://pedestrians.cpsievert.me/>
 * Highlights visualisation of the model in the data space as a key use of visualisation.
 
 * Techniques that he achieved that can be investigated further:
