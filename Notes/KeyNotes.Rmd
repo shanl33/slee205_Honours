@@ -122,14 +122,45 @@ knitr::opts_chunk$set(echo = TRUE)
     + Using PC1 and PC2 for the starting projectcion basis brings out the gender separation and using PC2 and PC3 (??) highlights the species separation (need to check this) since gender separation is more defined than the species separation?? Also need to check how the separation into 4 (sex-species) groups is seen in the tours.
     + A good dataset to demonstrate the usefulness of visualising and tracing the random tour paths of several tours. 
 * Which combination will result in smoother animation: (`plotly`+`shiny`) or (`plotly`+`crosstalk`)?
-    + They appear to be the same 'speed' but the tour plot and slider are more in sync and smoother, when using (`plotly`+`crosstalk`). 
+    + They appear to be the same 'speed' but the tour plot and slider are more in sync and smoother, when using (`plotly`+`crosstalk`). Other advantages of using (`plotly`+`crosstalk`):
+        - Standalone html viewer.
+        - Can still use R while interacting with the visual.
+        - Easy to link multiple plots and initiate brushing from any of the linked plots.
+        - Can use `html widgets` to achieve the same interactions provided by `shiny` inputs (sliders, buttons, etc)
     + For `crosstalk`: `animation_opts(33)` seems to be the same speed as `animation_opts(10)`. Maybe since speed maximised.
     + For `shiny`: Can adjust `animate = animationOptions(400)` argument for input slider, to be more in sync.
     + Can `subplot()` be used with (`plotly`+`shiny`)? YES
 * (`plotly`+`crosstalk`): Use Firefox browser if have multiple linked plots. Some other browsers may not show all plots.
+* Guided tour = combining grand tour and projection pursuit. This results in choosing new projections with respect to maximising an index of interest, rather than at random [^3].
+
+#### My function for 2D Guided Tours
+##### Goals / Intentions:
+* Model "good" statistical practice.
+    + Choice (and design) of plots, interactive tools, summary statistics, default values for arguments.
+    + Give reasons for the choices made based on literature and theory.
+* Useful for analysing a range of datasets where unsupervised cluster analysis is of interest.
+    + Provides a framework/structure but avoid being overspecific and prescriptive.
+    + Allows for further modification and extention (code-based).
+    
+##### Reasons for choices
+* Plot for projection pursuit index:
+    + Similarities with Fig 14 on p.216 [^3]:
+        - Link index value with the 2D tour projection.
+        - Use the index plot to compare local optimal projections from different tours and see if they are consistent. (An example of a wider theme of: Using visuals to gain insight into the consistency of random processes. eg. tours, cross-validation,..).
+        - Visualising the path of projection matrices in covering the data space is difficult since it involves a p-D hypersphere [^3]. To do: See [^4] and try the hypersphere interactive visualisation describe in `ggobi`.
+    + Differences with Fig 14 on p.216 [^3]:
+        - Use of principal components "shortcuts" the guided tours. Similar to the effect of launching a new tour from a 'particularly good projection' as described in Fig. 16 p.217 [^3].
+        - Comparing the local optimal projections of starting for pairwise combinations of PCs rather than random initial bases.
+        - Hence additional plots and relevant info on PCs required.
+        
+* Use of principal components and PCs plot (or Use of the Fisher linear discriminant and LDA index plot):
+    + First check the variables are on comparable scales, rescale to unit variance if needed (default).
+    + When using PCs we are interested in comparing the standard deviations of the PCs. We expect the first PC to have the greatest sd and the variation to decrease for subsequent PCs, but the size of differences in variation is of interest (p.357) [^2].
+    + The coefficients of each PC indicate which combinations of variables are being compared with each other (p.357 example of interpreting PCs for `crabs` data) [^2].
+    + Tours compliment numerical algorithms that find 'interesting linear combinations of data. These linear combinations might be fed into a tour or re-created directly using manual manipulation, after which their neighborhoods can be explored to see whether some nearby projection is even more informative' (p.34) [^1].
 
 ## tourr (R package)
-* See: <https://www.jstatsoft.org/article/view/v040i02/v40i02.pdf>
+* See: <https://www.jstatsoft.org/article/view/v040i02/v40i02.pdf> [^4]
 * Double arrow operator (<<-) allows assignmnet to parent levels (outside of current function or enviroment). The usual single arrow operator (<-) only allows assignment to current level.
 
 ### Tours
@@ -804,9 +835,9 @@ Does *interactivity* provide extra leverage that a static graphic cannot in EDA?
 <https://link-springer-com.ezproxy.auckland.ac.nz/article/10.1007/s00180-008-0115-y>
     + Most recent publication (I have found so far) on rggobi
 
-* Cook and Swayne book website
-<http://www.ggobi.org/book/index.html>
-    + Code used in book and can get datasets from here
+### Interactive and Dynamic Graphics for Data Analysis [^1]
+* Website for book: <http://www.ggobi.org/book/index.html>
+    + Code used in Cook and Swayne book and can get datasets from here
 
 * Other courses
     + See Dropbox: Using_Interactive_Graphics_to_Teach_Multivariate_D.pdf
@@ -843,3 +874,16 @@ Does *interactivity* provide extra leverage that a static graphic cannot in EDA?
 * Sievert also used the `tourr` package. Some differences in approach:
     + He used `rescale()` to standardise the data values rather than the `sphere` argument. 
     + He used `new_tour()` rather than `save_history()` hence did not need to interpolate from basis to basis (this is initiated within `new_tour()`)
+    
+### Modern Applied Statstics with S-plus [^2]
+
+
+### Visualizing Statistical Models: Removing the Blindfold [^3]
+* Distinction between visualising models in the data space (m-in-ds) and the data in the model space, which is more common. 
+* Advocates for more visuals for m-in-ds.
+
+## References
+[^1]: Cook and Swayne (2007) R and GGobi book
+[^2]: Venables, Ripley (1999) MASS book
+[^3]: Wickham, Cook, Hofmann (2015) Remove blindfold paper
+[^4]: Wickham, Cook, Hofmann, Buja (2011) tourr package paper
