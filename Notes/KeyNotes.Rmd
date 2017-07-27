@@ -446,7 +446,7 @@ observeEvent(input$new, {
 * Create interactive plots using either: plot_ly() or ggplot2 %>% ggplotly().
 * plot_ly() uses ~ before variable names. Otherwise similar to ggplot2: 
     + 'ggplot() + geom_*()' = 'plot_ly() %>% add_*()'
-* ggplotly() translates each layer of ggplot2 into one or more plotly.js traces. Assumptions about trace attributes not always appropriate, can modify. See: https://cpsievert.github.io/plotly_book/extending-ggplotly.html (Extending ggplotly).
+* ggplotly() translates each layer of ggplot2 into one or more plotly.js traces. Assumptions about trace attributes not always appropriate, can modify. See: <https://cpsievert.github.io/plotly_book/extending-ggplotly.html> (Extending ggplotly).
 * plot_ly() interacts more directly with plotly.js and hence generally not as ‘expensive’ as ggplotly(). Maybe faster with large ds?
 * Tooltip identification can be customised:
     + ggplot(aes(label=colName, label2=colName1))

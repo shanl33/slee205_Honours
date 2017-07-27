@@ -12,11 +12,11 @@ str(crabs)
 # Mosaic plot (would need shiny click?) or facet_wrap of scatterplots (crosstalk only)
 # facet_grid would allow up to 4 factors to be crossed into groups
 # Subset categorical vars
-fac_cols <- sapply(crabs, class)=="factor"
-Fdataset <- crabs[, fac_cols]
+fac_cols <- sapply(mtcars, class)=="factor"
+Fdataset <- mtcars[, fac_cols]
 fac_n <- length(Fdataset)
-Fdataset$Names <- rownames(crabs)
-Fdataset$All <- factor(rep("1", length(Fdataset$Names)))
+Fdataset$Names <- rownames(mtcars)
+Fdataset$All <- factor(rep("1", nrow(mtcars)))
 sd <- SharedData$new(data=Fdataset, key=~Names, group="2Dtour")
 
 fac_cols <- sapply(mtcars, class)=="factor"
@@ -94,6 +94,51 @@ tail(proj)
 basis <- data.frame(measure=rep(colnames(X_sphere), length(tinterp)),
                     step=rep(1:length(tinterp),each=p), magnitude= PC_x^2+PC_y^2, x=PC_x, y=PC_y)
 
+
+# Tours with different orthog projs as starting points --------------------
+# Rescale first then PCs if arg=T
+# Reorder df cols so that each pairwise combo is in position 1 and 2
+num_cols <- sapply(crabs, typeof)=="double"
+Xdataset <- as.data.frame(rescale(crabs[, num_cols])) #rescale
+p <- length(Xdataset)
+pc_rescale <- prcomp(Xdataset) # For extracting PC coeffs (see further below)
+XPC <- as.data.frame(apply(predict(pc_rescale), 2, scale))
+
+# Function for reordering first two cols (df can be sphere'd or not)
+# Output is a list with p(p-1)/2 components with a (n by p) data frames ready for touring
+col_reorder <- function (df, p) {
+  Xs <- list()
+  k <- 1
+  for (i in 1:(p-1)) {
+    for (j in 1:(p-i)) {
+      #Xs[[k]] <- df[c(i,(i+j),(1:p)[-c(i,(i+j))])]
+      Xs[[k]] <- df[c(i,(i+j))]
+      k <= k + 1
+    }
+  }
+}
+Xs <- list() # Where to put this??? in function??
+k <- 1
+col_reorder2 <- function(df, X_list) {
+  for (i in 1:4) {
+    for (j in 1:(5-i)) {
+      X_list[[k]] <- df[c(i,(i+j),(1:p)[-c(i,(i+j))])]
+      #Xs[[k]] <- df[c(i,(i+j))]
+      #k <= k + 1
+    }
+  }
+}
+
+ext_col <- function(df){
+  i <- 1
+  j <- i+1
+  df[c(i,(i+j))]
+}
+
+trial <- col_reorder2(XPC, Xs) #nothing happens
+head(ext_col(XPC)) #works
+Xs[[1]] <- ext_col(XPC)
+
 # Sphere-ing data ---------------------------------------------------------
 # Sphere data (Manually)
 M_sphere <- sphere(crabs[,4:8])
@@ -105,7 +150,6 @@ head(X_sphere)
 head(sphere(rescale(crabs[,4:8]))) # save_history = t_sphere is RESCALEd THEN sphered.
 pairs(X_sphere) 
 pairs(t_sphere) # More defined groups visible. RESCALE then sphere (order matters!)
-
 
 # Plot for principal components coefficients -----------------------------
 # tourr has rescale=T (so rescale first)

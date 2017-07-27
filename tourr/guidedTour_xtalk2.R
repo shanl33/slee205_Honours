@@ -16,13 +16,18 @@ data("crabs")
 pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
   # Subset real-valued vars (type="double") for touring
   num_cols <- sapply(dataset, typeof)=="double"
-  Xdataset <- dataset[, num_cols]
+  Xdataset <- rescale(dataset[, num_cols]) #Rescale first
+  # If argument PC=TRUE
+  pc_rescale <- prcomp(Xdataset) # For extracting PC coeffs (see further below)
+  XPC <- apply(predict(pc_rescale), 2, scale) 
+  ## Function for reordering first two cols with all pairwise combos of Xs
+  
   p <- length(Xdataset) # Number of real-valued Xs used in tour
-  # Save tour
+  # Save tour (rescale=F since already scaled to col to range [0,1])
   if (index=="cmass") {
-    t <- save_history(Xdataset, guided_tour(cmass, d=2, max.tries = 50), sphere=TRUE, max=50, ...) 
+    t <- save_history(Xdataset, guided_tour(cmass, d=2, max.tries = 50), rescale=FALSE, max=50, ...) 
   } else if (index=="holes") {
-    t <- save_history(Xdataset, guided_tour(holes, d=2, max.tries = 50), sphere=TRUE, max=50, ...)
+    t <- save_history(Xdataset, guided_tour(holes, d=2, max.tries = 50), rescale=FALSE, max=50, ...)
   } else {
     stop("Invalid 'index' argument. Choose either: cmass or holes")
   }
@@ -104,7 +109,7 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
     add_markers(color=I("darkgray")) %>%
     add_markers(color=I("red"), frame=~iteration) %>%
     layout(yaxis = list(title="Projection pursuit index"))
-           
+  
   
   # very important these animation options are specified _after_ subplot()
   # since they call plotly_build(., registerFrames = T)
@@ -170,8 +175,7 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
       highlight(on="plotly_select", off= "plotly_deselect", color = "blue", 
                 persistent=T, dynamic=T)
   }
-  # tourr has rescale=T (so rescale first)
-  pc_rescale <- prcomp(rescale(Xdataset))
+  # 'loads' are the coeffs for the PCs (from pc_rescale defined earlier)
   loads <- as.data.frame(pc_rescale$rotation)
   # Note: signs of coeffs are random.
   # We are interested in the magnitude of differences between the coefficients
