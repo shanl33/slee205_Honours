@@ -8,14 +8,11 @@ library(MASS) # For crabs dataset
 library(tidyr) # For PCs reshaping output for plot
 library(GGally) # For ggpairs plot of PCs
 data("crabs")
-# CS's code: <https://github.com/cpsievert/pedestrians/blob/master/docs/stl-tour.R>
-# Index plot not separated from slider.
 # No plot for coefficients of principal components
-# Click on scatterplot matrix to select intial basis.
-
+# Click on index plot to select intial basis.
 # 'factors=n' argument specifies number of factors to include in the plot for brushing groups
 # The first 'n' factors will be used.
-# Variables will be sphere'd so that principal coordinates are used in the analysis
+
 guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
   # Subset real-valued vars (type="double") for touring
   num_cols <- sapply(dataset, typeof)=="double"

@@ -8,6 +8,56 @@ library(tidyr)
 data("crabs")
 str(crabs)
 
+# Scattermatrix -----------------------------------------------------------
+# Lower diagonal is final proj and upper diagonal its axes components
+# List of P^2 (max 5) plots to plot using ggmatrix. Plots on diagonals (i,i) are empty
+scatt_list <- list()
+P <- ifelse(p > 5, 5, p)
+
+x <- c()
+y <- c()
+PC_x <- c()
+PC_y <- c()
+tour_n <- c() # tour number (1 to P*(p-1)/2)
+axes_n <- c() # also tour number but different length to above
+measure <- c()
+for (k in 1:P*(P-1)/2) {
+  tour_n <- c(tour_n, rep.int(k, nrow(crabs)))
+  axes_n <- c(axes_n, rep.int(k, p))
+  measure <- c(measure, colnames(Xdfs[[k]]))
+  single_tour <- t_tour[[k]]
+  i <- length(single_tour)
+  x <- c(x, unlist(single_tour[[i]][[1]][,1]))
+  y <- c(y, unlist(single_tour[[i]][[1]][,2]))
+  # Take first 'p' values to be x-coords for PCs
+  PC_x <- c(PC_x, unlist(test_interp[[k]][[i]][1:p])) 
+  # Take remaining 'p' values to be y-coords for PCs
+  PC_y <- c(PC_y, unlist(test_interp[[k]][[i]][(p+1):(p+p)])) 
+}
+
+# Dataframe for lower diagonal data 
+lower_tours <- data.frame(ID=rep(rownames(crabs), length(t_tour)), 
+                          x=x, y=y, tour_n=tour_n)
+# Dataframe for upper diagonal data 
+upper_tours <- data.frame(measure=measure,
+                          x=PC_x, y=PC_y, tour_n=axes_n)
+
+for (i in 1:P) {
+  # Diagonals
+  scatt_list[[(i-1)*p+i]] <- ggally_text(paste("Plot #", i, sep = ""))
+  # Upper plots of axes components
+  for (u in (i*p+1):(i*p+i)) {
+    scatt_list[[u]] <- 
+  }
+  # Lower plot of final tour proj (not fo i=P)
+  if (i < P) {
+    for (l in ((i-1)*(p+1)+2):i*p) {
+      scatt_list[[l]] <- 
+    } 
+  }
+}
+
+
 # Brush to select by group ------------------------------------------------
 # Mosaic plot (would need shiny click?) or facet_wrap of scatterplots (crosstalk only)
 # facet_grid would allow up to 4 factors to be crossed into groups
@@ -123,7 +173,7 @@ col_reorder <- function (df) {
 Xdfs <- col_reorder(XPC)
 head(Xdfs[[10]])
 # Apply save_history() to each Xdf, t <-
-test <- lapply(Xdfs, function (x) save_history(x, guided_tour(cmass, d=2, max.tries = 50), rescale=FALSE, max=50))
+t <- lapply(Xdfs, function (x) save_history(x, guided_tour(cmass, d=2, max.tries = 50), rescale=FALSE, max=50))
 str(test) #list of p(p-1)/2 components
 p <- ncol(Xdataset) # Number of real-valued Xs 
 t0 <- matrix(c(1, rep(0, p), 1, rep(0, (p-2))), ncol = 2)
