@@ -99,45 +99,116 @@ basis <- data.frame(measure=rep(colnames(X_sphere), length(tinterp)),
 # Rescale first then PCs if arg=T
 # Reorder df cols so that each pairwise combo is in position 1 and 2
 num_cols <- sapply(crabs, typeof)=="double"
-Xdataset <- as.data.frame(rescale(crabs[, num_cols])) #rescale
-p <- length(Xdataset)
+Xdataset <- as.data.frame(rescale(crabs[, num_cols])) #Rescale first
+p <- ncol(Xdataset) # Number of real-valued Xs 
 pc_rescale <- prcomp(Xdataset) # For extracting PC coeffs (see further below)
 XPC <- as.data.frame(apply(predict(pc_rescale), 2, scale))
-
 # Function for reordering first two cols (df can be sphere'd or not)
 # Output is a list with p(p-1)/2 components with a (n by p) data frames ready for touring
-col_reorder <- function (df, p) {
+
+# Need df input to reorder cols easily
+col_reorder <- function (df) {
+  p <- ncol(df)
   Xs <- list()
   k <- 1
   for (i in 1:(p-1)) {
-    for (j in 1:(p-i)) {
-      #Xs[[k]] <- df[c(i,(i+j),(1:p)[-c(i,(i+j))])]
-      Xs[[k]] <- df[c(i,(i+j))]
-      k <= k + 1
+    for (j in (i+1):p) {
+      Xs[[k]] <- df[c(i,j,(1:p)[-c(i,j)])]
+      k <- k + 1
     }
   }
+  return(Xs)
 }
-Xs <- list() # Where to put this??? in function??
-k <- 1
-col_reorder2 <- function(df, X_list) {
-  for (i in 1:4) {
-    for (j in 1:(5-i)) {
-      X_list[[k]] <- df[c(i,(i+j),(1:p)[-c(i,(i+j))])]
-      #Xs[[k]] <- df[c(i,(i+j))]
-      #k <= k + 1
-    }
+
+Xdfs <- col_reorder(XPC)
+head(Xdfs[[10]])
+# Apply save_history() to each Xdf, t <-
+test <- lapply(Xdfs, function (x) save_history(x, guided_tour(cmass, d=2, max.tries = 50), rescale=FALSE, max=50))
+str(test) #list of p(p-1)/2 components
+p <- ncol(Xdataset) # Number of real-valued Xs 
+t0 <- matrix(c(1, rep(0, p), 1, rep(0, (p-2))), ncol = 2)
+class(t0) <- "history_array"
+t1 <- lapply(t, function (x) array(c(t0, x), dim = dim(x) + c(0,0,1)))
+# Assign class and data attributes
+for (i in 1:length(t1)) {
+  class(t1[[i]]) <- "history_array"
+  attr(t1[[i]], "data") <- Xdfs[[i]]
+}
+str(t1)
+test_interp <- lapply(t1, interpolate)
+str(test_interp)
+#test, t_orthog, test_interp are all lists with p(p-1)/2 components (all possible pairwise combos)
+#t_tour is a list with p(p-1)/2 lists with varying dimensions (depend on the length of each tour)
+#t_tour contains info about the pursuit_index: for 'index_plot'
+#t_tour contains info about the x and y positions of the projections: for the plot 'tour' 
+#t_tour contains info about the tour axes coords: for the plot 'axes' (subplot of 'tour')
+t_tour <- list()
+#pp_index is a data frame with the vars: init_pair, iteration, index
+init_pair=c()
+iteration=c()
+pursuit_index=c()
+for(i in 1:length(test_interp)) {
+  X_matrix <- as.matrix(Xdfs[[i]])
+  # Apply index function to each projection basis
+  t_tour[[i]] <- apply(test_interp[[i]], 3, FUN = cmass_tour)
+  #t_tour[[i]] <-apply(tinterp[[i]], 3, FUN = paste(index,"_tour", sep=""))
+  # m is the number of iterations for that tour
+  m <- length(test_interp[[i]])
+  init_pair <- c(init_pair, rep.int(i, m))
+  iteration <- c(iteration, 1:m)
+  for (j in 1:m) {
+    pursuit_index <- c(pursuit_index, unlist(t_tour[[i]][[j]][2]))
   }
 }
+# for 'index_plot'
+pp_index <- data.frame(init_pair, iteration, pursuit_index)
+ggplot(pp_index, aes(x=iteration, y=pursuit_index, group=init_pair, col=as.factor(init_pair))) +
+  geom_point() +
+  geom_line() +
+  ggtitle("Projection pursuit index") +
+  theme(legend.position = "none")
+ggplotly()
+ggplotly(source = "index_plot")
 
-ext_col <- function(df){
-  i <- 1
-  j <- i+1
-  df[c(i,(i+j))]
-}
+# Use t_tour[[10]] to trial. The last tour
+single_tour <- t_tour[[10]]
 
-trial <- col_reorder2(XPC, Xs) #nothing happens
-head(ext_col(XPC)) #works
-Xs[[1]] <- ext_col(XPC)
+# for the plot 'tour' 
+proj <- data.frame(ID=rep(rownames(dataset), length(tinterp)), 
+                   iteration=rep(1:length(tinterp),each=nrow(Xdataset)), x=x, y=y)
+# for the plot 'axes' (subplot of 'tour')
+
+# Data used in tours as a matrix (same as dfs in Xdfs but need as matrices)
+X_matrix <- as.matrix(attr(t[[i]], "data")) 
+X_matrix <- as.matrix(attr(t1[[i]], "data")) 
+X_matrix <- as.matrix(Xdfs[[i]]) 
+
+#### Keep: Try again with interpolate ######
+dim(t10) + c(0,0,1)
+t10a <- array(c(t0, t10), dim = dim(t10) + c(0,0,1)) #no need for abind package
+attr(t10a, "data") <- Xdfs[[10]] # Retain Xdf data for each component in the list with the proj matrices
+class(t10a) <- "history_array"
+#check
+t10a[,,12] # Same as below
+t10[,,11]
+
+## Single initial orthog basis
+# 'Inserting' initial base as orthogonal projection of first two measures
+t10 <- test[[10]] # The proj matrices when we start w orthog proj of PC4 and 5
+t10 <- abind(t0, t10, along = 3) # insert orthog as initial base
+class(t10) <- "history_array"
+str(t10)
+t10_interp <- interpolate(t10)
+str(t10_interp)
+t10_tour <- apply(t10_interp, 3, FUN = cmass_tour)
+
+t_once <- save_history(XPC, guided_tour(cmass, d=2, max.tries = 50), rescale=FALSE, max=50)
+str(t_once)
+t_once[,,1]
+head(attr(t_once, "data")) #Same as XPC since all scaling and sphereing was done before function use
+head(XPC)
+t_once_interp <- interpolate(t_once)
+head(attr(t_once_interp, "data")) #same as XPC
 
 # Sphere-ing data ---------------------------------------------------------
 # Sphere data (Manually)
@@ -180,11 +251,18 @@ ggplotly(PC_plot)
 # Initial matrix
 t0 <- matrix(c(1, rep(0, p), 1, rep(0, (p-2))), ncol = 2)
 X_sphere[d$selection(),]
-# Assgin SharedData as an object
+# Assgin SharedData as an object d 
+#This only works in a REACTIVE environ like Shiny)
 # m is a dataset
 d <- SharedData$new(m, ~rowname)
 m[d$selection(),]
-
+# See: ?SharedData, selection(value, ownerId = "")
+#Set the ownerId argument to the outputId of a widget 
+#if conceptually that widget "initiated" the selection 
+#(prevents that widget from clearing its visual selection box, 
+#which is normally cleared when the selection changes). 
+# For example, if setting the selection based on a plotOutput brush, 
+#then ownerId should be the outputId of the plotOutput.
 
 # pc and pc_center 
 pc <- princomp(crabs[,4:8])

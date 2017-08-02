@@ -9,6 +9,8 @@ library(tidyr) # For PCs reshaping output for plot
 library(GGally) # For ggpairs plot of PCs
 data("crabs")
 # CS's code: <https://github.com/cpsievert/pedestrians/blob/master/docs/stl-tour.R>
+# Separated index plot from slider. Can click to select on it but not useful unless in Shiny
+# See: print(sd1$data(withSelection=TRUE)) # Not useful unless in a reactive environ like SHINY
 
 # 'factors=n' argument specifies number of factors to include in the plot for brushing groups
 # The first 'n' factors will be used.
@@ -16,18 +18,13 @@ data("crabs")
 pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
   # Subset real-valued vars (type="double") for touring
   num_cols <- sapply(dataset, typeof)=="double"
-  Xdataset <- rescale(dataset[, num_cols]) #Rescale first
-  # If argument PC=TRUE
-  pc_rescale <- prcomp(Xdataset) # For extracting PC coeffs (see further below)
-  XPC <- apply(predict(pc_rescale), 2, scale) 
-  ## Function for reordering first two cols with all pairwise combos of Xs
-  
+  Xdataset <- dataset[, num_cols]
   p <- length(Xdataset) # Number of real-valued Xs used in tour
-  # Save tour (rescale=F since already scaled to col to range [0,1])
+  # Save tour
   if (index=="cmass") {
-    t <- save_history(Xdataset, guided_tour(cmass, d=2, max.tries = 50), rescale=FALSE, max=50, ...) 
+    t <- save_history(Xdataset, guided_tour(cmass, d=2, max.tries = 50), sphere=TRUE, max=50, ...) 
   } else if (index=="holes") {
-    t <- save_history(Xdataset, guided_tour(holes, d=2, max.tries = 50), rescale=FALSE, max=50, ...)
+    t <- save_history(Xdataset, guided_tour(holes, d=2, max.tries = 50), sphere=TRUE, max=50, ...)
   } else {
     stop("Invalid 'index' argument. Choose either: cmass or holes")
   }
@@ -88,12 +85,19 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
     title = "", range = c(-1.1, 1.2), 
     zeroline = F, showticklabels = F
   )
+  #sd1 <- SharedData$new(proj, key=~ID, group = "2Dtour") 
+  #sd2 <- SharedData$new(proj, key=~iteration, group = "init_base") 
   # tour plot
+  #tour <- plot_ly(sd2, frame = ~iteration, color = I("black")) %>%
+   # add_markers(sd1, x = ~x, y = ~y, text = ~ID, hoverinfo = "text") %>%
+  #  layout(xaxis = tx, yaxis = tx, dragmode="select") %>%
+   # highlight(on="plotly_select", off= "plotly_deselect", color = "blue", persistent = TRUE)
+  
   tour <- proj %>%
     SharedData$new(~ID, group = "2Dtour") %>%
     plot_ly(x = ~x, y = ~y, frame = ~iteration, color = I("black")) %>%
     add_markers(text = ~ID, hoverinfo = "text") %>%
-    layout(xaxis = tx, yaxis = tx)
+    layout(xaxis = tx, yaxis = tx) 
   
   axes <- basis %>%
     plot_ly(x = ~x, y = ~y, frame = ~iteration, hoverinfo = "none") %>%
@@ -104,17 +108,23 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
     layout(xaxis = ax, yaxis = ax)
   # Doesn't work if use ggplot() for axes plot
   # Proj pursuit index plot
-  index <- pp_index %>% 
-    plot_ly(x=~iteration, y=~index) %>%
-    add_markers(color=I("darkgray")) %>%
-    add_markers(color=I("red"), frame=~iteration) %>%
-    layout(yaxis = list(title="Projection pursuit index"))
-  
+  sd1 <- SharedData$new(pp_index, key=~iteration, group="init_base")
+  index <- plot_ly(sd1, x=~iteration, y=~index) %>%
+    add_markers() %>%
+    #add_markers(color=I("red"), frame=~iteration) %>%
+    layout(yaxis = list(title="Projection pursuit index")) %>%
+    highlight(on="plotly_click", off= "plotly_doubleclick", color = "red")
+  #index <- pp_index %>% 
+   # plot_ly(x=~iteration, y=~index) %>%
+    #add_markers(color=I("darkgray")) %>%
+    #add_markers(color=I("red"), frame=~iteration) %>%
+    #layout(yaxis = list(title="Projection pursuit index"))
+  print(sd1$data(withSelection=TRUE)) # Not useful unless in a reactive environ like SHINY
   
   # very important these animation options are specified _after_ subplot()
   # since they call plotly_build(., registerFrames = T)
   # (Took a few minutes to run)
-  tour <- subplot(tour, axes, index, titleY = T) %>%
+  tour <- subplot(tour, axes, titleY = T) %>%
     animation_opts(33) %>% #33 milliseconds between frames
     hide_legend() %>%
     layout(dragmode = "select") %>%
@@ -137,26 +147,26 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
   Fdataset$All <- factor(rep("1", nrow(Fdataset)))
   
   # facet_grid would allow up to 4 factors to be crossed into groups
-  sd <- SharedData$new(Fdataset, key=~ID, group = "2Dtour") 
+  sd3 <- SharedData$new(Fdataset, key=~ID, group = "2Dtour") 
   if (fac_n==1) {
-    gp <- ggplot(sd, aes_string(x=names(Fdataset)[1])) +
+    gp <- ggplot(sd3, aes_string(x=names(Fdataset)[1])) +
       geom_jitter(aes(y=Fdataset$All, label=ID), 
                   width = 0.25, height = 0.25) +
       labs(title="The first factor is displayed") 
   } else if (fac_n==2) {
-    gp <- ggplot(sd, aes_string(x=names(Fdataset)[1], y=names(Fdataset)[2])) +
+    gp <- ggplot(sd3, aes_string(x=names(Fdataset)[1], y=names(Fdataset)[2])) +
       geom_jitter(aes(label=ID), 
                   width = 0.25, height = 0.25) +
       labs(title="The first 2 factors are displayed") 
   } else if (fac_n==3) {
-    gp <- ggplot(sd, aes_string(x=names(Fdataset)[1], y=names(Fdataset)[2],
+    gp <- ggplot(sd3, aes_string(x=names(Fdataset)[1], y=names(Fdataset)[2],
                                label1=names(Fdataset)[3])) +
       geom_jitter(aes(label=ID), 
                   width = 0.2, height = 0.2) +
       labs(title="The first 3 factors are displayed") +
       facet_grid(.~Fdataset[,3])
   } else if (fac_n>3) {
-    gp <- ggplot(sd, aes_string(x=names(Fdataset)[1], y=names(Fdataset)[2],
+    gp <- ggplot(sd3, aes_string(x=names(Fdataset)[1], y=names(Fdataset)[2],
                                label1=names(Fdataset)[3],
                                label2=names(Fdataset)[4])) +
       geom_jitter(aes(label=ID), 
@@ -175,7 +185,8 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
       highlight(on="plotly_select", off= "plotly_deselect", color = "blue", 
                 persistent=T, dynamic=T)
   }
-  # 'loads' are the coeffs for the PCs (from pc_rescale defined earlier)
+  # tourr has rescale=T (so rescale first)
+  pc_rescale <- prcomp(rescale(Xdataset))
   loads <- as.data.frame(pc_rescale$rotation)
   # Note: signs of coeffs are random.
   # We are interested in the magnitude of differences between the coefficients
@@ -195,9 +206,9 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
   
   html <- tags$div(
     style = "display: block;",
-    tags$div(tour, align = "center", style = "width: 100%; padding: 1em;"),
-    #tags$div(tour, style="width:50%; float:left;"),
-    #tags$div(index, style="width:50%; float:left;"),
+    #tags$div(tour, align = "center", style = "width: 100%; padding: 1em;"),
+    tags$div(tour, style="width:70%; float:left;"),
+    tags$div(index, style="width:30%; float:left;"),
     tags$div(brush_group, style="width:50%; float:left;"),
     tags$div(pc_coeffs, style = "width: 50%; float:left;")
   )

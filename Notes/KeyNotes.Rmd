@@ -10,6 +10,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Questions
 * Is it sensible for `plotly` plots to render faster than `ggplot2`?
     + `plotly` object keeps up better with animation at a faster speed (300 millisecond per animation step)
+* Apart from using `shiny`, how else can you be in a "reactive environment" (need this to explicitly retrieve SharedData details)
+eg. Use print(sd$data(withSelection=TRUE))
+* Using `plotly` alone (without `shiny`) has the advantage of producing a "standalone html". Why is this an advantage? Easier to share, no need to host on an external server (?) 
 
 ### Answered
 * Is `cranvas` worth investigating? 

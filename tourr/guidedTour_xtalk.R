@@ -1,7 +1,6 @@
 library(ggplot2)
 library(plotly)
 library(tourr)
-library(abind)
 library(crosstalk) # For (crosstalk+plotly) function
 library(htmltools)
 library(MASS) # For crabs dataset
@@ -28,10 +27,11 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
   }
   # Start view as orthogonal projection of first two measures
   # Retain orthogonal projection as initial basis
-  t0 <- t[,,1]
   t0 <- matrix(c(1, rep(0, p), 1, rep(0, (p-2))), ncol = 2)
-  t1 <- abind(t0, t, along = 3)
+  class(t0) <- "history_array"
+  t1 <- array(c(t0, t), dim = dim(t) + c(0,0,1)) 
   class(t1) <- "history_array"
+  attr(t1, "data") <- Xdataset # Retain data 
   tinterp <- interpolate(t1) 
   X_sphere <- attr(t, "data") #(n by p) 
   # Central mass index and projection pursuit tour function
@@ -48,11 +48,7 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
     list(rescale(XA), holes_index)
   }
   # Apply index function to each projection basis
-  if (index=="cmass") {
-    t_tour <- apply(tinterp, 3, FUN = cmass_tour)
-  } else if (index=="holes") {
-    t_tour <- apply(tinterp, 3, FUN = holes_tour)
-  }
+  t_tour <- apply(tinterp, 3, FUN = paste(index,"_tour", sep=""))
   pp_index <- data.frame(iteration=1:length(tinterp))
   x <- c()
   y <- c()
@@ -85,7 +81,7 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
   )
   # tour plot
   tour <- proj %>%
-    SharedData$new(~ID, group = "2Dtour") %>%
+    SharedData$new(key=~ID, group = "2Dtour") %>%
     plot_ly(x = ~x, y = ~y, frame = ~iteration, color = I("black")) %>%
     add_markers(text = ~ID, hoverinfo = "text") %>%
     layout(xaxis = tx, yaxis = tx)
@@ -102,14 +98,14 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
   index <- pp_index %>% 
     plot_ly(x=~iteration, y=~index) %>%
     add_markers(color=I("darkgray")) %>%
-    add_markers(color=I("red"), frame=~iteration) %>%
+    #add_markers(color=I("red"), frame=~iteration) %>%
     layout(yaxis = list(title="Projection pursuit index"))
            
   
   # very important these animation options are specified _after_ subplot()
   # since they call plotly_build(., registerFrames = T)
   # (Took a few minutes to run)
-  tour <- subplot(tour, axes, index, titleY = T) %>%
+  tour <- subplot(tour, axes, titleY = T) %>%
     animation_opts(33) %>% #33 milliseconds between frames
     hide_legend() %>%
     layout(dragmode = "select") %>%
@@ -193,7 +189,7 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
     style = "display: block;",
     tags$div(tour, align = "center", style = "width: 100%; padding: 1em;"),
     #tags$div(tour, style="width:50%; float:left;"),
-    #tags$div(index, style="width:50%; float:left;"),
+    tags$div(index, style="width:50%; float:left;"),
     tags$div(brush_group, style="width:50%; float:left;"),
     tags$div(pc_coeffs, style = "width: 50%; float:left;")
   )
