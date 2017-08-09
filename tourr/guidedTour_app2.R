@@ -98,16 +98,13 @@ tour_axes <- function(df) {
 
 # Draws LAST "tour" (proj) plot for scattermatrix
 last_plot <- function(df) {
-  sd <- SharedData$new(df, key=~ID, group = "2Dtour")
-  ggplot(sd, aes(x=x, y=y, label=ID)) +
+  # sd <- SharedData$new(df, key=~ID, group = "2Dtour") #ggmatrix won't work
+  ggplot(df, aes(x=x, y=y, label=ID)) +
     geom_point() +
     scale_x_continuous(limits = c(-0.1, 1.1)) +
     scale_y_continuous(limits = c(-0.1, 1.1)) +
     theme_void() +
     theme(legend.position = "none")
-  ggplotly() %>%
-    layout(dragmode="select") %>%
-    highlight(persistent=T)
 }
 # Draws LAST "tour" (proj) plot for scattermatrix
 last_axis_plot <- function(df) {
@@ -214,6 +211,24 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
   last_projs <- lapply(XYall, last_XY)
   last_axes <- lapply(PCall, last_PC)
   
+  # Scattermatrix plot data
+  # Lower diagonal is final proj and upper diagonal its axes components
+  # List of P^2 (max 5) plots to plot using ggmatrix. Plots on diagonals (i,i) are empty
+  diag_labels <- colnames(Xdfs[[1]])
+  scatt_list <- list(ggally_text(diag_labels[1])) 
+  P <- ifelse(p > 5, 5, p)
+  tplot_list <- lapply(last_projs, last_plot)
+  aplot_list <- lapply(last_axes, last_axis_plot)
+  for (i in 1:(P-1)) {
+    scatt_list <- c(scatt_list, tplot_list[1:(P-i)],
+                    aplot_list[1:i], list(ggally_text(diag_labels[i+1]))) 
+    #(P-i) is the number of tour plots and i the # of axes plots for iteration i
+    #Delete merged plots
+    tplot_list <- tplot_list[-c(1:(P-i))]
+    aplot_list <- aplot_list[-c(1:i)]
+  }
+  # scatt_list contains all last projections (for each tour, up to 10 tours)
+  
   # SharedData for the factors plot
   sdF <- SharedData$new(Fdataset, key=~ID, group = "2Dtour") 
   # SharedData for the tours plot (To do if needed selection() maybe needed in "tour" plot then)
@@ -225,8 +240,10 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
       plotlyOutput("tour"),
       plotlyOutput("indexPlot")
     ),
+    splitLayout(cellWidths = c("40%", "60%"),
     plotlyOutput("factors"),
-    plotlyOutput("scatter")
+    plotOutput("scatter")
+    )
   )
   server <- function(input, output, session) {
   ## Proj pursuit index plot
@@ -242,38 +259,12 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
   output$tour <- renderPlotly({
     s <- event_data("plotly_click", source = "index_plot")
     if (length(s)) {k <- s$curveNumber + 1} else {k <- 1}
-    # Functions to apply over each component in the list "tinterp"
-    # tour_data(tinterp)
-    # tour_plots()
-    
     proj <- cbind(ID=rownames(dataset), XYsingle(t_tour[[k]]))
     basis <- PCsingle(tinterp[[k]])
     
-    # Axes for tour plot and tour axes plot
-    #tx <- list(
-     # title = "", range = c(-0.1, 1.1), 
-    #  zeroline = F, showticklabels = F
-    #)
-    #ax <- list(
-     # title = "", range = c(-1.1, 1.2), 
-    #  zeroline = F, showticklabels = F
-    #)
-    
     ## tour plot
     tour <- proj %>% tour_plot()
-      #SharedData$new(key=~ID, group = "2Dtour") %>% 
-      #plot_ly(x = ~x, y = ~y, frame = ~iteration, color = I("black")) %>%
-      #add_markers(text = ~ID, hoverinfo = "text") %>%
-      #layout(xaxis = tx, yaxis = tx)
-    ## tour axes plot
     axes <- basis %>% tour_axes()
-      #plot_ly(x = ~x, y = ~y, frame = ~iteration, hoverinfo = "none") %>%
-      #add_segments(xend = 0, yend = 0, color = I("darkgray"), size = I(1)) %>%
-      #add_text(text = ~measure, color=I("black")) %>%
-      #layout(xaxis = ax, yaxis = ax)
-    # Doesn't seem to work if use ggplot() for axes plot and use with subplot()
-    # Maybe both plots need to be ggplot() to work?
-    # Combine the two tour plots with a single slider
     subplot(tour, axes, titleY = T, widths = c(0.7, 0.3), margin = 0) %>%
       animation_opts(33) %>% #33 milliseconds between frames
       hide_legend() %>%
@@ -320,9 +311,8 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
                   persistent=T, dynamic=T)
     }
   })
-  output$scatter <- renderPlotly({
-    #last_axis_plot(last_axes[[1]]) #works!
-    last_plot(last_projs[[1]]) # works
+  output$scatter <- renderPlot({
+    ggmatrix(scatt_list, P, P, byrow = F, showAxisPlotLabels = F)
   })
   }
   shinyApp(ui, server)
@@ -330,12 +320,3 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
 
 # Testing
 guidedTour_app(crabs, index = "holes")
-
-lcrabs <- crabs
-lcrabs[,4:8] <- log(lcrabs[,4:8])
-pp2D_xtalk(lcrabs, index = "holes")
-
-# Testing brush_group plot
-data("mtcars")
-mtcars[, c(2,8,9,10,11)] <- lapply(mtcars[, c(2,8,9,10,11)], factor)
-guidedTour_app(mtcars, factors = 4)

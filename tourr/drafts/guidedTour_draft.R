@@ -27,7 +27,7 @@ t_tour <- list()
 #pp_index is a data frame with the vars: init_pair, iteration, index
 init_pair=c()
 iteration=c()
-pursuit_index=c()
+pursuit_index=c() # Load cmass_tour fn first
 for(i in 1:length(tinterp)) {
   X_matrix <- as.matrix(Xdfs[[i]])
   # Apply index function to each projection basis
@@ -71,12 +71,6 @@ tail(last_axes[[1]])
 head(last_projs[[1]])
 tour_plot(last_projs[[1]])
 
-# Add "ID" variable, rownames of original dataset
-last_projs <- lapply(last_projs, function (x) {
-  ID <- rownames(crabs)
-  cbind(x, ID)
-  })
-
 # Draws "tour" (proj) plot 
 tour_plot <- function(df) {
   tx <- list(
@@ -102,6 +96,85 @@ tour_axes <- function(df) {
 
 #test
 PCall[[1]] %>% tour_axes()
+
+# Scattermatrix -----------------------------------------------------------
+# Lower diagonal is final proj and upper diagonal its axes components
+# List of P^2 (max 5) plots to plot using ggmatrix. Plots on diagonals (i,i) are empty
+diag_labels <- colnames(Xdfs[[1]])
+scatt_list <- list(ggally_text(diag_labels[1]))
+P <- ifelse(p > 5, 5, p)
+tplot_list <- lapply(last_projs, last_plot)
+aplot_list <- lapply(last_axes, last_axis_plot)
+for (i in 1:(P-1)) {
+  scatt_list <- c(scatt_list, tplot_list[1:(P-i)],
+                  aplot_list[1:i], list(ggally_text(diag_labels[i+1]))) 
+  #(P-i) is the number of tour plots and i the # of axes plots for iteration i
+  #Delete merged plots
+  tplot_list <- tplot_list[-c(1:(P-i))]
+  aplot_list <- aplot_list[-c(1:i)]
+}
+
+# testing
+ggmatrix(scatt_list,P, P, byrow = F, showAxisPlotLabels = F)
+
+test_list <- lapply(last_projs[1:4], last_plot)
+test_list <- list(last_plot(last_projs[[1]]), 
+                  last_plot(last_projs[[1]]),
+                  last_plot(last_projs[[1]]),
+                  last_plot(last_projs[[1]]))
+test_list2 <- c(test_list, list(ggally_text(diag_labels[1]), ggally_text(diag_labels[1])))
+ggmatrix(test_list2, 2, 3, byrow = F, showAxisPlotLabels = F)
+
+last_plot(last_projs[[1]])
+head(last_projs[[1]])
+
+ggmatrix(scatt_list,P, P, byrow = F, showAxisPlotLabels = F)
+
+#ggpairs
+data("mtcars")
+custom_car <- ggpairs(Xdfs[[1]], diag = "blank",
+                      lower = "blank", upper = "blank", axisLabels = "internal",
+                      title = "Final projections")
+plot <- last_plot(last_projs[[1]]) #working
+attr(plot, "class")
+plot2 <- ggally_text(diag_labels[1]) #works
+attr(plot2, "class")
+plot3 <- last_axis_plot(last_axes[[1]])
+attr(plot3, "class")
+custom_car[2, 1] <- plot
+custom_car
+m <- 2 #plot position in matrix
+t <- 0 #tour number for "tour" plot
+a <- 0 #tour number for "axes" plot
+while (m < P^2) {
+  for (i in 1:(P-1)) { #X var index number
+    while (t < P*(P-1)/2) {
+      for (j in 1:(P-i)) { #Number of "tour" plots
+        t <- t + 1
+        scatt_list[[m]] <- last_projs[[t]] %>% tour_plot()
+        m <- m + 1
+      }
+    }
+    while (a < P*(P-1)/2) {
+      for (j in 1:i) { #Number of "axes" plots
+        a <- a + 1
+        scatt_list[[m]] <- last_projs[[a]] %>% tour_axes()
+        m <- m + 1
+      }
+    }
+    scatt_list[[m]] <- ggally_text(diag_labels[i+1])
+    m <- m + 1 
+  }
+}
+
+
+
+# test (example)
+plotList <- list(ggally_text(diag_labels[1]))
+for (i in 2:4) {
+  plotList[[i]] <- ggally_text(diag_labels[i])
+}
+ggmatrix(plotList,2, 2, byrow = F, showAxisPlotLabels = F)
 
 # Function for pulling out info for each tour -----------------------------
 # Function to 'pull out' xy-cords for "tour" plot for a single tour
@@ -143,57 +216,6 @@ PCsingle <- function (single_tinterp) {
 #test
 PCdf <- PCsingle(tinterp[[1]])
 head(PCdf)
-
-
-# Scattermatrix -----------------------------------------------------------
-# Lower diagonal is final proj and upper diagonal its axes components
-# List of P^2 (max 5) plots to plot using ggmatrix. Plots on diagonals (i,i) are empty
-scatt_list <- list()
-P <- ifelse(p > 5, 5, p)
-
-x <- c()
-y <- c()
-PC_x <- c()
-PC_y <- c()
-tour_n <- c() # tour number (1 to P*(p-1)/2)
-axes_n <- c() # also tour number but different length to above
-measure <- c()
-for (k in 1:P*(P-1)/2) {
-  tour_n <- c(tour_n, rep.int(k, nrow(crabs)))
-  axes_n <- c(axes_n, rep.int(k, p))
-  measure <- c(measure, colnames(Xdfs[[k]]))
-  single_tour <- t_tour[[k]]
-  i <- length(single_tour)
-  x <- c(x, unlist(single_tour[[i]][[1]][,1]))
-  y <- c(y, unlist(single_tour[[i]][[1]][,2]))
-  # Take first 'p' values to be x-coords for PCs
-  PC_x <- c(PC_x, unlist(test_interp[[k]][[i]][1:p])) 
-  # Take remaining 'p' values to be y-coords for PCs
-  PC_y <- c(PC_y, unlist(test_interp[[k]][[i]][(p+1):(p+p)])) 
-}
-
-# Dataframe for lower diagonal data 
-lower_tours <- data.frame(ID=rep(rownames(crabs), length(t_tour)), 
-                          x=x, y=y, tour_n=tour_n)
-# Dataframe for upper diagonal data 
-upper_tours <- data.frame(measure=measure,
-                          x=PC_x, y=PC_y, tour_n=axes_n)
-
-for (i in 1:P) {
-  # Diagonals
-  scatt_list[[(i-1)*p+i]] <- ggally_text(paste("Plot #", i, sep = ""))
-  # Upper plots of axes components
-  for (u in (i*p+1):(i*p+i)) {
-    scatt_list[[u]] <- 
-  }
-  # Lower plot of final tour proj (not fo i=P)
-  if (i < P) {
-    for (l in ((i-1)*(p+1)+2):i*p) {
-      scatt_list[[l]] <- 
-    } 
-  }
-}
-
 
 # Brush to select by group ------------------------------------------------
 # Mosaic plot (would need shiny click?) or facet_wrap of scatterplots (crosstalk only)
