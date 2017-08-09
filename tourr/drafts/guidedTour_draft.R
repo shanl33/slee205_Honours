@@ -8,6 +8,143 @@ library(tidyr)
 data("crabs")
 str(crabs)
 
+# Setup for crabs for testing ---------------------------------------------
+Xdataset <- as.data.frame(rescale(crabs[, which(sapply(crabs, typeof)=="double")]))
+Xdataset <- as.data.frame(apply(predict(prcomp(Xdataset)), 2, scale))
+Xdfs <- col_reorder(Xdataset)
+t <- lapply(Xdfs, function (x) save_history(x, guided_tour(cmass, d=2, max.tries = 50), rescale=FALSE, max=50))
+p <- ncol(Xdataset) # Number of real-valued Xs 
+t0 <- matrix(c(1, rep(0, p), 1, rep(0, (p-2))), ncol = 2)
+class(t0) <- "history_array"
+t1 <- lapply(t, function (x) array(c(t0, x), dim = dim(x) + c(0,0,1)))
+# Assign class and data attributes
+for (i in 1:length(t1)) {
+  class(t1[[i]]) <- "history_array"
+  attr(t1[[i]], "data") <- Xdfs[[i]]
+}
+tinterp <- lapply(t1, interpolate)
+t_tour <- list()
+#pp_index is a data frame with the vars: init_pair, iteration, index
+init_pair=c()
+iteration=c()
+pursuit_index=c()
+for(i in 1:length(tinterp)) {
+  X_matrix <- as.matrix(Xdfs[[i]])
+  # Apply index function to each projection basis
+  t_tour[[i]] <-apply(tinterp[[i]], 3,  FUN = cmass_tour)
+  # m is the number of iterations for that tour
+  m <- length(tinterp[[i]])
+  init_pair <- c(init_pair, rep.int(i, m))
+  iteration <- c(iteration, 1:m)
+  for (j in 1:m) {
+    pursuit_index <- c(pursuit_index, unlist(t_tour[[i]][[j]][2]))
+  }
+}
+
+XYall <- lapply(t_tour, XYsingle)
+tail(XYall[[1]])
+max(XYall[[1]]$iteration)
+# Add "ID" variable, rownames of original dataset
+XYall <- lapply(XYall, function (x) {
+  ID <- rownames(crabs)
+  cbind(x, ID)
+})
+
+PCall <- lapply(tinterp, PCsingle)
+tail(PCall[[1]])
+
+# Extract the last projection for a tour
+last_XY <- function(XY) {
+  m <- max(XY$iteration)
+  XY[which(XY$iteration==m), -3]
+}
+# Extract the last axes plot coords for a tour
+last_PC <- function(PC) {
+  m <- max(PC$iteration)
+  PC[which(PC$iteration==m), -3]
+}
+
+last_projs <- lapply(XYall, last_XY)
+dim(last_projs[[2]])
+last_axes <- lapply(PCall, last_PC)
+tail(last_axes[[1]])
+head(last_projs[[1]])
+tour_plot(last_projs[[1]])
+
+# Add "ID" variable, rownames of original dataset
+last_projs <- lapply(last_projs, function (x) {
+  ID <- rownames(crabs)
+  cbind(x, ID)
+  })
+
+# Draws "tour" (proj) plot 
+tour_plot <- function(df) {
+  tx <- list(
+    title = "", range = c(-0.1, 1.1), 
+    zeroline = F, showticklabels = F
+  )
+  plot_ly(df, x = ~x, y = ~y, frame = ~iteration, color = I("black")) %>%
+    add_markers(text = ~ID, hoverinfo = "text") %>%
+    layout(xaxis = tx, yaxis = tx)
+}
+
+# Draws tour "axes" plot
+tour_axes <- function(df) {
+  ax <- list(
+    title = "", range = c(-1.1, 1.2), 
+    zeroline = F, showticklabels = F
+  )
+  plot_ly(df, x = ~x, y = ~y, frame = ~iteration, hoverinfo = "none") %>%
+    add_segments(xend = 0, yend = 0, color = I("darkgray"), size = I(1)) %>%
+    add_text(text = ~measure, color=I("black")) %>%
+    layout(xaxis = ax, yaxis = ax)
+}
+
+#test
+PCall[[1]] %>% tour_axes()
+
+# Function for pulling out info for each tour -----------------------------
+# Function to 'pull out' xy-cords for "tour" plot for a single tour
+# Input is a component in the list "t_tour"
+XYsingle <- function (single_tour) {
+  n <- length(single_tour)
+  x <- c()
+  y <- c()
+  for(i in 1:n) {
+    x <- c(x, unlist(single_tour[[i]][[1]][,1]))
+    y <- c(y, unlist(single_tour[[i]][[1]][,2]))
+  }
+  XY <- data.frame(x=x, y=y, iteration = rep(1:n, each=length(x)/n))
+  # need to add ID=rep(rownames(dataset), n) if using sdT
+}
+proj <- data.frame(ID=rep(rownames(dataset), length(t_tour[[k]])
+#test
+XYdf <- XYsingle(t_tour[[1]])
+head(XYdf)
+# Apply over all tours
+XYdfs <- lapply(t_tour, XYsingle)
+str(XYdfs)
+# Function to 'pull out' xy-cords for "axes" plot for a single tour
+# Input is a component in the list "t_interp"
+PCsingle <- function (single_tinterp) {
+  n <- length(single_tinterp)
+  p <- dim(single_tinterp)[1] #number of real valued Xs
+  PC_x <- c()
+  PC_y <- c()
+  for(i in 1:n) {
+    # Take first 'p' values to be x-coords for PCs
+    PC_x <- c(PC_x, unlist(single_tinterp[[i]][1:p])) 
+    # Take remaining 'p' values to be y-coords for PCs
+    PC_y <- c(PC_y, unlist(single_tinterp[[i]][(p+1):(p+p)])) 
+  }
+  PC <- data.frame(x = PC_x, y = PC_y, iteration = rep(1:n, each = p),
+              magnitude = PC_x^2+PC_y^2, measure=rep(colnames(attr(single_tinterp, "data")), n))
+}
+#test
+PCdf <- PCsingle(tinterp[[1]])
+head(PCdf)
+
+
 # Scattermatrix -----------------------------------------------------------
 # Lower diagonal is final proj and upper diagonal its axes components
 # List of P^2 (max 5) plots to plot using ggmatrix. Plots on diagonals (i,i) are empty

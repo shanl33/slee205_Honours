@@ -114,7 +114,6 @@ pp2D_xtalk <- function(dataset, index="cmass", factors=2, ...) {
   # Subset categorical vars
   fac_cols <- sapply(dataset, class)=="factor"
   Fdataset <- dataset[, fac_cols]
-  #fac_n <- length(Fdataset)
   if (factors <= length(Fdataset)) {
     fac_n <- factors
   } else if (length(Fdataset) >= 2) {
