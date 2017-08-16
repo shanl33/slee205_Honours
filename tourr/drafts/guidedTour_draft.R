@@ -11,7 +11,10 @@ str(crabs)
 # Setup for crabs for testing ---------------------------------------------
 Xdataset <- as.data.frame(rescale(crabs[, which(sapply(crabs, typeof)=="double")]))
 Xdataset <- as.data.frame(apply(predict(prcomp(Xdataset)), 2, scale))
-Xdfs <- col_reorder(Xdataset)
+reordered <- col_reorder(Xdataset) # Two output
+Xdfs <- reordered[[1]] # All combos of first two cols of Xs 
+tour_names <- reordered[[2]] 
+# Names for each tour by the leading pair names (eg."PC1&PC2"). Use in index plot
 t <- lapply(Xdfs, function (x) save_history(x, guided_tour(cmass, d=2, max.tries = 50), rescale=FALSE, max=50))
 p <- ncol(Xdataset) # Number of real-valued Xs 
 t0 <- matrix(c(1, rep(0, p), 1, rep(0, (p-2))), ncol = 2)
@@ -42,6 +45,7 @@ for(i in 1:length(tinterp)) {
 }
 
 XYall <- lapply(t_tour, XYsingle)
+rownames(XYall[[1]])
 tail(XYall[[1]])
 max(XYall[[1]]$iteration)
 # Add "ID" variable, rownames of original dataset

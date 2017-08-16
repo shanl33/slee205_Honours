@@ -29,13 +29,10 @@ achieved <- nzqa %>%
 zeros <- function(col) {
   replace(col, col==0, NA)
 }
-achieved$L1 <- zeros(achieved$L1)
-achieved$L2 <- zeros(achieved$L2)
-achieved$L3 <- zeros(achieved$L3)
-achieved$UE <- zeros(achieved$UE)
+achieved[2:5] <- sapply(achieved[2:5], zeros)
 # Remove schools with 'small cohort' warning (obscures pattern in non-small cohorts).
 achieved <- achieved[achieved$Small_sch=="",] #437 school left
-achieved <- achieved[, -8]
+achieved <- achieved[, -8] #Remove Small_sch var
 # 'achieved' contains schools with ONE or more % achievement rate (by participation)
 # NA's used otherwise
 # Small cohort schools removed
@@ -43,6 +40,12 @@ achieved <- achieved[, -8]
 ach_narm <- achieved[complete.cases(achieved),] #407 schools left
 ach_narm$Decile <- as.factor(ach_narm$Decile)
 rownames(ach_narm) <- ach_narm$School
+akl <- as.data.frame(ach_narm[ach_narm$Region=="Auckland", ]) #90 schools in Akl
+str(akl)
+rownames(akl) <- akl$School
+rownames(akl)
+guidedTour_app(akl[,-1], factors=1, index="holes")
+
 
 # Check with tourr tour ---------------------------------------------------
 library(colorspace)

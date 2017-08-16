@@ -7,7 +7,9 @@ library(htmltools)
 library(MASS) # For crabs dataset
 library(tidyr) # For PCs reshaping output for plot
 library(GGally) # For ggpairs plot of PCs
-data("crabs")
+# For wrangling NCEA data
+library(dplyr)
+
 # No plot for coefficients of principal components
 # Click on index plot to select intial basis.
 # 'factors=n' argument specifies number of factors to include in the plot for brushing groups
@@ -129,6 +131,7 @@ last_axis_plot <- function(axis_list) {
 guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
   # Subset real-valued vars (type="double") for touring
   realXs <- dataset[, which(sapply(dataset, typeof)=="double")]
+  rownames(realXs) <- rownames(dataset)
   Xdataset <- as.data.frame(rescale(realXs))
   if (PC) {
     Xdataset <- as.data.frame(apply(predict(prcomp(Xdataset)), 2, scale)) # Want df so can easily reorder cols
@@ -215,7 +218,7 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
   last_projs <- lapply(XYall, last_XY) # No need for ID since not in SharedData
   # Add "ID" variable, rownames of original dataset
   XYall <- lapply(XYall, function (x) {
-    ID <- rownames(crabs)
+    ID <- rownames(dataset)
     cbind(x, ID)
   })
   # "axes" plot coords for ALL tours
@@ -313,7 +316,7 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
     if (fac_n==1) {
       gp <- ggplot(sdF, aes_string(x=names(Fdataset)[1])) +
         geom_jitter(aes(y=Fdataset$All, label=ID), 
-                    width=0.25, height=0.25) +
+                    width=0, height=0.25) +
         labs(title="The first factor is displayed") 
     } else if (fac_n==2) {
       gp <- ggplot(sdF, aes_string(x=names(Fdataset)[1], y=names(Fdataset)[2])) +
@@ -354,7 +357,7 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
   })
   output$pairs <- renderPlotly({
     realXs %>% 
-      SharedData$new(group="2Dtour") %>%
+      SharedData$new(key=~rownames(realXs), group="2Dtour") %>%
       ggpairs(upper="blank") %>%
       #ggpairs(lower="blank", upper=list(continuous = "points")) %>%
       ggplotly() %>%
@@ -368,4 +371,46 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
 }
 
 # Testing
+data("crabs")
 guidedTour_app(crabs, index = "holes")
+
+# NCEA data (Akl schools) -------------------------------------------------
+nzqa2016 <- read.csv("http://www.nzqa.govt.nz/assets/Studying-in-NZ/Secondary-school-and-NCEA/stats-reports/2016/Qualification-Statistics-School-2016-29032017.csv")
+# Drop vars that will not be used (eg. cumulative achievement)
+nzqa <- nzqa2016[,-c(1,8,10)]
+names(nzqa) <- c("Decile", "Region", "School", "Year", "Qualification", "Achieve_participate", "Achieve_roll", "Small_sch")
+levels(nzqa$Qualification) <- c("L1", "L2", "L3", "UE")
+# Subset to use only Year 11 with Level 1, etc
+nzqa <- nzqa %>% filter(((Qualification=="L1")&(Year==11))|((Year==12) & (Qualification=="L2"))|
+                          ((Year==13) & (Qualification=="L3"))|((Year==13) & (Qualification=="UE")))
+# Reshape so that one row = one school
+# Current.Achievement.Rate.Participation kept for analysis only
+achieved <- nzqa %>% 
+  spread(Qualification, Achieve_participate, fill=0) %>%
+  group_by(School) %>%
+  summarise_at(c("L1", "L2", "L3", "UE"), sum) %>%
+  inner_join(nzqa[, c(1, 2, 3, 8)]) %>% #Add Decile and Region and Small_sch variables
+  distinct() %>% #One row per school
+  filter(!((L1==0)&(L2==0)&(L3==0))) #Remove schools with 0% achievement rate for all levels
+# Function to replace 0% with NA
+zeros <- function(col) {
+  replace(col, col==0, NA)
+}
+achieved[2:5] <- sapply(achieved[2:5], zeros)
+# Remove schools with 'small cohort' warning (obscures pattern in non-small cohorts).
+achieved <- achieved[achieved$Small_sch=="",] #437 school left
+achieved <- achieved[, -8] #Remove Small_sch var
+# 'achieved' contains schools with ONE or more % achievement rate (by participation)
+# NA's used otherwise
+# Small cohort schools removed
+# Remove obs with any NA values 
+ach_narm <- achieved[complete.cases(achieved),] #407 schools left
+ach_narm$Decile <- as.factor(ach_narm$Decile)
+rownames(ach_narm) <- ach_narm$School
+akl <- as.data.frame(ach_narm[ach_narm$Region=="Auckland", ]) #90 schools in Akl
+rownames(akl) <- akl$School
+guidedTour_app(akl[,-1], factors=1, index="holes")
+# PC1&2 show a bit of a separation of a group of schools from the main group 
+# This group is mainly decile 5 and below, except for Grammar & Kings
+# They are generally in the "scattered tail" of schools in the paris plot.
+# 'cmass' identifies outlier schools, where achievement across L1, 2, 3 and UE is inconsistent
