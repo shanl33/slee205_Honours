@@ -64,7 +64,7 @@ last_PC <- function(PC) {
   PC[which(PC$iteration==m), -3]
 }
 
-last_projs <- lapply(XYall, last_XY)
+
 dim(last_projs[[2]])
 last_axes <- lapply(PCall, last_PC)
 tail(last_axes[[1]])
@@ -318,16 +318,28 @@ XPC <- as.data.frame(apply(predict(pc_rescale), 2, scale))
 # Need df input to reorder cols easily
 col_reorder <- function (df) {
   p <- ncol(df)
+  Xnames <- colnames(df)
   Xs <- list()
+  tour_names <- vector(mode="character", length=10)
   k <- 1
   for (i in 1:(p-1)) {
     for (j in (i+1):p) {
       Xs[[k]] <- df[c(i,j,(1:p)[-c(i,j)])]
+      tour_names[k] <- paste(Xnames[i], Xnames[j], sep="&")
       k <- k + 1
     }
   }
-  return(Xs)
+  reordered <- list(Xs, tour_names)
+  return(reordered)
 }
+
+test_out <- col_reorder(Xdataset)
+str(test_out)
+# Char vector of names
+class(test_out[[2]])
+test_outXs <- test_out[[1]]
+str(test_outXs)
+str(Xdfs) # same as previous Xdfs
 
 Xdfs <- col_reorder(XPC)
 head(Xdfs[[10]])
@@ -529,7 +541,80 @@ fac_t <- unlist(subset(ach_narm, select = group_t)) %>% unlist() %>% as.factor()
 levels(fac_t)
 pal_t <- rainbow_hcl(length(levels(fac_t))) # Compute a rainbow of colours (qualitative palette)
 group_col_t <- as.factor(pal_t[as.numeric(fac_t)])
-group_col2 <- data.frame(col=group_col_t, group=fac_t)
+group_col2 <- data.frame(col=group_col_t, group=fac_t) 
+
+group <- "sex"
+fac <- unlist(subset(crabs, select = sex)) # %>% unlist() %>% as.factor() 
+# Vector 1:n labelling each object we it's group level membership
+palette <- rainbow_hcl(length(levels(fac))) # 2 elements for the #RGB code
+colour <- as.factor(palette[as.numeric(fac)]) # Vector 1:n  labeleling labelling each object we it's colour assignment
+# Now can use "colour" as and aesthetic mapping in ggplots
+hcl(seq(0, 360, length.out = 5))  # this is equivalent to "palette" but use a base colour space fn
+
+
+# Colour scatter matrix and tour index plot to match ----------------------
+
+# Use this, but get the list of first maximum 10 cols out of ggplot_bulid for index_plot
+# Create a new var in pp_index that labels by name of init_pair# (keep init_pair# as factor)
+# Colour scale used in the index ggplot2 plot
+index_cols <- hcl(h=seq(15, 360, 360/(p*(p-1)/2)), c=100, l=65)
+last_projs <- mapply(c, last_projs, as.list(index_cols), SIMPLIFY = FALSE)
+last_axes <- mapply(c, last_axes, as.list(index_cols), SIMPLIFY = FALSE)
+last_plot(last_projs[[8]])
+last_axis_plot(last_axes[[8]])
+last_plot <- function(df) {
+  colnames(df) <- c("x", "y", "ID", "col")
+  ggplot(df, aes(x=x, y=y, col=col)) +
+    geom_point() +
+    scale_x_continuous(limits = c(-0.1, 1.1)) +
+    scale_y_continuous(limits = c(-0.1, 1.1)) +
+    theme_void() +
+    theme(legend.position = "none")
+}
+
+last_plot(test[[1]])
+
+last_projs <- lapply(XYall, last_XY)
+
+# Check default hue colours for categorical vars in ggplot2
+p <- ggplot(pp_index[which(pp_index$init_pair<8),], aes(x=iteration, y=pursuit_index, group=init_pair, col=as.factor(init_pair))) +
+  geom_point() +
+  geom_line() +
+  ggtitle("Projection pursuit index") +
+  theme(legend.position = "none") +
+  scale_colour_manual(values = hcl(h=seq(15, 360, 360/7), c=100, l=65))
+ggplotly(p)
+p
+p_build <- ggplot_build(p)
+str(p_build)
+cols_used <- as.factor(p_build$data[[1]]$colour)
+levels(cols_used)
+# Colour scale used in the index ggplot2 plot
+hcl(h=seq(15, 360, 360/(p*(p-1)/2)), c=100, l=65)
+
+# "axes" plot coords for ALL tours
+PCall <- lapply(tinterp, PCsingle)
+# Colour scale used in the index ggplot2 plot
+tour_cols <- hcl(h=seq(15, 360, 360/(p*(p-1)/2)), c=100, l=65)
+
+
+# Change order of list elements (for last axis plots) ---------------------
+# Change the order in last_axes before applying last_axis_plot
+str(last_axes)
+test <- list(last_axes[[2]], last_axes[[1]])
+str(test)
+if (P==4) {
+  last_axes <- list(last_axes[[1]], last_axes[[2]], last_axes[[4]],
+                    last_axes[[3]], last_axes[[5]], last_axes[[6]])
+} else if (P==5) {
+  last_axes <- list(last_axes[[1]], last_axes[[2]], last_axes[[5]],
+                    last_axes[[3]], last_axes[[6]], last_axes[[8]],
+                    last_axes[[4]], last_axes[[7]], last_axes[[9]],
+                    last_axes[[10]])
+}
+aplot_list <- lapply(last_axes, last_axis_plot)
+head(aplot_list[[1]]$data)
+head(aplot_list[[2]]$data)
 
 
 # Projection axes plot ----------------------------------------------------
