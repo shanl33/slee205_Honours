@@ -26,15 +26,18 @@ for (i in 1:length(t1)) {
   attr(t1[[i]], "data") <- Xdfs[[i]]
 }
 tinterp <- lapply(t1, interpolate)
-t_tour <- list()
+
+# Test t-tour function
+t_tour <- lapply(1:length(tinterp), t_tour, tinterp, Xdfs, "holes")
+str(t_tour)
+t_tour[[1]][[1]]
+
+
 #pp_index is a data frame with the vars: init_pair, iteration, index
 init_pair=c()
 iteration=c()
 pursuit_index=c() # Load cmass_tour fn first
 for(i in 1:length(tinterp)) {
-  X_matrix <- as.matrix(Xdfs[[i]])
-  # Apply index function to each projection basis
-  t_tour[[i]] <-apply(tinterp[[i]], 3,  FUN = cmass_tour)
   # m is the number of iterations for that tour
   m <- length(tinterp[[i]])
   init_pair <- c(init_pair, rep.int(i, m))
@@ -557,7 +560,7 @@ hcl(seq(0, 360, length.out = 5))  # this is equivalent to "palette" but use a ba
 
 
 # Colour scatter matrix and tour index plot to match ----------------------
-
+tour_cols <- hcl(h=seq(15, 360, 360/(10)), c=100, l=65)
 # Use this, but get the list of first maximum 10 cols out of ggplot_bulid for index_plot
 # Create a new var in pp_index that labels by name of init_pair# (keep init_pair# as factor)
 # Colour scale used in the index ggplot2 plot
