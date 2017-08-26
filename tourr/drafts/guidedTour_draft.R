@@ -27,25 +27,36 @@ for (i in 1:length(t1)) {
 }
 tinterp <- lapply(t1, interpolate)
 
-# Test t-tour function
-t_tour <- lapply(1:length(tinterp), t_tour, tinterp, Xdfs, "holes")
-str(t_tour)
-t_tour[[1]][[1]]
-
-
-#pp_index is a data frame with the vars: init_pair, iteration, index
-init_pair=c()
-iteration=c()
-pursuit_index=c() # Load cmass_tour fn first
-for(i in 1:length(tinterp)) {
-  # m is the number of iterations for that tour
-  m <- length(tinterp[[i]])
-  init_pair <- c(init_pair, rep.int(i, m))
-  iteration <- c(iteration, 1:m)
-  for (j in 1:m) {
-    pursuit_index <- c(pursuit_index, unlist(t_tour[[i]][[j]][2]))
+# 't_tour' fn produces a list of p(p-1)/2 lists with varying lengths (depend on the length of each tour)
+# p(p-1)/2 is the number of combos for starting projections
+# 't_tour' collect together data on the projection pursuit index,
+# x and y co-ords for the tour projections and tour axes.
+# The bases are components in the list `tinterp`
+t_tour <- function(i, bases, Xdfs, index) {
+  if (index=="cmass") {
+    lapply(bases[[i]], cmass_tour, Xdfs[[i]])
+  } else if (index=="holes") {
+    lapply(bases[[i]], holes_tour, Xdfs[[i]])
   }
 }
+t_tour <- lapply(1:length(tinterp), t_tour, tinterp, Xdfs, "holes")
+
+pursuit_index <- function(j, a_tour) {unlist(a_tour[[j]][2])}
+
+pursuit_info <- function(base, t_name, a_tour) {
+  # steps is the number of iterations for that tour
+  steps <- length(base)
+  init_pair <- rep(t_name, steps)
+  iteration <- 1:steps
+  pp_index <- do.call(c, lapply(1:steps, pursuit_index, a_tour))
+  # Or rbind?
+  pp_info <- list(data.frame(init_pair, iteration, pp_index))
+  return(pp_info)
+}
+
+pp_index <- do.call(rbind.data.frame, 
+                   mapply(FUN=pursuit_info, base=tinterp, t_name=tour_names, a_tour=t_tour))
+
 
 XYall <- lapply(t_tour, XYsingle)
 rownames(XYall[[1]])

@@ -33,6 +33,53 @@ col_reorder <- function (df) {
   return(reordered)
 }
 
+# Central mass index and projected data, XA
+# 'base' is a projection matrices from the 3rd slice of array components in the list tinterp
+# 'Xdf' is the scaled X matrix
+cmass_tour <- function(base, Xdf) {
+  X_matrix <- as.matrix(Xdf)
+  XA <- X_matrix%*%matrix(base, ncol=2) # (n by d)
+  cmass_index <- (sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1]-exp(-dim(XA)[2]/2))/(1-exp(-dim(XA)[2]/2))
+  list(rescale(XA), cmass_index)
+}
+
+# Holes index and projected data, XA
+holes_tour <- function(base, Xdf) {
+  X_matrix <- as.matrix(Xdf)
+  XA <- X_matrix%*%matrix(base, ncol=2) # (n by d)
+  holes_index <- (1-sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1])/(1-exp(-dim(XA)[2]/2))
+  list(rescale(XA), holes_index)
+}
+
+# 't_tour' fn produces a list of p(p-1)/2 lists with varying lengths (depend on the length of each tour)
+# p(p-1)/2 is the number of combos for starting projections
+# 't_tour' collect together data on the projection pursuit index,
+# x and y co-ords for the tour projections and tour axes.
+# The bases are components in the list `tinterp`
+t_tour <- function(i, bases, Xdfs, index) {
+  if (index=="cmass") {
+    lapply(bases[[i]], cmass_tour, Xdfs[[i]])
+  } else if (index=="holes") {
+    lapply(bases[[i]], holes_tour, Xdfs[[i]])
+  }
+}
+
+# Function to collect variable required for the 'indexPlot'
+# ie. initial orthogonal projection used (init_pair), iteration step and pursuit index 
+# Sub-function: Unlists the proj pursuit index for each tour (stored within t_tour)
+pp_index <- function(j, a_tour) {unlist(a_tour[[j]][2])}
+# Apply pursuit_info to the first component of:
+# base = tinterp[[i]], t_name = tour_names[i], a_tour = t_tour[[i]]
+pursuit_info <- function(base, t_name, a_tour) {
+  # steps is the number of iterations for that tour
+  steps <- length(base)
+  init_pair <- rep(t_name, steps)
+  iteration <- 1:steps
+  pursuit_index <- do.call(c, lapply(1:steps, pp_index, a_tour))
+  pp_info <- list(data.frame(init_pair, iteration, pursuit_index))
+  return(pp_info)
+}
+
 # Extracts xy coords for "tour" projection plots of a single tour (ie. proj coords of a tour)
 XYsingle <- function (single_tour) {
   n <- length(single_tour)
@@ -47,18 +94,18 @@ XYsingle <- function (single_tour) {
 }
 
 # Extracts xy coords for "axes" plots of a single tour 
-PCsingle <- function (single_tinterp) {
+AXsingle <- function (single_tinterp) {
   n <- length(single_tinterp)
   p <- dim(single_tinterp)[1] #number of real valued Xs
-  PC_x <- c()
-  PC_y <- c()
+  AX_x <- c()
+  AX_y <- c()
   for(i in 1:n) {
-    # Take first 'p' values to be x-coords for PCs
-    PC_x <- c(PC_x, unlist(single_tinterp[[i]][1:p])) 
-    # Take remaining 'p' values to be y-coords for PCs
-    PC_y <- c(PC_y, unlist(single_tinterp[[i]][(p+1):(p+p)])) 
+    # Take first 'p' values to be x-coords for axes
+    AX_x <- c(AX_x, unlist(single_tinterp[[i]][1:p])) 
+    # Take remaining 'p' values to be y-coords for axes
+    AX_y <- c(AX_y, unlist(single_tinterp[[i]][(p+1):(p+p)])) 
   }
-  PC <- data.frame(x = PC_x, y = PC_y, iteration = rep(1:n, each = p),
+  AX <- data.frame(x = AX_x, y = AX_y, iteration = rep(1:n, each = p),
                    measure=rep(colnames(attr(single_tinterp, "data")), n))
 }
 
@@ -70,9 +117,9 @@ last_XY <- function(XY) {
 }
 
 # Extract the last axes plot coords for a tour
-last_PC <- function(PC) {
-  m <- max(PC$iteration)
-  PC[which(PC$iteration==m), -3]
+last_AX <- function(AX) {
+  m <- max(AX$iteration)
+  AX[which(AX$iteration==m), -3]
 }
 
 # Draws "tour" (proj) plot 
@@ -117,7 +164,7 @@ last_plot <- function(proj_list) {
     theme(legend.position = "none")
 }
 
-# Draws LAST "tour" (proj) plot for scattermatrix
+# Draws LAST tour proj's axes for scattermatrix
 last_axis_plot <- function(axis_list) {
   names(axis_list) <- c("x", "y", "m", "col")
   df <- data.frame(x=axis_list$x, y=axis_list$y, measure=axis_list$m)
@@ -129,43 +176,21 @@ last_axis_plot <- function(axis_list) {
     theme_void()
 }
 
-cmass_tour <- function(base, Xdf) {
-  X_matrix <- as.matrix(Xdf)
-  XA <- X_matrix%*%matrix(base, ncol=2) # (n by d)
-  cmass_index <- (sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1]-exp(-dim(XA)[2]/2))/(1-exp(-dim(XA)[2]/2))
-  list(rescale(XA), cmass_index)
-}
-
-# Holes index
-holes_tour <- function(base, Xdf) {
-  X_matrix <- as.matrix(Xdf)
-  XA <- X_matrix%*%matrix(base, ncol=2) # (n by d)
-  holes_index <- (1-sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1])/(1-exp(-dim(XA)[2]/2))
-  list(rescale(XA), holes_index)
-}
-
-# The bases are components in the list tinterp
-t_tour <- function(i, bases, Xdfs, index) {
-  if (index=="cmass") {
-    lapply(bases[[i]], cmass_tour, Xdfs[[i]])
-  } else if (index=="holes") {
-    lapply(bases[[i]], holes_tour, Xdfs[[i]])
-  }
-}
-
-guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
+guidedTour_app <- function(dataset, index="cmass", factors=2, PC=TRUE, ...) {
   # Subset real-valued vars (type="double") for touring
   realXs <- dataset[, which(sapply(dataset, typeof)=="double")]
   rownames(realXs) <- rownames(dataset)
   Xdataset <- as.data.frame(rescale(realXs))
   if (PC) {
-    Xdataset <- as.data.frame(apply(predict(prcomp(Xdataset)), 2, scale)) # Want df so can easily reorder cols
+    Xdataset <- as.data.frame(apply(predict(prcomp(Xdataset)), 2, scale))
   }
-  # All possible combinations of Xs as first two variables
-  reordered <- col_reorder(Xdataset) # Two output
-  Xdfs <- reordered[[1]] # All combos of first two cols of Xs 
+  
+  # All possible combinations of pairs of Xs as first two variables
+  reordered <- col_reorder(Xdataset) 
+  Xdfs <- reordered[[1]]  
   tour_names <- reordered[[2]] 
-  # Names for each tour by the leading pair names (eg."PC1&PC2"). Use in index plot
+  # Names for each tour using the initial pair's names (eg."PC1&PC2"). 
+  
   # Save tour (rescale=F since already scaled to col to range [0,1])
   if (index=="cmass") {
     t <- lapply(Xdfs, function (x) save_history(x, guided_tour(cmass, d=2, max.tries = 50), rescale=FALSE, max=50, ...))
@@ -174,57 +199,91 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
   } else {
     stop("Invalid 'index' argument. Choose either: cmass or holes")
   }
+  
   # 'Inserting' initial base as orthogonal projection of first two measures
   p <- ncol(Xdataset) # Number of real-valued Xs 
   t0 <- matrix(c(1, rep(0, p), 1, rep(0, (p-2))), ncol = 2)
   class(t0) <- "history_array"
   t1 <- lapply(t, function (x) array(c(t0, x), dim = dim(x) + c(0,0,1)))
-  # Assign class and data attributes
+  # Assign class and data attributes to new basis 
   for (i in 1:length(t1)) {
     class(t1[[i]]) <- "history_array"
     attr(t1[[i]], "data") <- Xdfs[[i]]
   }
   tinterp <- lapply(t1, interpolate)
-  #t, t1, tinterp are all lists with p(p-1)/2 components (all possible pairwise combos)
-  # Central mass index and projection pursuit tour function
-  #cmass_tour <- function(base) {
-    # Projected data matrix 
-  #  XA <- X_matrix%*%matrix(base, ncol=2) # (n by d)
-  #  cmass_index <- (sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1]-exp(-dim(XA)[2]/2))/(1-exp(-dim(XA)[2]/2))
-  #  list(rescale(XA), cmass_index)
-  #}
+  # t, t1, tinterp, t_tour, Xdfs are all lists with p(p-1)/2 components 
+  # The components contain info for the tour resulting from each starting position
   
-  # Holes index
-  #holes_tour <- function(base) {
-   # XA <- X_matrix%*%matrix(base, ncol=2) # (n by d)
-    #holes_index <- (1-sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1])/(1-exp(-dim(XA)[2]/2))
-    #list(rescale(XA), holes_index)
-  #}
-  
-  #t_tour is a list with p(p-1)/2 lists with varying dimensions (depend on the length of each tour)
-  #t_tour contains info about the pursuit_index: for 'index_plot'
-  #t_tour contains info about the x and y positions of the projections: for the plot 'tour' 
-  #t_tour contains info about the tour axes coords: for the plot 'axes' (subplot of 'tour')
+  # t_tour contains data for the 'tour' plot and its subplots 'axes' and 'tour'. 
+  # t_tour contains data for the pursuit_index: for 'indexPlot'
   t_tour <- lapply(1:length(tinterp), t_tour, tinterp, Xdfs, index)
-  #pp_index is a data frame with the vars: init_pair, iteration, index
-  init_pair=c()
-  iteration=c()
-  pursuit_index=c()
-  for(i in 1:length(tinterp)) {
-    #X_matrix <- as.matrix(Xdfs[[i]])
-    # Apply index function to each projection basis
-    #t_tour[[i]] <-apply(tinterp[[i]], 3,  FUN = paste(index,"_tour", sep=""))
-    # m is the number of iterations for that tour
-    m <- length(tinterp[[i]])
-    init_pair <- c(init_pair, rep(tour_names[i], m))
-    iteration <- c(iteration, 1:m)
-    for (j in 1:m) {
-      pursuit_index <- c(pursuit_index, unlist(t_tour[[i]][[j]][2]))
-    }
+  
+  # pp_info contains data for the 'indexPlot'
+  pp_info <- do.call(rbind.data.frame, 
+                     mapply(FUN=pursuit_info, 
+                            base=tinterp, t_name=tour_names, a_tour=t_tour))
+  
+  # "tour" proj plot xy coords for ALL tours
+  XYall <- lapply(t_tour, XYsingle) 
+  # Last tour projection for each tour.
+  last_projs <- lapply(XYall, last_XY) # No need for ID since not in SharedData
+  
+  # Add "ID" variable, rownames of original dataset
+  XYall <- lapply(XYall, function (x) {
+    ID <- rownames(dataset)
+    cbind(x, ID)
+  })
+  
+  # "axes" plot coords for ALL tours
+  AXall <- lapply(tinterp, AXsingle)
+  
+  # Pull out last tour axes plot for each tour.
+  last_axes <- lapply(AXall, last_AX)
+  
+  # Colour scale used in the index ggplot2 plot
+  tour_cols <- hcl(h=seq(15, 360, 360/(p*(p-1)/2)), c=100, l=65)
+  # Colour each last tour projection to match index plot cols
+  if (p>5) {
+    index_cols <- tour_cols[1:10] # Maximum of 10 pairwise combos
+  } else {
+    index_cols <- tour_cols 
   }
-  pp_index <- data.frame(init_pair, iteration, pursuit_index)
-
-  # Subset categorical vars
+  
+  # x, y, and col for each last proj is in a list
+  last_projs <- mapply(c, last_projs, as.list(index_cols), SIMPLIFY = FALSE)
+  last_axes <- mapply(c, last_axes, as.list(index_cols), SIMPLIFY = FALSE)
+  
+  P <- ifelse(p > 5, 5, p) # Maximum of 10 pairwise combos
+  # Reorder plots for last_axes so that the scattermatrix will be diagonally symmetrical
+  if (P==4) {
+    last_axes <- list(last_axes[[1]], last_axes[[2]], last_axes[[4]],
+                      last_axes[[3]], last_axes[[5]], last_axes[[6]])
+  } else if (P==5) {
+    last_axes <- list(last_axes[[1]], last_axes[[2]], last_axes[[5]],
+                      last_axes[[3]], last_axes[[6]], last_axes[[8]],
+                      last_axes[[4]], last_axes[[7]], last_axes[[9]],
+                      last_axes[[10]])
+  }
+  
+  # Scattermatrix plot data (max of 10 pairwise combos)
+  # Lower diagonal is final proj and upper diagonal its axes components
+  # List of P^2 (max 5) plots to plot using ggmatrix. 
+  # Plots on diagonals (i,i) are empty
+  diag_labels <- colnames(Xdfs[[1]])
+  scatt_list <- list(ggally_text(diag_labels[1])) 
+  tplot_list <- lapply(last_projs, last_plot)
+  aplot_list <- lapply(last_axes, last_axis_plot)
+  for (i in 1:(P-1)) {
+    scatt_list <- c(scatt_list, tplot_list[1:(P-i)],
+                    aplot_list[1:i], list(ggally_text(diag_labels[i+1]))) 
+    # (P-i) is the number of tour plots and i the # of axes plots for iteration i
+    # Delete merged plots
+    tplot_list <- tplot_list[-c(1:(P-i))]
+    aplot_list <- aplot_list[-c(1:i)]
+  }
+  # scatt_list contains all last projections (for each tour, up to 10 tours)
+  
+  # Subset categorical vars (for linked brushing by groups)
   Fdataset <- dataset[, which(sapply(dataset, class)=="factor")]
   if (factors <= length(Fdataset)) {
     fac_n <- factors
@@ -237,60 +296,6 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
   }
   Fdataset$ID <- rownames(Fdataset)
   Fdataset$All <- factor(rep("1", nrow(Fdataset)))
-  # "tour" proj plot xy coords for ALL tours
-  XYall <- lapply(t_tour, XYsingle) 
-  # Pull out last tour projection for each tour.
-  last_projs <- lapply(XYall, last_XY) # No need for ID since not in SharedData
-  # Add "ID" variable, rownames of original dataset
-  XYall <- lapply(XYall, function (x) {
-    ID <- rownames(dataset)
-    cbind(x, ID)
-  })
-  # "axes" plot coords for ALL tours
-  PCall <- lapply(tinterp, PCsingle)
-  # Colour scale used in the index ggplot2 plot
-  tour_cols <- hcl(h=seq(15, 360, 360/(p*(p-1)/2)), c=100, l=65)
-  
-  # Pull out last tour axes plot for each tour.
-  #last_projs <- lapply(XYall, last_XY)
-  last_axes <- lapply(PCall, last_PC)
-  
-  # Colour each last tour projection to match index plot cols
-  if (p>5) {
-    index_cols <- tour_cols[1:10] # Maximum of 10 pairwise combos
-  } else {
-    index_cols <- tour_cols 
-  }
-  # x, y, and col for each last proj is in a list
-  last_projs <- mapply(c, last_projs, as.list(index_cols), SIMPLIFY = FALSE)
-  last_axes <- mapply(c, last_axes, as.list(index_cols), SIMPLIFY = FALSE)
-  P <- ifelse(p > 5, 5, p) # Maximum of 10 pairwise combos
-  # Reorder plots for last_axes so that the scattermatrix will be diagonally symmetrical
-  if (P==4) {
-    last_axes <- list(last_axes[[1]], last_axes[[2]], last_axes[[4]],
-                      last_axes[[3]], last_axes[[5]], last_axes[[6]])
-  } else if (P==5) {
-    last_axes <- list(last_axes[[1]], last_axes[[2]], last_axes[[5]],
-                      last_axes[[3]], last_axes[[6]], last_axes[[8]],
-                      last_axes[[4]], last_axes[[7]], last_axes[[9]],
-                      last_axes[[10]])
-  }
-  # Scattermatrix plot data (max of 10 pairwise combos)
-  # Lower diagonal is final proj and upper diagonal its axes components
-  # List of P^2 (max 5) plots to plot using ggmatrix. Plots on diagonals (i,i) are empty
-  diag_labels <- colnames(Xdfs[[1]])
-  scatt_list <- list(ggally_text(diag_labels[1])) 
-  tplot_list <- lapply(last_projs, last_plot)
-  aplot_list <- lapply(last_axes, last_axis_plot)
-  for (i in 1:(P-1)) {
-    scatt_list <- c(scatt_list, tplot_list[1:(P-i)],
-                    aplot_list[1:i], list(ggally_text(diag_labels[i+1]))) 
-    #(P-i) is the number of tour plots and i the # of axes plots for iteration i
-    #Delete merged plots
-    tplot_list <- tplot_list[-c(1:(P-i))]
-    aplot_list <- aplot_list[-c(1:i)]
-  }
-  # scatt_list contains all last projections (for each tour, up to 10 tours)
   
   # SharedData for the factors plot
   sdF <- SharedData$new(Fdataset, key=~ID, group="2Dtour") 
@@ -300,46 +305,45 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
     splitLayout(cellWidths = c("25%", "40%", "35%"),
       plotlyOutput("indexPlot"),
       plotlyOutput("tour"),
-      #plotlyOutput("factors")
       plotlyOutput("pairs")
     ),
     splitLayout(cellWidths = c("40%", "60%"),
     plotOutput("scatter"),
-    #plotlyOutput("pairs")
     plotlyOutput("factors")
     )
   )
   server <- function(input, output, session) {
-  ## Proj pursuit index plot
+  # Proj pursuit index plot 
   output$indexPlot <- renderPlotly({
-    ggplot(pp_index, aes(x=iteration, y=pursuit_index, group=init_pair, col=init_pair)) +
+    ggplot(pp_info, aes(x=iteration, y=pursuit_index, group=init_pair, col=init_pair)) +
       geom_point() +
       geom_line() +
-      ggtitle("Projection pursuit index") +
+      labs(title="Pursuit index", subtitle="Click to select tour") +
+      #ggtitle("Pursuit index (click to select tour)") +
       theme(legend.position="none") # Selecting by legend hard to reset.
       ggplotly(source="index_plot", tooltip = c("x", "y", "group")) %>%
         layout(autosize = F, width=350, height=400)
   })
+  
   output$tour <- renderPlotly({
     s <- event_data("plotly_click", source = "index_plot")
     if (length(s)) {k <- s$curveNumber + 1} else {k <- 1}
     proj <- XYall[[k]]
-    basis <- PCall[[k]]
-    
-    ## tour plot
+    basis <- AXall[[k]]
+    # tour plot
     tour <- tour_plot(proj)
     axes <- tour_axes(basis, tour_cols, k)
     subplot(tour, axes, titleY=F, widths=c(0.7, 0.3), margin=0) %>%
       animation_opts(33) %>% #33 milliseconds between frames
-      #animation_button(xanchor="middle", x=0, yanchor="top", y=0) %>%
       hide_legend() %>%
       layout(dragmode="select",
              margin=list(l=0, r=0, b=0, t=0, pad=0)) %>%
       highlight(on="plotly_select", off="plotly_deselect", color="blue", 
                 persistent=T, dynamic=T)
   })
+  
   output$factors <- renderPlotly({
-    # facet_grid would allow up to 4 factors to be crossed into groups
+    # facet_grid allows up to 4 factors to be crossed into groups
     if (fac_n==1) {
       gp <- ggplot(sdF, aes_string(x=names(Fdataset)[1])) +
         geom_jitter(aes(y=Fdataset$All, label=ID), 
@@ -366,7 +370,6 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
         labs(title="The first 4 factors are displayed") +
         facet_grid(Fdataset[,4]~Fdataset[,3], scales="free", space="free")
     }
-    
     if (fac_n==0) { # fac_n=0 No factors in dataset
       plotly_empty()
       warning("There are no variables that are factors in the data set.")
@@ -378,21 +381,24 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC= TRUE, ...) {
                   persistent=T)
     }
   })
+  
   output$scatter <- renderPlot({
     ggmatrix(scatt_list, P, P, byrow = F, showAxisPlotLabels = F,
              title="Final tour projection and axes plots")
   })
+  
   output$pairs <- renderPlotly({
     realXs %>% 
       SharedData$new(key=~rownames(realXs), group="2Dtour") %>%
       ggpairs(upper="blank") %>%
       #ggpairs(lower="blank", upper=list(continuous = "points")) %>%
       ggplotly() %>%
-      layout(dragmode="select", title="Pairs plot") %>%
+      layout(dragmode="select", title="Pairs plot", 
+             autosize = F, width=400, height=400) %>%
       highlight(on="plotly_select", off="plotly_deselect", color="blue", 
-                persistent=T) %>%
-      layout(autosize = F, width=400, height=400)
+                persistent=T)
   })
+  
   }
   shinyApp(ui, server)
 }
