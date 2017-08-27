@@ -137,7 +137,7 @@ tour_plot <- function(df) {
 }
 
 # Draws tour "axes" plot
-# k is the tour # from the "plotly_click"
+# k is the tour number from the "plotly_click"
 tour_axes <- function(df, tour_cols, k) {
   ax <- list(
     title="", range=c(-1.1, 1.2), 
@@ -388,11 +388,15 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC=TRUE, ...) {
   })
   
   output$pairs <- renderPlotly({
-    realXs %>% 
-      SharedData$new(key=~rownames(realXs), group="2Dtour") %>%
-      ggpairs(upper="blank") %>%
+    #realXs %>% 
+     # SharedData$new(key=~rownames(realXs), group="2Dtour") %>%
+    #  ggpairs(upper="blank") %>%
       #ggpairs(lower="blank", upper=list(continuous = "points")) %>%
-      ggplotly() %>%
+    sdpairs <- SharedData$new(realXs, key=~rownames(realXs), group="2Dtour")
+    pairs_plot <- ggpairs(data=sdpairs, upper="blank")
+    #plot <- last_axis_plot(last_axes[[1]])
+    #pairs_plot[1, 2] <- plot
+      ggplotly(pairs_plot) %>%
       layout(dragmode="select", title="Pairs plot", 
              autosize = F, width=400, height=400) %>%
       highlight(on="plotly_select", off="plotly_deselect", color="blue", 

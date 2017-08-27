@@ -505,7 +505,7 @@ observeEvent(input$new, {
 * https://beta.rstudioconnect.com/jcheng/shiny-crosstalk/
 
 ## Plotly + Crosstalk
-* Can talk back to R? (Crosstalk can by Plotly can't)
+* Can talk back to R? (Crosstalk can but Plotly can't)
 
 ### Advantages
 1. Can still use R console when interacting with the plots.

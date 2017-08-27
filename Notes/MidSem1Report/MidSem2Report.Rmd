@@ -1,0 +1,50 @@
+---
+title: "Code-based open-source software for teaching interactive data visualisation"
+subtitle: "Mid Semester 2 Report"
+author: "Shan-I Lee"
+date: "8/26/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+This report will discuss the developments since last semester on using code-based open-source software for teaching interactive data visualisation. The insights gained from developing an exemplar of interactive techniques "in action", will form the foundation of discussion. Changes in the focus of research will be identified, followed by a consolidation of "new" interactive software with those previously examined. 
+
+### Exemplar of interactive techniques
+* Process of finding NCEA data and then question prompted classfication analysis (static tree) - show. Unable to identify and brush. Black box, data in model space representation?
+Developed single tour first.
+Central to the exemplar is the 2D tour. 
+* Reasons for using a tour:
+It was proposed in the previous report that missing values and cluster analysis would be motivating contexts for students to apply interactive visualisation techniques to.
+Demostrations involving tours often use pre-recordings of tours. Although the recordings are dynamic, the level of interactivity is limited to rewinding. The stochastic nature of tours begs for more user interaction than as a post-event observer. 
+Being able to interact with several "live" tours that still show the same signals, provides the objectivity and rigour that some may criticise as lacking from GDA.
+Stochastic processes: visuals are apt for contextualising the signal in the context of the variation inherent in random processes (see blindfold).
+Numerical methods: Visuals allow us to "get under the hood" of black-box numerical methods to gain a better understanding of the process and the solutions produced (blindfold). Visual representations provide a way to make large volumes of numerical output meaningful, with or without summarising, so that patterns and connections can be identified across several iterations. Applying interactive techniques leverages the visuals to bring together even more information and enable deeper insights.
+This exemplar also exploits the use of "law of small multiples" (see Seivert and trelliscope). Blindfold advocates for many views together rather than one alone.
+
+### Shifts in focus 
+Shift away from large data sets: Troubleshooting can be difficult for novices and errors are costly in terms of time.
+"New" datasets: Mixture of something "tried and true" (olives was suggested last time), crabs data used. Did we reveal something new? Species split is more obvious than gender, Orange species easier to differentiate than Blue (3 groupings appear sometimes) - Check if either Cook or Mass note these.
+Choosing own dataset to try techniques/tools on was motivating, but good to test out techniques and tools on tried and true examples (Using crabs dataset prompted further investigation into how the tourr package chose the starting point for tours since some of the views described in the literature were not being observed. The choice of starting point is very important in tours since a stochastic process is used to search the neighbourhood for a view that is more "interesting" than any previously seen. If after a certain number of attempts no such view is found then the tour ends. So a tour can get "stuck" at a local maxima, hence the need to examine multiple starting points. A random tour eventually covers the whole data space but it can be challenging to retain so many views for comparison and know when to stop the tour in order to avoid being similarly trapped in a relative comparison.
+Hence the idea of "maximising" the tour coverage by launching 2D tours from orthogonal projections of different variable pairs and collating their outcomes through interactive visuals - for comparison between tours and analysis within each tour. The projection pursuit index plot not only compares the index values reached by the tours, but also gives insight into the iterative process, the "length" of tours. Linking this plot to an animation of the tour allows direct access to the views associated with certain levels of the index. In the crabs data we often see two groupings in index levels when using the "holes" projectio pursuit. By inspecting the tours related to these projection we can see 
+
+### Interactive techniques and software
+* rggobi/ggobi: Showcase dynamic, interactive visualisation techniques at its best. rggobi a way to document and replicate visual explorations using code (a bridge into ggobi). The challenge of retaining views when observing tours in ggobi and being able to inspect previous projections in more detail, led to the motivation to find a way to document, review and compare tours. 
+
+* trelliscopejs, Alteryx and Tableau? Discuss? More custom made, trying to balance general and provide guidance on when to apply. But restrictive in user modification, creating something bespoke (discussed later)
+
+* Definite-must-teach techniques: motivation to learn outweighs the learning curve required. Motivation to learn determined by how useful the techniques are perceived to be, through exposure to its use in a range of ways (?) and having to use it yourself to achieve something meaningful. There is a "demand" for quick but reliable analytics that can be delivered by well chosen visualisations with interactive techniques applied to allow for further analysis and understanding. Apply interactive techniques could also aid with explaining complex concepts to non-statisticians. 
+Through exploring the use of interactive techniques with tours I have been able to troubleshoot misunderstandings of underlying processes and test conjectures to explore abstract concepts like principal components.  
+Linked brushing enables the plots to become a whole that is greater than the sum of its parts. (Linked brushing exemplifies Aristotle's quote, "The whole is greater than the sum of its parts"). Tooltips for identification become easily taken for granted once one becomes accustomed to this basic interactive technique. This is definitely one technique that is favourable in all aspects (ease of application, widely applicable, hence motivation to learn outweighs the learning curve required, greatly). Both linked brushing and tooltip identification were used in the exemplar, in addition to guided tour visualisations. Tours are more abstract and hence may seem less applicable since the results are not directly linked to the "raw data". However tours provide one of the few ways for us to visualise multidimensional space and hence allows inspection of joint distributions and models in data space (blindfold).
+Linked brushing provides a way to visualise the model in data space? (brushed points in tour projection linked with 2D pairs plot in data space - but low-D data space). Added value to other interactive visualisation techniques, ie. tours, relating model back to the data space.
+Interactive techniques that may not be as general - deleting, changing points on a plot (Alteryx allows points to be dragged in the `Network Analysis` tool, but not in the other dashboards. In comparison deletion, changing values in any scatterplot and parallel coordinate plot in ggobi is possible. Onus is on the user to decide what techniques are appropriate for their dataset). Tours:
+
+### Insights from developing an exemplar
+Recent developments in open-source interactive software (i.e. shiny, crosstalk, plotly) allow for tools to be be shared and reproduced easily via code documentation. In contrast explorations carried out in ggobi or Mondrian are typically shared through a screencast with commentary and hence cannot be "instantaneously" reproduced. The code documentation also allows for re-use and modification to analyse another dataset.
+With this in mind users are able to either produce bespoke or general interactive applications.
+* Bespoke creations vs general interactive tools (flows on from must-have-techniques).
+Apply a collection of interactive techniques to build an "app" for a specific dataset (eg. NCEA data) or a set of similar datasets (eg. apply to data where identifying clusters is of interest). On the latter extreme of this spectrum is building a package as opposed to writing code for a specific dataset (see code for exemplar above). The coding skills required increases as the app becomes more general. Hence allowing students to choose where on the spectrum they wish to work helps to cater for a range of programming expertise and levels the playing field for assessment on the quality of visuals and interactive techniques applied. The exemplar that was developed sits in between the two extremes. 
+The desire to add more and more interactive details tends to pull an app towards the bespoke end, while the desire keep things general to maximise the return from amount of time and effort invested in creating the app. Regardless of where on the spectrum an interactive visualisation app sits, students will be able to draw on this experience of applying interactive visualisation techniques, in future projects. Furthermore since the software used are open-source students can reuse or update chunks of code to quickly demonstrate how interactive visuals can add value to analysis.
