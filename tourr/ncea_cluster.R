@@ -39,6 +39,7 @@ achieved <- achieved[, -8] #Remove Small_sch var
 # Remove obs with any NA values 
 ach_narm <- achieved[complete.cases(achieved),] #407 schools left
 ach_narm$Decile <- as.factor(ach_narm$Decile)
+class(ach_narm) <- "data.frame"
 rownames(ach_narm) <- ach_narm$School
 akl <- as.data.frame(ach_narm[ach_narm$Region=="Auckland", ]) #90 schools in Akl
 str(akl)

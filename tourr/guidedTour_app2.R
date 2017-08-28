@@ -22,7 +22,7 @@ col_reorder <- function (df) {
   p <- ncol(df)
   Xnames <- colnames(df)
   Xs <- list()
-  tour_names <- vector(mode="character", length=10)
+  tour_names <- vector(mode="character", length=p*(p-1)/2)
   k <- 1
   for (i in 1:(p-1)) {
     for (j in (i+1):p) {
@@ -413,7 +413,8 @@ ach_narm$Decile <- as.factor(ach_narm$Decile)
 rownames(ach_narm) <- ach_narm$School
 akl <- as.data.frame(ach_narm[ach_narm$Region=="Auckland", ]) #90 schools in Akl
 rownames(akl) <- akl$School
-guidedTour_app(akl[,-1], factors=1, index="holes")
+akl <- akl[-1]
+guidedTour_app(akl, factors=1, index="holes")
 # PC1&2 show a bit of a separation of a group of schools from the main group 
 # This group is mainly decile 5 and below, except for Grammar & Kings
 # They are generally in the "scattered tail" of schools in the paris plot.

@@ -8,12 +8,57 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(dplyr) # For tidying of NCEA data
 ```
 
 ## Introduction
 This report will discuss the developments since last semester on using code-based open-source software for teaching interactive data visualisation. The insights gained from developing an exemplar of interactive techniques "in action", will form the foundation of discussion. Changes in the focus of research will be identified, followed by a consolidation of "new" interactive software with those previously examined. 
 
 ### Exemplar of interactive techniques
+A narrative on how ideas for the exemplar emerged and change over its development will be outlined and discussed with respect to the insights gained on applying interactive techniques. 
+The motivation to apply interactive visualisation to cluster analysis emerged from reading literature on the topic, as well as finding "real" data for which it was of interest to see if there was any such underlying structure. Data on the performance of New Zealand schools in the National Certificate of Educational Achievement (NCEA), at the four qualification levels, Level One, Two, Three and University Entrance, can be obtained from the New Zealand Qualifications Authority (NZQA) website. Information on the decile, region and a "small" cohort warning, were also included in the data. The achievement rate of a school for each qualification level was quantified in a few ways. The achievement indicator chosen for analysis was the proportion of students at the school who were successful in obtaining the qualification level, given that they were entered in enough standards to have an opportunity to earn the qualification in the 2016 school year. This is referred to as the "Current Year Achievement Rate" for the "Participating Cohort" by the NZQA (see <http://www.nzqa.govt.nz/assets/Studying-in-NZ/Secondary-school-and-NCEA/stats-reports/NZQA-Secondary-Statistics-Consolidated-Data-Files-Short-Guide.pdf>). 
+Only Auckland schools with achievement indicators across all four qualification levels were retained in the analysis to minimise the unreliability of rates from small samples sizes (i.e. small schools). The NZQA indicator of a "small" cohort was at a very low threshold of fewer than five candidates for a qualification level. Being the most populated city in New Zealand, Auckland has many of the larger schools, but there may still be some schools left in the analysis that have less than 30 candidates entered in a qualification level. The first few observations from the data set are shown below.
+
+```{r, echo=FALSE}
+nzqa2016 <- read.csv("http://www.nzqa.govt.nz/assets/Studying-in-NZ/Secondary-school-and-NCEA/stats-reports/2016/Qualification-Statistics-School-2016-29032017.csv")
+# Drop vars that will not be used (eg. cumulative achievement)
+nzqa <- nzqa2016[,-c(1,8,10)]
+names(nzqa) <- c("Decile", "Region", "School", "Year", "Qualification", "Achieve_participate", "Achieve_roll", "Small_sch")
+levels(nzqa$Qualification) <- c("L1", "L2", "L3", "UE")
+# Subset to use only Year 11 with Level 1, etc
+nzqa <- nzqa %>% filter(((Qualification=="L1") & (Year==11)) | 
+                          ((Year==12) & (Qualification=="L2")) |
+                          ((Year==13) & (Qualification=="L3")) | 
+                          ((Year==13) & (Qualification=="UE"))) %>%
+  # Reshape so that each row represents an observation (a school)
+  # Current.Achievement.Rate.Participation kept for analysis only
+  spread(Qualification, Achieve_participate, fill=0) %>%
+  group_by(School) %>%
+  summarise_at(c("L1", "L2", "L3", "UE"), sum) %>%
+  inner_join(nzqa[, c(1, 2, 3, 8)]) %>% # Add Decile and Region and Small_sch variables
+  distinct() %>% 
+  filter(!((L1==0)&(L2==0)&(L3==0))) #Remove schools with 0% achievement rate for all levels
+
+# Function to replace 0% with NA
+zeros <- function(col) {
+  replace(col, col==0, NA)
+}
+
+nzqa[2:5] <- sapply(nzqa[2:5], zeros)
+# Remove schools with 'small cohort' warning (obscures pattern in non-small cohorts).
+nzqa <- nzqa[nzqa$Small_sch=="",] # 437 school left
+nzqa <- nzqa[, -8] # Remove Small_sch var
+# Remove schools with any NA values 
+nzqa <- nzqa[complete.cases(nzqa),] # 407 schools left
+nzqa$Decile <- as.factor(nzqa$Decile)
+# Subset Auckland schools only
+akl <- as.data.frame(nzqa[nzqa$Region=="Auckland", -7]) #90 schools in Akl
+rownames(akl) <- akl$School
+akl <- akl[-1] # Delete "School" var
+head(akl, n=3)
+```
+
+
 * Process of finding NCEA data and then question prompted classfication analysis (static tree) - show. Unable to identify and brush. Black box, data in model space representation?
 Developed single tour first.
 Central to the exemplar is the 2D tour. 
@@ -24,6 +69,20 @@ Being able to interact with several "live" tours that still show the same signal
 Stochastic processes: visuals are apt for contextualising the signal in the context of the variation inherent in random processes (see blindfold).
 Numerical methods: Visuals allow us to "get under the hood" of black-box numerical methods to gain a better understanding of the process and the solutions produced (blindfold). Visual representations provide a way to make large volumes of numerical output meaningful, with or without summarising, so that patterns and connections can be identified across several iterations. Applying interactive techniques leverages the visuals to bring together even more information and enable deeper insights.
 This exemplar also exploits the use of "law of small multiples" (see Seivert and trelliscope). Blindfold advocates for many views together rather than one alone.
+* Cluster analysis capitalises on some of the strengths of visual representations.
+It makes sense to support answers to the following questions with visual evidence, rather than numerical measures alone:
+- How many clusters are there? How big are the clusters?
+- What shape are the clusters? Do they overlap?
+Coloring plots according to cluster membership identified by numerical methods helps with the interpretation and evaluation of the model (Cook p126). When groups are clearly separated, a graphical approach may be sufficient alone, without the needs to satisfy assumptions about equality of variance or linear boundaries.
+How does interactive techniques add more?
+* Tooltip identification allows you to quickly query outliers and unusual values, then being able to brush and link to other variables to identify features of these outliers. eg. Auckland Grammar, without contextual knowledge of Auckland schools we may not think it is unusual for Grammar to be in the lower achieving cluster but by linking the plot of the tour projection to a plot showing the decile rating of the school we can see why it's unusual. (Grammar not necessarily that unusual in its values for L1 to L3 and UE, when compared to all schools but combined with the data on its decile rating, it is unusual. Cannot pick this up without linked brushing. Also the tour view allows us to identify this, it would have been difficult to single out Grammar in the pairs plots. No clear separation into clusters in the univariate or bivariate distributions)
+* Linked brushing of plots can help to answer the questions that we are interested in when evaluating clusters (me):
+- Which variables contribute the most to the clustering? 
+- Can the clusters be qualitatively described?
+Linking tour and pairs plot (addition of visual info about loadings of PCAs). Intuitively there is an underlying desire to view the model in data space (blindfold)
+Cluster analysis is appropriate only as an explorative technique, but it is a powerful tool for data simplification (Cook 107). Cluster analysis 'tends to produce hypotheses rather than testing them' (p.107).
+NCEA data: initially started with the intention of using a numerical method to model clusters and then using visualisation to interpret and analyse the model (ie. using interactive techniques after analysis) but evolved into developing an exploratory tool for identifying clusters instead.
+To do: How easy is it to modify current app so that it can be used for original purpose? (evaluation after numerical analysis). Replace index plot with heirachical cluster model (ie. how the clusters are being found has been changed) and...
 
 ### Shifts in focus 
 Shift away from large data sets: Troubleshooting can be difficult for novices and errors are costly in terms of time.
@@ -32,7 +91,7 @@ Choosing own dataset to try techniques/tools on was motivating, but good to test
 Hence the idea of "maximising" the tour coverage by launching 2D tours from orthogonal projections of different variable pairs and collating their outcomes through interactive visuals - for comparison between tours and analysis within each tour. The projection pursuit index plot not only compares the index values reached by the tours, but also gives insight into the iterative process, the "length" of tours. Linking this plot to an animation of the tour allows direct access to the views associated with certain levels of the index. In the crabs data we often see two groupings in index levels when using the "holes" projectio pursuit. By inspecting the tours related to these projection we can see 
 
 ### Interactive techniques and software
-* rggobi/ggobi: Showcase dynamic, interactive visualisation techniques at its best. rggobi a way to document and replicate visual explorations using code (a bridge into ggobi). The challenge of retaining views when observing tours in ggobi and being able to inspect previous projections in more detail, led to the motivation to find a way to document, review and compare tours. 
+* rggobi/ggobi: Showcase dynamic, interactive visualisation techniques at its best. rggobi a way to document and replicate visual explorations using code (a bridge into ggobi). The challenge of retaining views when observing tours in ggobi and being able to inspect previous projections in more detail, led to the motivation to find a way to document, review and compare tours. After working with ggobi there was a desire to document the interactions so that it could be easily reproduced and shared (and can pick up where left off). Capture an useful view.
 
 * trelliscopejs, Alteryx and Tableau? Discuss? More custom made, trying to balance general and provide guidance on when to apply. But restrictive in user modification, creating something bespoke (discussed later)
 

@@ -8,13 +8,13 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Questions
-* Is it sensible for `plotly` plots to render faster than `ggplot2`?
-    + `plotly` object keeps up better with animation at a faster speed (300 millisecond per animation step)
 * Apart from using `shiny`, how else can you be in a "reactive environment" (need this to explicitly retrieve SharedData details)
 eg. Use print(sd$data(withSelection=TRUE))
-* Using `plotly` alone (without `shiny`) has the advantage of producing a "standalone html". Why is this an advantage? Easier to share, no need to host on an external server (?) 
 
 ### Answered
+* Is it sensible for `plotly` plots to render faster than `ggplot2`? Yes, plotly is lower-level to the javascript library it uses than using `ggplot()+ggplotly`.
+    + `plotly` object keeps up better with animation at a faster speed (300 millisecond per animation step)
+* Using `plotly` alone (without `shiny`) has the advantage of producing a "standalone html". Why is this an advantage? Easier to share, no need to host on an external server, don't need R running in the backgroun if you don't want it to.
 * Is `cranvas` worth investigating? 
     + NO, difficult to install and appears to be not in development anymore.
     + Will not exceed ggobi's capabilities.
@@ -25,27 +25,22 @@ eg. Use print(sd$data(withSelection=TRUE))
 * Do I have to cite a specific source when making "common statements"? quote from someone or from a study (or via a demonstration)
     + eg. Order of vars for a parallel coord point is impt?
     + Choice of file type for image (raster vs scalable)
-
-## To do's
-* Tour function (using `tourr` package)
-    + Investigate and visually display the effect of the starting projection matrix on the random tour path, by creating the plot described in the above point, and creating a scatterplot matrix of pairs of PC's as possible starting matrices. Click on scatterplot pair to select as starting matrix and initiates a few random tour paths with the traces of their paths displayed for comparison.
-        - An equivalent to `pairs()` plot in `GGally` or `plotly`? Or just have a static pairs plot and checkboxes on the side?
-    + PCP of linear combination of variables for the PC's used in the tour (Xs on axes, PCs are the obs, coloured by magnitude of PC in projection). The PCP will help to relate the PCs used in tour with the X vars from the context.
-* Create a dendrogram in ggobi that can be brushed (see Paul's notes from 20 June). Brushed linking of line segments with parallel plot demonstrated in Cook p.110.
-* "Export" the linear combination coordinates from tours using DescribeDisplay. 
-    + Allow for comparison with numerical methods.
-* Large ds and applications 
-* Look at other data visualisation courses (see Reading List section)
-* Look at documenting interactions when used for exploration
-    + 'capture' an useful view or brushed selection
-* Shiny sliders:
-    + cycling of combinations of possible vars for scatterplot and mosaic plots (2 to 3 vars only)
-* Use interactive environments in Shiny to record interactions and send them back to R (and back again?). 
-    + See *Interactive environments in Shiny* section
 *'googleVis' bought Hans Rosling's stuff. 
     + R package to connect w it.
 *`ggiraph` R package, a bit like plotly but allows more custom control over interactive techniques.
     + Adds interactive techniques to ggplot2 plots.
+
+## To do's
+* See if projection pursuit values are saved (invisibly) in output from tourr, if so use it to save running time for app. (Profiling shows the index calc in code takes some mem and time, otherwise the time is mostly being chewed up by the stochastic process within tourr fns)
+* Return to original intention (an interactive visual to analyse a heirachical clustering algorithm) to show if can modify current app easily and make it a worthwhile, lasting investment? 
+* Tour function (using `tourr` package)
+    + PCP of linear combination of variables for the PC's used in the tour (Xs on axes, PCs are the obs, coloured by magnitude of PC in projection). The PCP will help to relate the PCs used in tour with the X vars from the context.
+* Create a dendrogram in ggobi that can be brushed (see Paul's notes from 20 June). Brushed linking of line segments with parallel plot demonstrated in Cook p.110.
+* Look at other data visualisation courses (see Reading List section)
+* Shiny sliders:
+    + cycling of combinations of possible vars for scatterplot and mosaic plots (2 to 3 vars only)
+* Use interactive environments in Shiny to record interactions and send them back to R (and back again?). 
+    + See *Interactive environments in Shiny* section
 
 ### NCEA data
 * See: <http://www.nzqa.govt.nz/studying-in-new-zealand/secondary-school-and-ncea/find-information-about-a-school/secondary-school-statistics/consolidated-files/data-files-for-2016/>
@@ -78,6 +73,7 @@ eg. Use print(sd$data(withSelection=TRUE))
         - For self-organising maps: Tours can help identify problems with the fit (that would not be picked up in a 2D map view eg. when map wraps in on itself and makes points close to each other seem apart),
         - Confusion table with linked brushing to plots (such as a tour projection) allow mismatches and agreements between methods to be explored.
 * Cluster analysis 'tends to produce hypotheses rather than testing them' (p.107). Hence cluster analysis is an exploratory technique, that may lack 'formal validation' but it is powerful in data simplification. 
+* Cluster analysis vs classifying: cluster analysis is unsupervised while classifying assumes an underlying structure of membership to certain groups (?)
 
 ### Principal Components
 * `princomp()` and `prcomp()` are two functions in R for obtaining PCs. `tourr` package uses the latter. The signs of the components are random. We are interested in the differences in size of coefficients, where direction of difference doesn't matter. 

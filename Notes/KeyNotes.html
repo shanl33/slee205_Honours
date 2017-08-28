@@ -122,6 +122,14 @@ $(document).ready(function () {
 
 <div id="questions" class="section level2">
 <h2>Questions</h2>
+<ul>
+<li>Is it sensible for <code>plotly</code> plots to render faster than <code>ggplot2</code>?
+<ul>
+<li><code>plotly</code> object keeps up better with animation at a faster speed (300 millisecond per animation step)</li>
+</ul></li>
+<li>Apart from using <code>shiny</code>, how else can you be in a “reactive environment” (need this to explicitly retrieve SharedData details) eg. Use print(sd$data(withSelection=TRUE))</li>
+<li>Using <code>plotly</code> alone (without <code>shiny</code>) has the advantage of producing a “standalone html”. Why is this an advantage? Easier to share, no need to host on an external server (?)</li>
+</ul>
 <div id="answered" class="section level3">
 <h3>Answered</h3>
 <ul>
@@ -147,6 +155,19 @@ $(document).ready(function () {
 <div id="to-dos" class="section level2">
 <h2>To do’s</h2>
 <ul>
+<li>Tour function (using <code>tourr</code> package)
+<ul>
+<li>Investigate and visually display the effect of the starting projection matrix on the random tour path, by creating the plot described in the above point, and creating a scatterplot matrix of pairs of PC’s as possible starting matrices. Click on scatterplot pair to select as starting matrix and initiates a few random tour paths with the traces of their paths displayed for comparison.
+<ul>
+<li>An equivalent to <code>pairs()</code> plot in <code>GGally</code> or <code>plotly</code>? Or just have a static pairs plot and checkboxes on the side?</li>
+</ul></li>
+<li>PCP of linear combination of variables for the PC’s used in the tour (Xs on axes, PCs are the obs, coloured by magnitude of PC in projection). The PCP will help to relate the PCs used in tour with the X vars from the context.</li>
+</ul></li>
+<li>Create a dendrogram in ggobi that can be brushed (see Paul’s notes from 20 June). Brushed linking of line segments with parallel plot demonstrated in Cook p.110.</li>
+<li>“Export” the linear combination coordinates from tours using DescribeDisplay.
+<ul>
+<li>Allow for comparison with numerical methods.</li>
+</ul></li>
 <li>Large ds and applications</li>
 <li>Look at other data visualisation courses (see Reading List section)</li>
 <li>Look at documenting interactions when used for exploration
@@ -159,55 +180,245 @@ $(document).ready(function () {
 </ul></li>
 <li>Use interactive environments in Shiny to record interactions and send them back to R (and back again?).
 <ul>
-<li>See <em>Interactive environments in Shiny</em> section</li>
+<li>See <em>Interactive environments in Shiny</em> section *‘googleVis’ bought Hans Rosling’s stuff.</li>
+<li>R package to connect w it. *<code>ggiraph</code> R package, a bit like plotly but allows more custom control over interactive techniques.</li>
+<li>Adds interactive techniques to ggplot2 plots.</li>
+</ul></li>
+</ul>
+<div id="ncea-data" class="section level3">
+<h3>NCEA data</h3>
+<ul>
+<li>See: <a href="http://www.nzqa.govt.nz/studying-in-new-zealand/secondary-school-and-ncea/find-information-about-a-school/secondary-school-statistics/consolidated-files/data-files-for-2016/" class="uri">http://www.nzqa.govt.nz/studying-in-new-zealand/secondary-school-and-ncea/find-information-about-a-school/secondary-school-statistics/consolidated-files/data-files-for-2016/</a></li>
+<li>Bi-modal distribution in L3 (and slightly L2).
+<ul>
+<li>Investigate clustering based on L3 alone?</li>
+</ul></li>
+<li>Aim: Partition student achievement data according to the decile of the school.</li>
+<li>Cluster analysis: Use a numerical method to model clusters, then use visualisation to interpret and analyse clusters.
+<ul>
+<li>Heirarchical clustering algorithm using Euclidean distances and average linkage identified 4 clusters and two overlapping clusters. The smaller cluster was relatively low-achieving and consisted of the lower tail of the univariate distributions for each level of achievement. All schools except 1 in this cluster was from decile 6 or below. There is no clear separation between the two clusters in any univariate distribution and the 2D tours looked at so far.</li>
+</ul></li>
+</ul>
+<div id="to-do" class="section level4">
+<h4>To do:</h4>
+<ul>
+<li>Re-analyse with the 6 clusters (using L1, 2, 3 AND UE).</li>
+<li>Use correlation distance instead of Euclidean to identify clusters that a similar in structure.</li>
+<li>Investigate bi-modal distn in L3.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="statistical-methods" class="section level2">
+<h2>Statistical methods</h2>
+<div id="cluster-analysis" class="section level3">
+<h3>Cluster analysis</h3>
+<ul>
+<li>Cook (p.126): Uses of graphics in cluster analysis to…
+<ul>
+<li>Identify clusters graphically (sometimes a graphical approach alone may be sufficient)
+<ul>
+<li>Works well when groups are clearly separated.</li>
+<li>No need for assumptions about equality of variance or linear boundaries.</li>
+<li>Does not work well when clusters overlap or purpose is to partition data (regardless of whether clusters exist).</li>
+<li>Numerical methods are preferable if partitioning is the goal and then graphics can be used to interpret and evaluate the model (see below).</li>
+</ul></li>
+<li>Interpret models resulting from (numerical) algorithms, by colouring with cluster membership and using scatterplots, parallel coordinate plots, area plots and dendograms, to check the clustering is sensible.
+<ul>
+<li>How many clusters are there? How big are the clusters?</li>
+<li>What shape are the clusters? Do they overlap?</li>
+<li>Which variables contribute the most to the clustering?</li>
+<li>Can the clusters be qualitatively described?</li>
+</ul></li>
+<li>Assess (or compare and/or refine) models from algorithms.
+<ul>
+<li>Check assumptions about distributions</li>
+<li>For self-organising maps: Tours can help identify problems with the fit (that would not be picked up in a 2D map view eg. when map wraps in on itself and makes points close to each other seem apart),</li>
+<li>Confusion table with linked brushing to plots (such as a tour projection) allow mismatches and agreements between methods to be explored.</li>
+</ul></li>
+</ul></li>
+<li>Cluster analysis ‘tends to produce hypotheses rather than testing them’ (p.107). Hence cluster analysis is an exploratory technique, that may lack ‘formal validation’ but it is powerful in data simplification.</li>
+</ul>
+</div>
+<div id="principal-components" class="section level3">
+<h3>Principal Components</h3>
+<ul>
+<li><code>princomp()</code> and <code>prcomp()</code> are two functions in R for obtaining PCs. <code>tourr</code> package uses the latter. The signs of the components are random. We are interested in the differences in size of coefficients, where direction of difference doesn’t matter.</li>
+<li>When coeffs are close to zero they are dropped in some methods (eg. <code>princomp(crabs[,4:8])</code> drops some coeffs while <code>prcomp()</code> will return a coeff for all vars even when close to zero. A threshold can be entered as an argument).</li>
+<li>See MASS book pg.357 for a good example of how to interpret the coeffs of PCs.</li>
+</ul>
+</div>
+<div id="d-tours" class="section level3">
+<h3>2D Tours</h3>
+<ul>
+<li><code>crabs</code> dataset could be a good example to demonstrate the use of guided tours optimising the holes index to identify group structures in the data.
+<ul>
+<li>Using PC1 and PC2 for the starting projectcion basis brings out the gender separation and using PC2 and PC3 (??) highlights the species separation (need to check this) since gender separation is more defined than the species separation?? Also need to check how the separation into 4 (sex-species) groups is seen in the tours.</li>
+<li>A good dataset to demonstrate the usefulness of visualising and tracing the random tour paths of several tours.</li>
+</ul></li>
+<li>Which combination will result in smoother animation: (<code>plotly</code>+<code>shiny</code>) or (<code>plotly</code>+<code>crosstalk</code>)?
+<ul>
+<li>They appear to be the same ‘speed’ but the tour plot and slider are more in sync and smoother, when using (<code>plotly</code>+<code>crosstalk</code>). Other advantages of using (<code>plotly</code>+<code>crosstalk</code>):
+<ul>
+<li>Standalone html viewer.</li>
+<li>Can still use R while interacting with the visual.</li>
+<li>Easy to link multiple plots and initiate brushing from any of the linked plots.</li>
+<li>Can use <code>html widgets</code> to achieve the same interactions provided by <code>shiny</code> inputs (sliders, buttons, etc)</li>
+</ul></li>
+<li>For <code>crosstalk</code>: <code>animation_opts(33)</code> seems to be the same speed as <code>animation_opts(10)</code>. Maybe since speed maximised.</li>
+<li>For <code>shiny</code>: Can adjust <code>animate = animationOptions(400)</code> argument for input slider, to be more in sync.</li>
+<li>Can <code>subplot()</code> be used with (<code>plotly</code>+<code>shiny</code>)? YES</li>
+</ul></li>
+<li>(<code>plotly</code>+<code>crosstalk</code>): Use Firefox browser if have multiple linked plots. Some other browsers may not show all plots.</li>
+<li>Guided tour = combining grand tour and projection pursuit. This results in choosing new projections with respect to maximising an index of interest, rather than at random <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</li>
+</ul>
+<div id="my-function-for-2d-guided-tours" class="section level4">
+<h4>My function for 2D Guided Tours</h4>
+<div id="goals-intentions" class="section level5">
+<h5>Goals / Intentions:</h5>
+<ul>
+<li>Model “good” statistical practice.
+<ul>
+<li>Choice (and design) of plots, interactive tools, summary statistics, default values for arguments.</li>
+<li>Give reasons for the choices made based on literature and theory.</li>
+</ul></li>
+<li>Useful for analysing a range of datasets where unsupervised cluster analysis is of interest.
+<ul>
+<li>Provides a framework/structure but avoid being overspecific and prescriptive.</li>
+<li>Allows for further modification and extention (code-based).</li>
 </ul></li>
 </ul>
 </div>
-<div id="virtual-machine" class="section level2">
-<h2>Virtual Machine</h2>
+<div id="reasons-for-choices" class="section level5">
+<h5>Reasons for choices</h5>
 <ul>
-<li>Software to have on VM:
+<li>Plot for projection pursuit index:
 <ul>
-<li>R (RStudio if possible?) with the following packages:
+<li>Similarities with Fig 14 on p.216 <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>:
 <ul>
-<li>rggobi</li>
-<li>DescribeDisplay</li>
-<li>shiny</li>
-<li>plotly (requires ggplot2)</li>
-<li>crosstalk: devtools::install_github(“rstudio/crosstalk”)</li>
-<li>iplots (?)</li>
-<li>dplyr</li>
-<li>tidyr</li>
-<li>ggally (requires ggplot2)</li>
+<li>Link index value with the 2D tour projection.</li>
+<li>Use the index plot to compare local optimal projections from different tours and see if they are consistent. (An example of a wider theme of: Using visuals to gain insight into the consistency of random processes. eg. tours, cross-validation,..).</li>
+<li>Visualising the path of projection matrices in covering the data space is difficult since it involves a p-D hypersphere <a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>. To do: See <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a> and try the hypersphere interactive visualisation describe in <code>ggobi</code>.</li>
 </ul></li>
-<li>ggobi</li>
-<li>Mondrian</li>
-<li>Manet</li>
-</ul></li>
-<li>Installation:
+<li>Differences with Fig 14 on p.216 <a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a>:
 <ul>
-<li>Download VirtualBox from <a href="https://www.virtualbox.org/" class="uri">https://www.virtualbox.org/</a></li>
-<li>MAC: If stuck on verifying see: <a href="http://osxdaily.com/2016/07/26/fix-stuck-pkg-verifying-installer-mac-os-x/" class="uri">http://osxdaily.com/2016/07/26/fix-stuck-pkg-verifying-installer-mac-os-x/</a></li>
-<li>Transfer files from USB.</li>
-<li>BEFORE starting a session in VirtualBox change the “Shared Folder” directory to where you saved the USB files.</li>
-<li>Start session in VirtualBox (search for Terminal etc)</li>
+<li>Use of principal components “shortcuts” the guided tours. Similar to the effect of launching a new tour from a ‘particularly good projection’ as described in Fig. 16 p.217 <a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a>.</li>
+<li>Comparing the local optimal projections of starting for pairwise combinations of PCs rather than random initial bases.</li>
+<li>Hence additional plots and relevant info on PCs required.</li>
 </ul></li>
-<li>ggobi/rggobi
+</ul></li>
+<li>Use of principal components and PCs plot (or Use of the Fisher linear discriminant and LDA index plot):
 <ul>
-<li>ggobi control window is on the Terminal option menu (rather than a separate window)</li>
-<li><code>DescribeDisplay</code> ggobi plugin is installed but R package yet to be installed.</li>
+<li>First check the variables are on comparable scales, rescale to unit variance if needed (default).</li>
+<li>When using PCs we are interested in comparing the standard deviations of the PCs. We expect the first PC to have the greatest sd and the variation to decrease for subsequent PCs, but the size of differences in variation is of interest (p.357) <a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a>.</li>
+<li>The coefficients of each PC indicate which combinations of variables are being compared with each other (p.357 example of interpreting PCs for <code>crabs</code> data) <a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a>.</li>
+<li>Tours compliment numerical algorithms that find ‘interesting linear combinations of data. These linear combinations might be fed into a tour or re-created directly using manual manipulation, after which their neighborhoods can be explored to see whether some nearby projection is even more informative’ (p.34) <a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a>.</li>
+<li>‘The first few principal components are often useful to reveal structure in the data’ (p.331). <a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a> So we only need to explore pairwise combinations of the first few PCs as starting bases for guided tours (?) BUT we still need to p number of PCs for the tour in order to explore the p-dimnesional data space (NB: p = # of X-vars). ie. Want k=p (see below about k)</li>
+<li>PC are rotations of the original variables that best explain the variation in the data. If we only take the first k principal components then ‘the subspace they span contains the best k-dimensional view of the data’. Since the covariance matrix is maximised and the residual sum of squares between the original points and their projections is minimised (p331) <a href="#fn11" class="footnoteRef" id="fnref11"><sup>11</sup></a>
+<ul>
+<li>To do: Double-check understanding of biplots as when k=2 (scatterplots with PC1 and PC2), so biplots are best 2D view of the data. Specific static projections of 2D tours are equivalent to biplots with axes rescaled to equal length (see p.35). <a href="#fn12" class="footnoteRef" id="fnref12"><sup>12</sup></a></li>
+</ul></li>
 </ul></li>
 </ul>
+</div>
+</div>
+</div>
+</div>
+<div id="tourr-r-package" class="section level2">
+<h2>tourr (R package)</h2>
+<ul>
+<li>See: <a href="https://www.jstatsoft.org/article/view/v040i02/v40i02.pdf" class="uri">https://www.jstatsoft.org/article/view/v040i02/v40i02.pdf</a> <a href="#fn13" class="footnoteRef" id="fnref13"><sup>13</sup></a></li>
+<li>Double arrow operator (&lt;&lt;-) allows assignmnet to parent levels (outside of current function or enviroment). The usual single arrow operator (&lt;-) only allows assignment to current level.</li>
+</ul>
+<div id="tours" class="section level3">
+<h3>Tours</h3>
+<ol style="list-style-type: decimal">
+<li>Sphere data (transform to principal components)
+<ul>
+<li><code>sphere=T</code> (and <code>rescale=T</code> default) arguments rescales the data (to range [0,1]) THEN spheres it. Order matters. The resulting PCs identifies more group structure than only sphere-ing. Better for <code>holes</code> pp but not much difference for <code>cmass</code>.</li>
+<li>Use of PC’s (rather than raw data Xs) chooses a starting point for the (random) tour path that is more likley to lead to interesting views. This results in more consistency between the random tours and increases the chance for the most interesting views to be consistently captured in each random tour.</li>
+<li>PCA (Principal Component Analysis): Seeks to find a linear combinaton of X with maximal (or minimal) variance. The ith principal component is the ith linear combination picked that maximises variance and is uncorrelated with the linear combinations that have been picked earlier. (“The first few PCs are often useful to reveal structure in data”)</li>
+<li>Sphering rotates and scales data to remove ‘typically obvious correlation’ (p.8)</li>
+<li>After sphering the data matrix will have a mean vector of zero and variance-covariance as the identity matrix.</li>
+</ul></li>
+<li>Choose the guided (projection pursuit) tour.
+<ul>
+<li>In either 1D, 2D or k-D projection (hence choose a display method)</li>
+</ul></li>
+<li>Choose a projection pursuit index (function to optimise).
+<ul>
+<li>Holes (<code>holes</code>), central mass (<code>cmass</code>), LDA (<code>lda_pp</code>) or PDA (<code>pda_pp</code>).</li>
+<li><code>cmass</code> = 1 - <code>holes</code> index</li>
+</ul></li>
+</ol>
+<ul>
+<li>5 types of tour generators: Everything available in <code>ggobi</code> is available in <code>tourr</code>, with the addition of being able to “replay” a saved tour (<code>planned_tour()</code>)
+<ol style="list-style-type: decimal">
+<li>grand_tour</li>
+<li>guided_tour: projection pursuit with 4 indices
+<ul>
+<li>Holes (<code>holes</code>): few points in the center</li>
+<li>Central mass (<code>cmass</code>): lots of points in center</li>
+<li>Linear discriminant analysis, LDA (<code>lda_pp</code>): maximised when the centres of pre-defined groups are furtherest apart. Equal variance of groups assumption.</li>
+<li>PDA (<code>pda_pp</code>): for small n, large p (<code>ggobi</code> has PCA in 1D as the fourth index option).</li>
+</ul></li>
+<li>planned_tour</li>
+<li>dependence_tour</li>
+<li>local_tour: alternates between specified starting position and nearby random projections.</li>
+</ol></li>
+<li>Replicate tour function and show trace of the tour paths to display the consistency of the endpoints of the random tours. Also the differences in tour paths when the orthogonal projecton of a different pair of PCs are used as the starting basis.
+<ul>
+<li>Visualising the path of a tour requires the use of multidimensional scaling of “principal angles” between planes. When represented on a 2D plot it does NOT represent the path’s coverage of the X’s-dimensional space, hence is not very useful for illustrating the consistency of tours. (See <code>visualise_paths.R</code>)</li>
+</ul></li>
+<li>Multiple display methods depending on projection dimension. Function: <code>animate(display=&quot;&quot;)</code> or <code>animate_*()</code>.
+<ul>
+<li>1D:
+<ul>
+<li><code>dist</code>: histogram, ASH, density plot</li>
+<li><code>image</code>: image plot</li>
+<li><code>ts</code>: time series</li>
+</ul></li>
+<li>2D:
+<ul>
+<li><code>xy</code>: scatterplot (biplot?)</li>
+</ul></li>
+<li>3D:
+<ul>
+<li><code>stereo</code>: anaglyphs (require 3D blue-red glasses to view)</li>
+<li><code>depth</code>: 3D depth cues (using size, colour,…)</li>
+</ul></li>
+<li>k-D:
+<ul>
+<li><code>andrews</code>: Andrews curves</li>
+<li><code>faces</code>: Chernoff faces (not implemented in <code>ggobi</code>)</li>
+<li><code>stars</code>: star glyphs (not implemented in <code>ggobi</code>)</li>
+<li><code>pcp</code>: <strong>parallel coord plots</strong></li>
+<li><code>scatmat</code>: <strong>scatterplot matrix</strong></li>
+</ul></li>
+<li>Arguments
+<ul>
+<li><code>fps</code>: frames per second, controls smoothness of transition between frames.</li>
+<li><code>aps</code>: angular velocity, speed of tour along tour path.</li>
+</ul></li>
+</ul></li>
+<li>“very easy to hook up to additional method of data display” that is already available in R.</li>
+<li><code>tourr</code> functions are sensitive to the order of vars in the dataframe used since the default ‘start’ projection basis is the orthogonal projection of the first two variables.</li>
+</ul>
+</div>
 </div>
 <div id="tableau" class="section level2">
 <h2>Tableau</h2>
 <ul>
 <li>See: <a href="http://onlinehelp.tableau.com/current/pro/desktop/en-us/actions.html" class="uri">http://onlinehelp.tableau.com/current/pro/desktop/en-us/actions.html</a></li>
 <li>Tableau interactive visualisation can be shared via it’s web application framework (’Tableau Public` <a href="https://public.tableau.com/s/" class="uri">https://public.tableau.com/s/</a>)</li>
-<li><code>URL Action</code> (hyperlink w results from other actions) is an additional technique that other tools may not have.</li>
+<li><code>URL Action</code> (hyperlink w results from other actions) is an additional technique that other tools may not have. ### Tableau Public (Free App version)</li>
+<li>Drag and drop to create plot.
+<ul>
+<li>Certain plot choices are available depending on type of vars selected.</li>
+</ul></li>
+<li>Create a <code>dashboard</code> to display plots side-by-side (for brushed linking etc)</li>
+<li>Create a <code>story</code> seems to be like a slide show. ### Interactive techniques (“Actions” in Tableau)</li>
 </ul>
-<div id="interactive-techniques-actions-in-tableau" class="section level3">
-<h3>Interactive techniques (“Actions” in Tableau)</h3>
 <table>
 <colgroup>
 <col width="16%"></col>
@@ -250,7 +461,6 @@ $(document).ready(function () {
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 <div id="alteryx" class="section level2">
 <h2>Alteryx</h2>
@@ -372,6 +582,16 @@ $(document).ready(function () {
 <li>Can re-create using either plot() or ggplot()</li>
 </ul></li>
 </ul></li>
+<li>Recording dynamic analysis such as tours.
+<ul>
+<li>Sievert (Journal paper draft) uses <code>vimeo</code> with no voice over.</li>
+<li>Hadley et al. (“…blindfold” paper on <code>tourr</code> package) embeds short bites of tours in the pdf document so that the reader can click and view without leaving the pdf document.
+<ul>
+<li>Used <code>render()</code> in <code>tourr</code> package to save plots as pdf’s and then ‘glued’ the plots together using the <code>animate</code> package in Latex.</li>
+<li>Should be able to achieve similar with Rmarkdown (html) and <code>shiny</code></li>
+</ul></li>
+<li>Check if <code>screencast</code> or something similar will work in VM.</li>
+</ul></li>
 </ul>
 <pre class="r"><code>library(rggobi)
 # Transfering data between R and ggobi.
@@ -472,6 +692,7 @@ variables(d) # Displays wt(6), qsec(7), vs(8), then drat(5), vs(4), .., mpg(1)</
 <li>A wide range of in-house interactions (ie. it is a complete pipeline and does not need add-ons to achieve the interactive techniques).</li>
 <li>Some statistical analyses available that can be applied directly to interaction.</li>
 <li>Currently, probably the best interactive tool for handling large ds.</li>
+<li>Able to brush, link and identify when using parallel coordinate plots BUT difficult to isolate individual cases if there are many similar cases close together (check brushing ease of brushing edges again)</li>
 </ul>
 </div>
 <div id="disadvantages" class="section level4">
@@ -586,6 +807,12 @@ observeEvent(input$new, {
 <div id="plotly" class="section level2">
 <h2>Plotly</h2>
 <ul>
+<li>Code for yet to be published journal paper: <a href="https://github.com/cpsievert/pedestrians/tree/master/docs" class="uri">https://github.com/cpsievert/pedestrians/tree/master/docs</a></li>
+<li>2017 Webinar: <a href="https://plotcon17.cpsievert.me/webinar/#1" class="uri">https://plotcon17.cpsievert.me/webinar/#1</a>
+<ul>
+<li>Brushed linking examples (without use of <code>Shiny</code>)</li>
+<li><code>SharedData</code> and <code>highlight()</code> (with <code>crosstalk</code>)</li>
+</ul></li>
 <li><a href="https://plot.ly/r/reference/" class="uri">https://plot.ly/r/reference/</a></li>
 <li>Book (Phd thesis?) by author of plotly: <a href="https://cpsievert.github.io/plotly_book/" class="uri">https://cpsievert.github.io/plotly_book/</a></li>
 <li>Create interactive plots using either: plot_ly() or ggplot2 %&gt;% ggplotly().</li>
@@ -595,6 +822,11 @@ observeEvent(input$new, {
 </ul></li>
 <li>ggplotly() translates each layer of ggplot2 into one or more plotly.js traces. Assumptions about trace attributes not always appropriate, can modify. See: <a href="https://cpsievert.github.io/plotly_book/extending-ggplotly.html" class="uri">https://cpsievert.github.io/plotly_book/extending-ggplotly.html</a> (Extending ggplotly).</li>
 <li>plot_ly() interacts more directly with plotly.js and hence generally not as ‘expensive’ as ggplotly(). Maybe faster with large ds?</li>
+<li>Tooltip identification can be customised:
+<ul>
+<li>ggplot(aes(label=colName, label2=colName1))</li>
+<li>ggplotly(tooltip = “label”, “label1”)</li>
+</ul></li>
 </ul>
 <div id="advantages-2" class="section level3">
 <h3>Advantages</h3>
@@ -607,7 +839,11 @@ observeEvent(input$new, {
 <li>Defaults: Tooltip identification of aesthetics, scaling.</li>
 <li>Persistent brushing easily achieved by an argument: pipe plotly object to a ‘highlight()’ layer with ‘persistent=F/T’ and ‘dynamic=F/T’ arguments. Limitations to ‘memorising selections’ and currently a limited number of modes to choose from (cannot support AND), rewinding selections? (See Hofmann and Theus (1998))</li>
 <li>plotly objects can have more than aes mapping data attached to them, such as statistical output that was generated in R by ggplot2 when creating the plot. Eg. with goem_smooth() See: <a href="https://cpsievert.github.io/plotly_book/extending-ggplotly.html" class="uri">https://cpsievert.github.io/plotly_book/extending-ggplotly.html</a> (Extending ggplotly)</li>
-<li>Can still use R console when interacting with the plot.</li>
+<li>Can still use R console when interacting with the plot (if using <code>plotly</code>+<code>crosstalk</code>).</li>
+<li>Discussion on use with <code>shiny</code> and/or <code>crosstalk</code>: <a href="https://community.plot.ly/t/plotly-crosstalk-issue/3810/2" class="uri">https://community.plot.ly/t/plotly-crosstalk-issue/3810/2</a>
+<ul>
+<li>“The goal is to produce standalone html” (Sievert, 2017 webinar)</li>
+</ul></li>
 </ol>
 </div>
 <div id="disadvantages-2" class="section level3">
@@ -620,7 +856,6 @@ observeEvent(input$new, {
 <li>Difficulty keeping up with tooltip display.</li>
 <li>Lasso/click drag selection very slow and hard to control, difficult to use for exploration.</li>
 </ul></li>
-<li>Tooltip default for comparing values can only compare a maximum of 4 obs?</li>
 <li>Tooltip identification for area plots (bar charts) a bit hit and miss? Esp with ggplot2 plots? Does not take all categorical labels with it when passed thru ggplotly()?</li>
 <li>Cannot brush (select) edges or nodes of parallel plots.
 <ul>
@@ -634,8 +869,12 @@ observeEvent(input$new, {
 <ul>
 <li><a href="https://rstudio.github.io/crosstalk/using.html" class="uri">https://rstudio.github.io/crosstalk/using.html</a></li>
 <li>Crosstalk creates a ShareData environment for inter-widgets communication.</li>
-<li>? Can still use R console during interaction?</li>
+<li>Can still use R console during interaction? YES, it appears so with <code>plotly</code>.</li>
 <li>htmlwidgets for 3D rotation (and more dimensions?): <a href="https://www.r-bloggers.com/a-first-look-at-htmlwidgets/" class="uri">https://www.r-bloggers.com/a-first-look-at-htmlwidgets/</a></li>
+<li><code>SharedData</code> environment
+<ul>
+<li>Each <code>SharedData$new(... group=&quot;..&quot;)</code> call makes a new <code>group</code> of widgets that link to each other.</li>
+</ul></li>
 </ul>
 <div id="advantages-3" class="section level3">
 <h3>Advantages</h3>
@@ -671,7 +910,7 @@ observeEvent(input$new, {
 <div id="plotly-crosstalk" class="section level2">
 <h2>Plotly + Crosstalk</h2>
 <ul>
-<li>Can talk back to R? (Crosstalk can by Plotly can’t)</li>
+<li>Can talk back to R? (Crosstalk can but Plotly can’t)</li>
 </ul>
 <div id="advantages-4" class="section level3">
 <h3>Advantages</h3>
@@ -960,11 +1199,94 @@ observeEvent(input$new, {
 <li>Testing: Assign variable to interaction fn and print() the output.</li>
 <li>Colour #RRGGBB__: <a href="http://sape.inf.usi.ch/quick-reference/ggplot2/colour" class="uri">http://sape.inf.usi.ch/quick-reference/ggplot2/colour</a></li>
 </ul>
+<div id="virtual-machine" class="section level3">
+<h3>Virtual Machine</h3>
+<ul>
+<li>Software to have on VM:
+<ul>
+<li>R (RStudio if possible?) with the following packages:
+<ul>
+<li>rggobi</li>
+<li>DescribeDisplay</li>
+<li>shiny</li>
+<li>plotly (requires ggplot2)</li>
+<li>crosstalk: devtools::install_github(“rstudio/crosstalk”)</li>
+<li>iplots (?)</li>
+<li>dplyr</li>
+<li>tidyr</li>
+<li>ggally (requires ggplot2)</li>
+</ul></li>
+<li>ggobi</li>
+<li>Mondrian</li>
+<li>Manet</li>
+</ul></li>
+<li>Installation:
+<ul>
+<li>Download VirtualBox from <a href="https://www.virtualbox.org/" class="uri">https://www.virtualbox.org/</a></li>
+<li>MAC: If stuck on verifying, see: <a href="http://osxdaily.com/2016/07/26/fix-stuck-pkg-verifying-installer-mac-os-x/" class="uri">http://osxdaily.com/2016/07/26/fix-stuck-pkg-verifying-installer-mac-os-x/</a></li>
+<li>Transfer files from USB.</li>
+<li>BEFORE starting a session in VirtualBox change the “Shared Folder” directory to where you saved the USB files.</li>
+<li>Start session in VirtualBox (search for Terminal etc)</li>
+</ul></li>
+<li>Using GIT with VM:
+<ul>
+<li>Setup (do only once) to pull, merge and commit to a subdirectory, see: <a href="https://lakehanne.github.io/git-sparse-checkout" class="uri">https://lakehanne.github.io/git-sparse-checkout</a> (typo in .git/info/sparse-checkout no speech mark at the end)
+<ul>
+<li>This fetches all files in remote repo but does not checkout all of them (ie. clone with a sparse checkout)</li>
+</ul></li>
+<li>START of every work session: Check if you have the ‘current’ version from the remote (git) repo.
+<ul>
+<li>Command: git pull origin master</li>
+<li>gitGUI: Sync button</li>
+</ul></li>
+<li>END of every work session: Commit any changes
+<ul>
+<li>Command: git status (Clean?)</li>
+<li>If not git add ., git commit -m “…”, git push.</li>
+<li>gitGUI: Commit &amp; Sync button</li>
+</ul></li>
+</ul></li>
+<li>ggobi/rggobi
+<ul>
+<li>ggobi control window is on the Terminal option menu (rather than a separate window)</li>
+<li><code>DescribeDisplay</code> ggobi plugin is installed but R package yet to be installed.</li>
+</ul></li>
+</ul>
+</div>
 </div>
 <div id="general-comments" class="section level2">
 <h2>General comments</h2>
 <div id="the-role-of-interactive-visualisation" class="section level3">
 <h3>The role of interactive visualisation</h3>
+<ul>
+<li>Difficult to argue that the use of interactive data visualisation AlONE is sufficient for analysis. BUT graphics should be part of all analyses and INTERACTIVE techniques enable visuals to play an even greater role in revealing insights about data as well as evaluating and understanding results from numerical methods. Interactive visuals are not only useful for communication, but an essential part of any analysis, alongside numerical methods.</li>
+<li>Aim to make interactive graphical techniques easy to access and apply, to more data analysts, but still allow modification and generalisation.
+<ul>
+<li><code>ggobi</code> is rigourous and easy to apply but access to the software is limited (due to installation requirements). Also no room for modification.</li>
+<li><code>R</code> is easy to access, use and allows for modification as well as generalisation.</li>
+<li>Create a template for using tours for data analysis based on the techniques used by Cook and Swayne. Hopefully this allows relative novices to explore the techniques and develop an understanding of how tours can be applied to a range of problems.
+<ul>
+<li>A stepping stone towards developing intuition in applying the interactive techniques.</li>
+<li>To try and reduce the learning curve (and/or investment in time and effort required for set up) that may be discouraging ppl from applying or including interactive graphical visualisation techniques in their data analysis.</li>
+</ul></li>
+</ul></li>
+<li>Lots of recent examples where interactive visualisation leverages the way we communicate findings and/or make data more accessible to others (see Shiny gallery, etc) BUT is it effective as a explorative tool? Does it have the rigor to be applied alongside theoretical analysis techniques? Does <em>interactivity</em> provide extra leverage that a static graphic cannot in EDA? Could this lead to more use of interactive visuals in ‘theoretical’ analysis?</li>
+<li>Would we one day have an interactive plot as part of the output of functions? (eg. Bayesian: Instead of a table of likelihoods and joint probs, have an interactive graphic with tooltip identification)</li>
+<li>When using interactive visualisation for exploration we need the interaction to be ‘fast’ to be useful, so need to be mindful of writing efficient code. (eg. Use of functions like <code>ifelse</code> rather than if and then loops).</li>
+<li>Using ‘modern’ visualisation tools like <code>shiny</code>/<code>crosstalk</code> and <code>plotly</code>, for GDA and analysis has the added advantage of being easy to share and document. Also allows for modification, extending and indvidualising to a particular dataset.
+<ul>
+<li>Software like <code>ggobi</code>(and most likely <code>mondrian</code> etc) are powerful but specialised. The user is confined to the pre-determined and fixed visual template of the environment. A template is helpful for guiding initial GDA but being able to extend and modify the template would leverage it.</li>
+<li>Tours: Being able to ‘rewind’ and review the tour and capture interesting views. See <code>tourr</code> folder.
+<ul>
+<li><code>plotly</code> allows for a static plot to be captured when interacting with the plot (in the “app”).</li>
+</ul></li>
+</ul></li>
+<li>Need to be confident and familiar with the statistical processes represented by the visuals in order to interpret appropriately.</li>
+<li>Transfering visuals (interactiveor not) from one environment to another (eg. <code>ggobi</code> to <code>R</code>) generally results in modifications to the visual, which may lead to significant details being lost. Also the transferred object may require some work to make it compatible with other functions in the new environment.
+<ul>
+<li>Preferable to stay within <code>R</code> environment since there are lots of packages that can be used together.</li>
+</ul></li>
+</ul>
 <div id="advantages-arguments-for" class="section level4">
 <h4>Advantages (arguments for)</h4>
 <ul>
@@ -994,6 +1316,10 @@ observeEvent(input$new, {
 <ul>
 <li>See Efron: ‘resistance to empiricism’ (in the context of bootstrap methods?)</li>
 </ul></li>
+</ul></li>
+<li>Novices may be afraid of making wrong decisions (eg. to sphere or not to sphere? Argument settings) and errorneous visual interpretations.
+<ul>
+<li>Decisions also need to be made when using numerical methods but numeric methods may seem more formulaic or can be ‘taught’ in a more formulaic manner. ie. You can follow a worked example to apply the numerical method and interpretation to a new problem. The yardstick used to make a judgement usually involve values that are fixed or comparisons between quantifiable magnitudes. While graphical analysis may seem more intuitive and subjective, with the approach and interpretation dependent on the specific problem (?). Hence more effort, confidence and experience (?) is required when using visuals in data analysis.</li>
 </ul></li>
 </ul>
 </div>
@@ -1137,15 +1463,98 @@ observeEvent(input$new, {
 <ul>
 <li>Most recent publication (I have found so far) on rggobi</li>
 </ul></li>
-<li>Cook and Swayne book website <a href="http://www.ggobi.org/book/index.html" class="uri">http://www.ggobi.org/book/index.html</a>
+</ul>
+<div id="interactive-and-dynamic-graphics-for-data-analysis-1" class="section level3">
+<h3>Interactive and Dynamic Graphics for Data Analysis <a href="#fn14" class="footnoteRef" id="fnref14"><sup>14</sup></a></h3>
 <ul>
-<li>Code used in book and can get datasets from here</li>
+<li>Website for book: <a href="http://www.ggobi.org/book/index.html" class="uri">http://www.ggobi.org/book/index.html</a>
+<ul>
+<li>Code used in Cook and Swayne book and can get datasets from here</li>
 </ul></li>
 <li>Other courses
 <ul>
 <li>See Dropbox: Using_Interactive_Graphics_to_Teach_Multivariate_D.pdf</li>
 </ul></li>
 </ul>
+</div>
+<div id="carson-sieverts-paper-not-yet-in-print" class="section level3">
+<h3>Carson Sievert’s paper (not yet in print)</h3>
+<ul>
+<li>For code: <a href="https://pedestrians.cpsievert.me/" class="uri">https://pedestrians.cpsievert.me/</a></li>
+<li><p>Highlights visualisation of the model in the data space as a key use of visualisation.</p></li>
+<li>Techniques that he achieved that can be investigated further:
+<ul>
+<li>Brushing of nodes on dendrogram to select all observations under that node.</li>
+<li>Smoothness of tour animation (due to data set size or otherwise?)</li>
+<li>Presentation of variable coefficents for tours (subplot with plot of tour)</li>
+<li>Linked brushing of parallel coordinate plots. What if brush on a shared node? (use linked tour plot instead to highlight)</li>
+<li>Linked brushing of several plots using <code>crosstalk</code>.</li>
+</ul></li>
+<li>Interesting use of tours with time series.
+<ul>
+<li>Components of the timeseries used as the variables in the tour (eg. linearity, seasonal trend,…)</li>
+<li>Similar usage as <code>animate_ts()</code> in <code>tourr</code> package?</li>
+</ul></li>
+<li>Refers to ‘tasks’ of interactive graphic techniques outlied in “Interactive High-Dimensional Data Visualisation” by Cook, Buja and Swayne (1996).
+<ul>
+<li>What is “Gestalt”??</li>
+</ul></li>
+<li><p>Sievert highlights in addtion to using graphical techniques for EDA and model diagnosis and interpretation (as suggested already by Cook and Swayne), they are also useful for “presenting results to a wider audience”. The latter has been the focus of recent developments in interactive web graphics. He identifies the “lack of tools for iteration in a larger statistical computing enviroment” as a key hinderance for using web based tools for exploring data visually.</p></li>
+<li>Multiple views of one panel.
+<ul>
+<li>Requires a lot of explanation for use? Good to scaffold explanation of part of the panel first then layer on the rest.</li>
+<li>Views very tailored to each specific contextual problem? Or are there common themes? ie. Use of data maps, pcp, linked brushing.</li>
+<li>How does this approach compare with the law of small multiples?</li>
+</ul></li>
+<li>Found graphical evidence to support domain knowledge.
+<ul>
+<li>Melbourne pedestrian traffic at NYE</li>
+</ul></li>
+<li>Found graphical evidence to make a claim about what happened in the context.
+<ul>
+<li>Zika virus cases in Columbia being switched from confirmed to suspected.</li>
+</ul></li>
+<li>Sievert also used the <code>tourr</code> package. Some differences in approach:
+<ul>
+<li>He used <code>rescale()</code> to standardise the data values rather than the <code>sphere</code> argument.</li>
+<li>He used <code>new_tour()</code> rather than <code>save_history()</code> hence did not need to interpolate from basis to basis (this is initiated within <code>new_tour()</code>)</li>
+</ul></li>
+</ul>
+</div>
+<div id="modern-applied-statstics-with-s-plus-2" class="section level3">
+<h3>Modern Applied Statstics with S-plus <a href="#fn15" class="footnoteRef" id="fnref15"><sup>15</sup></a></h3>
+</div>
+<div id="visualizing-statistical-models-removing-the-blindfold-3" class="section level3">
+<h3>Visualizing Statistical Models: Removing the Blindfold <a href="#fn16" class="footnoteRef" id="fnref16"><sup>16</sup></a></h3>
+<ul>
+<li>Distinction between visualising models in the data space (m-in-ds) and the data in the model space, which is more common.</li>
+<li>Advocates for more visuals for m-in-ds.</li>
+</ul>
+</div>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Wickham, Cook, Hofmann (2015) Remove blindfold paper<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>Wickham, Cook, Hofmann (2015) Remove blindfold paper<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>Wickham, Cook, Hofmann (2015) Remove blindfold paper<a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>Wickham, Cook, Hofmann, Buja (2011) tourr package paper<a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p>Wickham, Cook, Hofmann (2015) Remove blindfold paper<a href="#fnref5">↩</a></p></li>
+<li id="fn6"><p>Wickham, Cook, Hofmann (2015) Remove blindfold paper<a href="#fnref6">↩</a></p></li>
+<li id="fn7"><p>Venables, Ripley (1999) MASS book<a href="#fnref7">↩</a></p></li>
+<li id="fn8"><p>Venables, Ripley (1999) MASS book<a href="#fnref8">↩</a></p></li>
+<li id="fn9"><p>Cook and Swayne (2007) R and GGobi book<a href="#fnref9">↩</a></p></li>
+<li id="fn10"><p>Venables, Ripley (1999) MASS book<a href="#fnref10">↩</a></p></li>
+<li id="fn11"><p>Venables, Ripley (1999) MASS book<a href="#fnref11">↩</a></p></li>
+<li id="fn12"><p>Cook and Swayne (2007) R and GGobi book<a href="#fnref12">↩</a></p></li>
+<li id="fn13"><p>Wickham, Cook, Hofmann, Buja (2011) tourr package paper<a href="#fnref13">↩</a></p></li>
+<li id="fn14"><p>Cook and Swayne (2007) R and GGobi book<a href="#fnref14">↩</a></p></li>
+<li id="fn15"><p>Venables, Ripley (1999) MASS book<a href="#fnref15">↩</a></p></li>
+<li id="fn16"><p>Wickham, Cook, Hofmann (2015) Remove blindfold paper<a href="#fnref16">↩</a></p></li>
+</ol>
 </div>
 
 

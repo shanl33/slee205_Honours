@@ -20,7 +20,7 @@ col_reorder <- function (df) {
   p <- ncol(df)
   Xnames <- colnames(df)
   Xs <- list()
-  tour_names <- vector(mode="character", length=10)
+  tour_names <- vector(mode="character", length=p*(p-1)/2)
   k <- 1
   for (i in 1:(p-1)) {
     for (j in (i+1):p) {
@@ -184,7 +184,6 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC=TRUE, ...) {
   if (PC) {
     Xdataset <- as.data.frame(apply(predict(prcomp(Xdataset)), 2, scale))
   }
-  
   # All possible combinations of pairs of Xs as first two variables
   reordered <- col_reorder(Xdataset) 
   Xdfs <- reordered[[1]]  
@@ -284,7 +283,8 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC=TRUE, ...) {
   # scatt_list contains all last projections (for each tour, up to 10 tours)
   
   # Subset categorical vars (for linked brushing by groups)
-  Fdataset <- dataset[, which(sapply(dataset, class)=="factor")]
+  Fcols <- which(sapply(dataset, class)=="factor")
+  Fdataset <- as.data.frame(dataset[, Fcols])
   if (factors <= length(Fdataset)) {
     fac_n <- factors
   } else if (length(Fdataset) >= 2) {
@@ -294,8 +294,9 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC=TRUE, ...) {
     fac_n = length(Fdataset)
     warning("'factors' argument exceeds number of factors in data.")
   }
-  Fdataset$ID <- rownames(Fdataset)
-  Fdataset$All <- factor(rep("1", nrow(Fdataset)))
+  colnames(Fdataset) <- attr(Fcols, "names")
+  Fdataset$ID <- rownames(dataset)
+  Fdataset$All <- factor(rep("1", nrow(dataset)))
   
   # SharedData for the factors plot
   sdF <- SharedData$new(Fdataset, key=~ID, group="2Dtour") 
@@ -406,7 +407,3 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC=TRUE, ...) {
   }
   shinyApp(ui, server)
 }
-
-# Testing
-data("crabs")
-guidedTour_app(crabs, index = "holes", factors = 2)
