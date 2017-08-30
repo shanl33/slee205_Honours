@@ -49,6 +49,15 @@ eg. Use print(sd$data(withSelection=TRUE))
 * Aim: Partition student achievement data according to the decile of the school.
 * Cluster analysis: Use a numerical method to model clusters, then use visualisation to interpret and analyse clusters.
     + Heirarchical clustering algorithm using Euclidean distances and average linkage identified 4 clusters and two overlapping clusters. The smaller cluster was relatively low-achieving and consisted of the lower tail of the univariate distributions for each level of achievement. All schools except 1 in this cluster was from decile 6 or below. There is no clear separation between the two clusters in any univariate distribution and the 2D tours looked at so far.
+* Multicollinearity is a big issue! Don't include all the levels, since they are measuring the same thing! (avoid using many clustering variables, because
+the chance of the variables being similar increases. Multi-collinearity = difficult to segment, identify clusters, Corr>0.9 = problems).
+* Whether you use correlation or one of the distance measures depends on whether
+you think the relative magnitude of the variables within an object (which favors
+correlation) matters more than the relative magnitude of each variable across
+objects (which favors distance). However, it is generally recommended that one
+uses correlations when applying clustering procedures that are susceptible to outliers,
+such as complete linkage, average linkage or centroid (see next section).
+
 
 #### To do:
 * Re-analyse with the 6 clusters (using L1, 2, 3 AND UE).

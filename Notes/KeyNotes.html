@@ -123,16 +123,16 @@ $(document).ready(function () {
 <div id="questions" class="section level2">
 <h2>Questions</h2>
 <ul>
-<li>Is it sensible for <code>plotly</code> plots to render faster than <code>ggplot2</code>?
-<ul>
-<li><code>plotly</code> object keeps up better with animation at a faster speed (300 millisecond per animation step)</li>
-</ul></li>
 <li>Apart from using <code>shiny</code>, how else can you be in a “reactive environment” (need this to explicitly retrieve SharedData details) eg. Use print(sd$data(withSelection=TRUE))</li>
-<li>Using <code>plotly</code> alone (without <code>shiny</code>) has the advantage of producing a “standalone html”. Why is this an advantage? Easier to share, no need to host on an external server (?)</li>
 </ul>
 <div id="answered" class="section level3">
 <h3>Answered</h3>
 <ul>
+<li>Is it sensible for <code>plotly</code> plots to render faster than <code>ggplot2</code>? Yes, plotly is lower-level to the javascript library it uses than using <code>ggplot()+ggplotly</code>.
+<ul>
+<li><code>plotly</code> object keeps up better with animation at a faster speed (300 millisecond per animation step)</li>
+</ul></li>
+<li>Using <code>plotly</code> alone (without <code>shiny</code>) has the advantage of producing a “standalone html”. Why is this an advantage? Easier to share, no need to host on an external server, don’t need R running in the backgroun if you don’t want it to.</li>
 <li>Is <code>cranvas</code> worth investigating?
 <ul>
 <li>NO, difficult to install and appears to be not in development anymore.</li>
@@ -147,7 +147,9 @@ $(document).ready(function () {
 <li>Do I have to cite a specific source when making “common statements”? quote from someone or from a study (or via a demonstration)
 <ul>
 <li>eg. Order of vars for a parallel coord point is impt?</li>
-<li>Choice of file type for image (raster vs scalable)</li>
+<li>Choice of file type for image (raster vs scalable) *‘googleVis’ bought Hans Rosling’s stuff.</li>
+<li>R package to connect w it. *<code>ggiraph</code> R package, a bit like plotly but allows more custom control over interactive techniques.</li>
+<li>Adds interactive techniques to ggplot2 plots.</li>
 </ul></li>
 </ul>
 </div>
@@ -155,34 +157,21 @@ $(document).ready(function () {
 <div id="to-dos" class="section level2">
 <h2>To do’s</h2>
 <ul>
+<li>See if projection pursuit values are saved (invisibly) in output from tourr, if so use it to save running time for app. (Profiling shows the index calc in code takes some mem and time, otherwise the time is mostly being chewed up by the stochastic process within tourr fns)</li>
+<li>Return to original intention (an interactive visual to analyse a heirachical clustering algorithm) to show if can modify current app easily and make it a worthwhile, lasting investment?</li>
 <li>Tour function (using <code>tourr</code> package)
 <ul>
-<li>Investigate and visually display the effect of the starting projection matrix on the random tour path, by creating the plot described in the above point, and creating a scatterplot matrix of pairs of PC’s as possible starting matrices. Click on scatterplot pair to select as starting matrix and initiates a few random tour paths with the traces of their paths displayed for comparison.
-<ul>
-<li>An equivalent to <code>pairs()</code> plot in <code>GGally</code> or <code>plotly</code>? Or just have a static pairs plot and checkboxes on the side?</li>
-</ul></li>
 <li>PCP of linear combination of variables for the PC’s used in the tour (Xs on axes, PCs are the obs, coloured by magnitude of PC in projection). The PCP will help to relate the PCs used in tour with the X vars from the context.</li>
 </ul></li>
 <li>Create a dendrogram in ggobi that can be brushed (see Paul’s notes from 20 June). Brushed linking of line segments with parallel plot demonstrated in Cook p.110.</li>
-<li>“Export” the linear combination coordinates from tours using DescribeDisplay.
-<ul>
-<li>Allow for comparison with numerical methods.</li>
-</ul></li>
-<li>Large ds and applications</li>
 <li>Look at other data visualisation courses (see Reading List section)</li>
-<li>Look at documenting interactions when used for exploration
-<ul>
-<li>‘capture’ an useful view or brushed selection</li>
-</ul></li>
 <li>Shiny sliders:
 <ul>
 <li>cycling of combinations of possible vars for scatterplot and mosaic plots (2 to 3 vars only)</li>
 </ul></li>
 <li>Use interactive environments in Shiny to record interactions and send them back to R (and back again?).
 <ul>
-<li>See <em>Interactive environments in Shiny</em> section *‘googleVis’ bought Hans Rosling’s stuff.</li>
-<li>R package to connect w it. *<code>ggiraph</code> R package, a bit like plotly but allows more custom control over interactive techniques.</li>
-<li>Adds interactive techniques to ggplot2 plots.</li>
+<li>See <em>Interactive environments in Shiny</em> section</li>
 </ul></li>
 </ul>
 <div id="ncea-data" class="section level3">
@@ -198,6 +187,8 @@ $(document).ready(function () {
 <ul>
 <li>Heirarchical clustering algorithm using Euclidean distances and average linkage identified 4 clusters and two overlapping clusters. The smaller cluster was relatively low-achieving and consisted of the lower tail of the univariate distributions for each level of achievement. All schools except 1 in this cluster was from decile 6 or below. There is no clear separation between the two clusters in any univariate distribution and the 2D tours looked at so far.</li>
 </ul></li>
+<li>Multicollinearity is a big issue! Don’t include all the levels, since they are measuring the same thing! (avoid using many clustering variables, because the chance of the variables being similar increases. Multi-collinearity = difficult to segment, identify clusters, Corr&gt;0.9 = problems).</li>
+<li>Whether you use correlation or one of the distance measures depends on whether you think the relative magnitude of the variables within an object (which favors correlation) matters more than the relative magnitude of each variable across objects (which favors distance). However, it is generally recommended that one uses correlations when applying clustering procedures that are susceptible to outliers, such as complete linkage, average linkage or centroid (see next section).</li>
 </ul>
 <div id="to-do" class="section level4">
 <h4>To do:</h4>
@@ -238,6 +229,7 @@ $(document).ready(function () {
 </ul></li>
 </ul></li>
 <li>Cluster analysis ‘tends to produce hypotheses rather than testing them’ (p.107). Hence cluster analysis is an exploratory technique, that may lack ‘formal validation’ but it is powerful in data simplification.</li>
+<li>Cluster analysis vs classifying: cluster analysis is unsupervised while classifying assumes an underlying structure of membership to certain groups (?)</li>
 </ul>
 </div>
 <div id="principal-components" class="section level3">

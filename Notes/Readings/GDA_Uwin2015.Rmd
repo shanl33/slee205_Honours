@@ -58,7 +58,7 @@ knitr::opts_chunk$set(echo = TRUE)
     + Shiny interaction to 'cycle' through different orderings of axes. Similarly w diff axes scaling (checkbox input)
     + Order vars on axes by amount of difference between groups (F-statistic) (see p.120)
     + Order of colouring obs important since the last group will be on top. Selected group should always be last to be plotted, so that it is above the rest.
-* Changes in NZ Consumer Price Index over the years using paralle coord plots
+* Changes in NZ Consumer Price Index over the years using paralles coord plots
     + See `Pcps for indices` under `Parallel coord plots`
     + Unwin p.113
 * Mosaic plots for `Berkley` admissions' dataset is a common example

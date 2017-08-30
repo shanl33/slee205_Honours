@@ -75,8 +75,9 @@ plot(achieved[,c(2:6)])
 # Facet wrap
 
 # Defining similarity
-# Euclidean distance between cases
-# Correlation distance between cases: Identifies similarities in structure (smaller correlation distance)
+# Euclidean distance between cases (difference between obs for vars)
+# Correlation distance between cases (difference between vars for an obs)
+# Correlation dist: Identifies similarities in structure (smaller correlation distance)
 
 # Unsupervised cluster analysis: 
 # Explore whether Decile and/or Region explains any structure that is 'naturally' present
@@ -87,6 +88,9 @@ library(MASS)
 # Dissimilarity clusters = AVERAGE of dissimilarities between members
 # Dendrogram using Euclidean distance
 h <- hclust(dist(ach_narm[,2:4]), method = "average")
+a <- hclust(dist(akl[2:4]), method = "average")
+# Remove L1 since highly correlated with L2?
+plot(a)
 plot(h)
 # Two schools are clearly separated from the rest (65 and 339?)
 # A couple of schools also a bit different from the two main clusters (345 & 49?)
