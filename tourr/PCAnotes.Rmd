@@ -1,0 +1,193 @@
+---
+title: "Principal Component Analysis Notes"
+author: "Shan-I Lee"
+date: "9/11/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# For tidying of NCEA data
+library(tidyr) 
+library(dplyr)
+library(GGally)
+library(plotly)
+library(MASS)
+library(tourr)
+
+# NCEA data setup
+nzqa2016 <- read.csv("http://www.nzqa.govt.nz/assets/Studying-in-NZ/Secondary-school-and-NCEA/stats-reports/2016/Qualification-Statistics-School-2016-29032017.csv")
+# Drop vars that will not be used (eg. cumulative achievement)
+nzqa2016 <- nzqa2016[,-c(1,8,10)]
+names(nzqa2016) <- c("Decile", "Region", "School", "Year", "Qualification", "Achieve_participate", "Achieve_roll", "Small_sch")
+levels(nzqa2016$Qualification) <- c("L1", "L2", "L3", "UE")
+# Subset to use only Year 11 with Level 1, etc
+nzqa <- nzqa2016 %>% filter(((Qualification=="L1") & (Year==11)) | 
+                              ((Year==12) & (Qualification=="L2")) |
+                              ((Year==13) & (Qualification=="L3")) | 
+                              ((Year==13) & (Qualification=="UE"))) %>%
+  # Reshape so that each row represents an observation (a school)
+  # Current.Achievement.Rate.Participation kept for analysis only
+  spread(Qualification, Achieve_participate, fill=0) %>%
+  group_by(School) %>%
+  summarise_at(c("L1", "L2", "L3", "UE"), sum) %>%
+  inner_join(nzqa2016[, c(1, 2, 3, 8)]) %>% # Add Decile and Region and Small_sch variables
+  distinct() %>% 
+  filter(!((L1==0)&(L2==0)&(L3==0))) #Remove schools with 0% achievement rate for all levels
+
+# Function to replace 0% with NA
+zeros <- function(col) {
+  replace(col, col==0, NA)
+}
+
+nzqa[2:5] <- sapply(nzqa[2:5], zeros)
+# Remove schools with 'small cohort' warning (obscures pattern in non-small cohorts).
+nzqa <- nzqa[nzqa$Small_sch=="",] # 437 school left
+nzqa <- nzqa[, -8] # Remove Small_sch var
+# Remove schools with any NA values 
+nzqa <- nzqa[complete.cases(nzqa),] # 408 NZ schools
+# Subset Auckland schools only
+akl <- as.data.frame(nzqa[nzqa$Region=="Auckland", -7]) # 91 AKL schools
+rownames(akl) <- akl$School # Need for tooltips in tour
+head(akl[-1], n=3)
+```
+
+#### NCEA data
++ No need to rescale if the vars are on 'comparable units'. 
+Otherwise in general scaling before PCA is recommended: Use scale.=T in prcomp(), or cor=T in princomp().
++ MASS p.303: PC's depend on the scale of the original values hence need to rescale vars to unit variance first. Use of correlation matrix (cor=T) implicitly rescales all vars (since the correlation of a var with itself is 1).
+
+```{r}
+akl.pca <- prcomp(akl[2:5])
+akl.pca2 <- princomp(akl[2:5])
+# Coeffs of linear combos
+akl.pca$rotation
+akl.pca2$loadings
+# Screeplot for variances of each principal component
+plot(akl.pca)
+plot(akl.pca2)
+```
+
+#### Comparing princomp() in MASS and prcomp() in tourr package (more recent)
++ Possible changes in signs of coeffs of linear combos
++ Change in terminology to be more consistent (?): Drop the use of 'loadings' to 'rotation'
++ prcomp() does not supress loadings/coeffs output and variance calculated using (n-1)
++ The coeffs and variances for PCs and the rotated data appear to be the same (apart from changes in sign). 
+
+```{r}
+# Rotated data on the principal components (all below are equiv, apart from changes in sign)
+head(akl.pca$x)
+head(akl.pca2$scores)
+head(predict(akl.pca))
+```
+
+
+#### Comparing pre-scaling in princomp() and prcomp() and Sphere'ing data
++ Rotated data are not exactly the same but very similar for pre-scaled data (ie. akl.pca.scale["x"] and akl.pca.scale2["scores"]). Seems prcomp() uses correlation matrix when argument "scale.=T".
++ Pre-scaling shows better separation in plots (makes sense since it is recommended)
++ If apply "scale()" to PC scores then it is equivalent to sphere'ing the data in preparation for projection pursuit.
++ MASS p.305: PCA used to sphere data in preparation for projection pursuits since "many measures of 'interestingness' look for features in sphered data".
++ Sphered data will be a sphere n-dimensional cloud in multivariate space.
++ Sphered data has unit variance and uncorrelated Xs (ie. covariance matrix is the identity matrix)
+
+```{r}
+# Scale to unit variance before PCA using prcomp()
+akl.pca.scale <- prcomp(akl[2:5], scale.=T)
+akl.pca.scale$rotation 
+plot(akl.pca.scale)
+head(akl.pca.scale$x)
+
+# Scale using correlation matrix for PCA in princomp()
+akl.pca.scale2 <- princomp(akl[2:5], cor=T)
+akl.pca.scale2$loadings # Same as akl.pca.scale
+head(akl.pca.scale2$scores)
+
+# Plots of first two PCs
+plot(akl.pca$x[, 1:2])
+plot(akl.pca.scale$x[, 1:2])
+plot(akl.pca.scale2$scores[, 1:2])
+
+# With sphering (just changes scale, but relative patterns stay consistent)
+spheredPCdata <- scale(akl.pca.scale$x)
+var(scaledPCdata) # Uncorrelated AND unit variance 
+var(akl.pca.scale$x) # Uncorrelated but different variance
+plot(spheredPCdata[, 1:2])
+```
+
+#### PCA on crabs dataset (in comparison to MASS p.305, p.96)
++ "scale()" standardises each col, by centering first (subtract col mean) and then dividing by col std. Hence achieves unit variance (as recommended before applying PCA and projection pursuits)
++ "rescale()" 'standardises' by comparing with min and range to make to cols have range [0, 1], BUT not unit variance. So rescale() is very much 'aesthetic'. This is a tourr fn, NOT a generic function. rescale() may be useful when plotting tours so that the axes range stays the same for each projection.
+
+```{r}
+# rescale() produces no difference for the NCEA data since they are % (already between 0 and 1), but scale() will have an effect
+data("crabs")
+crabs.pca <- prcomp(crabs[5:8], scale.=T)
+pairs(crabs.pca$x) 
+#To do: Link to factors plot and compare to Fig 4.13 on p.96 (used log values and no scaling)
+
+# Rescale is superficial only
+var(rescale(crabs[5:8])) 
+var(scale(crabs[5:8])) # Unit variance
+var(crabs[5:8])
+
+# Same as prcomp(crabs[5:8], scale.=T)
+crabs.pca.scale <- prcomp(scale(crabs[5:8]))
+head(crabs.pca$x)
+head(crabs.pca.scale$x)
+```
+
+#### Conclusions
+1. Unit variance is required twice, using scale(): 
++ Before applying PCA (if using PCs).
++ Before projection pursuit (if using PCs may need to scale again since PCs do not have unit variance, only uncorrelated).
+    - Projection pursuit indices look for 'interesting' features of SPHERED data (Mass, p305)
+2. rescale() Xs to range [0, 1] is useful for plotting convenience (keeping axes settings constant) but not really applied for analytical reasons.
+3. What does a tour and interactive techniques, add to the analysis using the static plot on p.96 Mass?
++ Brushing two-ways, not just factor plot to PCA but vice versa too (identify an interesting feature in PCA plot and link to factors)
++ Tours = 'genuinely multivariate method(s)' (p.302 MASS)
+
+### Compare different scalings for biplots
+See: <https://stats.stackexchange.com/questions/141085/positioning-the-arrows-on-a-pca-biplot/141531#141531>
+
++ The 'pairings' of 'Projected PCs' (scores) and axes (loadings) follow the 1 to 3 order described in the link above.
+
++ Second pair is the 'PCA biplot' described by Gabriel (1971). This has been plotted. The cosines of the angles between the axes reflects the correlation between the original variables. (The lenght of the axes reflects the standard deviation of the original vars but since we have standardised to unit variance before PCA, all the axes will be the same length).
+
++ The plot produced is similar to that of Cook & Swayne (p.35) in shape, patterns, relationships and hence conclusions. The range for PCs are different, not sure which pairing used to get that scale on axes.
+Also: <https://stats.stackexchange.com/questions/104306/what-is-the-difference-between-loadings-and-correlation-loadings-in-pca-and>
+
+```{r}
+data("crabs")
+crabs.pca <- prcomp(crabs[4:8], scale.=T)
+# Biplots from 'scratch'
+# Projected PCs (in order of 1 to 3 from first stackexchange link)
+scaledPC <- standardisedPC/sqrt(nrow(crabs)-1)
+standardisedPC <- as.data.frame(t(t(crabs.pca$x[, 1:2])*(crabs.pca$sdev[1:2]^-1)))
+rawPC <- data.frame(crabs.pca$x[, 1:2])
+
+# Only second has unit variance
+var(standardisedPC) 
+
+lambda <- crabs.pca$sdev[1:2]/sqrt(nrow(crabs)-1)
+# Axes (again in order of 1 to 3)
+VS.loadings <- data.frame(varnames = rownames(crabs.pca$rotation), 
+                          t(t(crabs.pca$rotation[, 1:2])*crabs.pca$sdev[1:2]))
+actual.loadings <- data.frame(varnames = rownames(crabs.pca$rotation), 
+                              t(t(crabs.pca$rotation[, 1:2])*lambda*10))
+# 10 is used as an arbitary scale factor so that the axes can be on a comparable scale as the standardisedPCs (this is common practice, see link).
+# nudge_x argument adjusted according to scale of plot.
+eigen.loadings <- data.frame(varnames = rownames(crabs.pca$rotation),
+                             crabs.pca$rotation[, 1:2])
+
+ggplot(actual.loadings) + 
+  geom_point(data=standardisedPC, aes(x=PC1, y=PC2)) + 
+  geom_segment(aes(x=0, y=0, xend=PC1, yend=PC2),
+               colour="red") +
+  geom_text(aes(x=PC1, y=PC2, label=varnames), 
+            colour="red", nudge_x=0.1) +
+  theme(
+    panel.border = element_rect(colour="grey", fill=NA),
+    panel.background = element_blank(),
+    legend.position = "none")
+```
+

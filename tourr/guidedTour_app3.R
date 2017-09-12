@@ -180,9 +180,9 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC=TRUE, ...) {
   # Subset real-valued vars (type="double") for touring
   realXs <- dataset[, which(sapply(dataset, typeof)=="double")]
   rownames(realXs) <- rownames(dataset)
-  Xdataset <- as.data.frame(rescale(realXs))
+  Xdataset <- as.data.frame(scale(realXs)) # No need if using grand_tour
   if (PC) {
-    Xdataset <- as.data.frame(apply(predict(prcomp(Xdataset)), 2, scale))
+    Xdataset <- as.data.frame(apply(predict(prcomp(realXs, scale.=T)), 2, scale))
   }
   # All possible combinations of pairs of Xs as first two variables
   reordered <- col_reorder(Xdataset) 
@@ -190,7 +190,7 @@ guidedTour_app <- function(dataset, index="cmass", factors=2, PC=TRUE, ...) {
   tour_names <- reordered[[2]] 
   # Names for each tour using the initial pair's names (eg."PC1&PC2"). 
   
-  # Save tour (rescale=F since already scaled to col to range [0,1])
+  # Save tour (rescale=F since Xdfs already rescaled to range [0, 1])
   if (index=="cmass") {
     t <- lapply(Xdfs, function (x) save_history(x, guided_tour(cmass, d=2, max.tries = 50), rescale=FALSE, max=50, ...))
   } else if (index=="holes") {

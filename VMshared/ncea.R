@@ -109,6 +109,8 @@ ggparcoord(data = achieved, columns = 6:2, scale = "uniminmax", groupColumn = "R
 # Align at median, scaled at each individual max and min 
 ggparcoord(data = achieved, columns = 6:2, scale = "center", groupColumn = "Region",
            scaleSummary = "median")
+ggparcoord(data = nzqa, columns = 2:5, scale = "uniminmax", groupColumn = "Decile")
+
 # To do:
 # Slider for Decile rather than plotly click
 #'Heatmap matrix' of Euclidean distance as well as Correlation distance to select parallel plot with

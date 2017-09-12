@@ -13,6 +13,8 @@ library(tidyr)
 library(dplyr)
 library(GGally)
 library(plotly)
+library(MASS)
+library(tourr)
 #library(gridExtra)
 ```
 
@@ -59,7 +61,7 @@ zeros <- function(col) {
 
 nzqa[2:5] <- sapply(nzqa[2:5], zeros)
 # Remove schools with 'small cohort' warning (obscures pattern in non-small cohorts).
-nzqa <- nzqa[nzqa$Small_sch=="",] # 437 school left
+nzqa <- nzqa[nzqa$Small_sch=="",] # 439 school left
 nzqa <- nzqa[, -8] # Remove Small_sch var
 # Remove schools with any NA values 
 nzqa <- nzqa[complete.cases(nzqa),] # 408 NZ schools
@@ -93,14 +95,14 @@ pairs(akl[-1], lower.panel=panel.cor)
 ##### Figure 2: Univariate distributions for NCEA data on Auckland schools
 
 ```{r, echo=FALSE}
-NCEAhist <- function(x, title) {hist(x, xlab="Achievement rate", main=title)}
+NCEA_hist <- function(x, title) {hist(x, xlab="Achievement rate", main=title)}
 layout(matrix(1:4, byrow=1, ncol=2))
-NCEAplots <- mapply(NCEAhist, akl[2:5], colnames(akl[2:5]))
+NCEA.hists <- mapply(NCEA_hist, akl[2:5], colnames(akl[2:5]))
 ```
 
 #### Multivariate visual representations
 
-The pairs plot in Figure 2 provided a glimpse into the multivariate distribution of achievement rates across the four qualification levels. The parallel coordinates plot (PCP) shown below in Figure 3 allows us to further compare the multivariate distribtuions of achievement rates for different decile groups, as well as identify high dimensional clustering and outliers.
+The pairs plot in Figure 2 provided a glimpse into the multivariate distribution of achievement rates across the four qualification levels. The parallel coordinates plot (PCP) shown below in Figure 3 allows us to further compare the multivariate distributions of achievement rates for different decile groups, as well as identify high dimensional clustering and outliers.
 
 The ordering of axes in a PCP greatly affects the quality of the graphical analysis (Unwin, 2015). In the case of the NCEA data, the natural ordering of the four qualification levels by difficulty, conincides with the recommendation from Cook and Swayne (2007) to order the axes based correlation. In addition, Unwin (2015) highlights the layering of colours also needs to be considered carefully, since the last group assigned a colour will dominate the other lines.
 
@@ -127,25 +129,113 @@ ggpcp(nzqa) + ggtitle("Achievement of NZ schools in 2016")
 
 ##### Figure 5: Parallel coordinates plot with alpha blending
 ```{r, echo=FALSE}
-nz_plot <- ggpcp(nzqa, a=0.5) + ggtitle("Achievement of NZ schools in 2016")
-nz_plot
+nz.pcp <- ggpcp(nzqa, a=0.5) + ggtitle("Achievement of NZ schools in 2016")
+nz.pcp
 ```
 
 #### Leveraging static plots with interactivity
 
-Unwin (2015) advocates for the use of colour and interactive ordering of axes, in order to maximise the effectiveness of parallel coordinates plots. Figure 6 demonstrates how adding interactive filtering helps to further reduce the problems with overplotting and allows direct comparison between selected decile groups.
+Unwin (2015) advocates for the use of colour and interactive ordering of axes, in order to maximise the effectiveness of parallel coordinates plots. Similarly MASS (???) also suggests that without interactivity, such as identification and linked brushing, parallel plots are largely difficult to use. Figure 6 demonstrates how adding interactive filtering helps to further reduce the problems with overplotting and allows direct comparison between selected decile groups.
 
 One of the strengths of parallel coordinates plots is in identifying multivariate features, such as outliers (Cook and Swayne, 2007). Figure 3 suggests a school's performance can be unusual in two ways, either it performs inconsistently to the bivariate correlations between the qualification levels (this was previously noted as typical of "lower" decile schools), or its achievement rates across the levels are unusual compared to the rest of its decile group. The latter becomes difficult to see for the New Zealand dataset, in the static plots (Figures 4 and 5), even with alpha blending applied. The filtering feature of Figure 6 overcomes the problems caused by overplotting by allowing the user to isolate the distribution of each decile group (via a double-click on the legend). Furthermore the interactive tooltip feature enables the possible outliers to be identified by school name, or observation number, as shown in Figure 6. 
 
 ##### Figure 6: Parallel coordinates plot with interactivity
 
 ```{r, echo=FALSE}
-ggplotly(nz_plot, tooltip=c("label1", "x", "y", "label"))
+ggplotly(nz.pcp, tooltip=c("label1", "x", "y", "label"))
 ```
 
-#### Multivariate visual representations with interactivity
+The parallel coordinates plot in Figure 3 suggests that patterns of performance across decile groups, if they exist, are difficult to distinguish at the multivariate level for Auckland schools. 
+Principal component analysis provides an...
 
-The parallel coordinates plot in Figure 3 suggests that patterns of performance across decile groups, if they exist, are difficult to distinguish at the multivariate level for Auckland schools. Tours provide another visual perspective that is not restricted to orthogonal projections of the multivariate space. Wickham et al. (2015) highlight interactive visuals, such as tours, are more effective for exploring high-dimensional object than static plots. In addition, Cook and Swayne (2007) emphasise the important role of interactive graphics in interpreting, assessing and refining models obtained from numerical methods. Visuals in general allow us to "get under the hood" of black-box numerical methods to gain a better understanding of the process and the solutions produced (Wickham et al. 2015). A guided tour embodies the fusion of a numerical method, projection pursuit, in a dynamic visualisation. 
+
+##### Figure 7: Plot of first two principal components for Auckland schools
+```{r, echo=FALSE}
+# Static PCA plot
+# Function for PCA and plot
+# scale.factor is an arbitary value that scales the loadings axes so that they can be on a comparable scale as the standardised PCs (scores). 
+# nudge argument also depends on the range of PC1 (used for enhancing the legibility of text labels on loadings axes).
+ncea_PCA <- function(df, scale.factor=20, nudge=-0.2) {
+  # Perform PCA
+  pca <- prcomp(df[2:5], scale.=T)
+  # Explained variance
+  exp.var <- round(pca$sdev^2/sum(pca$sdev^2)*100, 1)
+  # Scores (rotated principal components)
+  scores <- data.frame(df[1], t(t(pca$x[, 1:2])*(pca$sdev[1:2]^-1)))
+  scores$Decile <- as.factor(df$Decile)
+  #scores$Decile <- as.factor(as.character(df$Decile))
+  #scores$Decile <- factor(scores$Decile, levels(scores$Decile)[c(1, 2, 4:11, 3)])
+  axis.limit <- c(-round(max(abs(scores[2:3])), 1), round(max(abs(scores[2:3])), 1))
+  # Variable axes (loadings)
+  lambda <- pca$sdev[1:2]/sqrt(nrow(df)-1)
+  loadings <- data.frame(varnames = rownames(pca$rotation), 
+                              t(t(pca$rotation[, 1:2])*lambda*scale.factor))
+  # Plot of first to PCs
+  p <- ggplot(loadings) + 
+    geom_text(data=scores, aes(x=PC1, y=PC2, label=Decile, 
+                                     colour=Decile, label1=School)) + 
+    geom_segment(aes(x=0, y=0, xend=PC1, yend=PC2), colour="grey35") +
+    geom_text(aes(x=PC1, y=PC2, label=varnames), colour="grey35", nudge_x=nudge) +
+    #coord_fixed() +
+    labs(x=paste("PC1 (", exp.var[1], "% explained var.)", sep=""),
+         y=paste("PC2 (", exp.var[2], "% explained var.)", sep="")) +
+    scale_x_continuous(limits=axis.limit) +
+    scale_y_continuous(limits=axis.limit) +
+    theme(
+      panel.border = element_rect(colour="grey", fill=NA),
+      panel.background = element_blank(),
+      legend.position = "none")
+  return(p)
+}
+# Static plot
+akl.PCA <- ncea_PCA(akl) + ggtitle("Achievement of Auckland schools in 2016")
+akl.PCA
+```
+
+The static plot in Figure 7 highlights the usefulness of being able to directly identify unusual observations. Which schools are the two unusual decile 9 and 10 schools? The interactive tooltips in Figure 8.
+
+##### Figure 8: Plot of first two principal components with interactivity
+```{r, echo=FALSE}
+ggplotly(akl.PCA, tooltip=c("label1"))
+# Linked brushing of PCA and decile plot
+# Will need to add akl to sharedData first.
+# Brush decile 6 to 8 schools and then brush the small group in the "biplot"
+sdAkl <- SharedData$new(akl, key=~School, group="aklPCA")
+# SharedData for the factors plot
+Fdataset <- data.frame(School=akl$School, Decile=as.factor(akl$Decile))
+sdF <- SharedData$new(Fdataset, key=~School, group="aklPCA") 
+
+decile <- ggplot(sdF, aes_string(x=names(Fdataset)[1])) +
+        geom_jitter(aes(y=Fdataset$All, label=ID), 
+                    width=0, height=0.25) +
+        labs(title="The first factor is displayed") 
+
+ggplotly(decile, tooltip=c("x", "y", "label", "label1", "label2"), height=400, width=600) %>%
+        layout(dragmode="select") %>%
+        hide_legend() %>%
+        highlight(on="plotly_select", off="plotly_deselect", color="blue", 
+                  persistent=T)
+
+```
+
+### AKL figure
+```{r}
+ggplotly(akl.PCA, tooltip=c("label1"))
+```
+
+Show how biplot above is related to initial orthogonal projection of tour (see Cook)
+Rationale for launching tours from these initial bases:
+"The first k principal components span a subspace containing the 'best' k-dimensional view of the data" (p.303 Mass)
+
+```{r}
+# NZ schools
+nz.PCA <- ncea_PCA(nzqa, scale.factor = 50) + ggtitle("Achievement of NZ schools in 2016")
+nz.PCA
+```
+
+
+#### Dynamic and interactive multivariate visual representations
+Tours provide another visual perspective that is not restricted to orthogonal projections of the multivariate space. Wickham et al. (2015) highlight interactive visuals, such as tours, are more effective for exploring high-dimensional object than static plots. In addition, Cook and Swayne (2007) emphasise the important role of interactive graphics in interpreting, assessing and refining models obtained from numerical methods. Visuals in general allow us to "get under the hood" of black-box numerical methods to gain a better understanding of the process and the solutions produced (Wickham et al. 2015). A guided tour embodies the fusion of a numerical method, projection pursuit, in a dynamic visualisation. 
 
 Cook and Swayne (2007) used the `crabs` dataset to demonstrate how tours can be used effectively to perform cluster analysis when the clusters are clearly separated. The dataset consists of five physical measurements for 50 Australian female and male crabs of two colour forms, blue, `B`, and orange, `O`. This dataset and interactive techniques demonstrated by Cook and Swayne (2007) using `ggobi` helped to develop the guided tour shown in the final exemplar. Based on the analysis so far, the Auckland schools dataset is unlikely to contain distinct clusters, but the dynamic nature of tours may help shed more light on its complex multivariate distribution. Hence the dynamic and interactive environment of `ggobi` was explored to gain ideas for the exemplar. 
 
@@ -196,425 +286,3 @@ Lastly a mixture of "tried and true" datasets with novel "real" data provides a 
 #### Conclusion
 
 The development of an exemplar for applying interactive techniques to data analysis identified how the use of different datasets can provide motivation and guidance. Furthermore the experience provided an opportunity to explore and hence more thoroughly understand, abstract and complex theory previously encountered in literature. The availability of open-source software that is relatively easy to learn, supports the teaching of interactive visualisation techniques. Furthermore the advantages of encoporating graphics in data analysis can be leveraged with the application of interactive techniques to conventional static plots.
-
-##### Code for exemplar
-
-```{r, eval=FALSE}
-library(ggplot2)
-library(plotly)
-library(tourr)
-library(crosstalk) # For (crosstalk+plotly) function
-library(shiny)
-library(htmltools)
-library(MASS) # For crabs dataset
-library(tidyr) # For PCs reshaping output for plot
-library(GGally) # For ggpairs plot of PCs
-
-# No plot for coefficients of principal components
-# Click on index plot to select intial basis.
-# 'factors=n' argument specifies number of factors to include in the plot for brushing groups
-# The first 'n' factors will be used.
-
-# Function for reordering first two cols (df can be sphere'd or not)
-# All possible combinations of Xs as first two variables
-# Output is a list with p(p-1)/2 components that are (n by p) data frames (ready for touring)
-col_reorder <- function (df) {
-  p <- ncol(df)
-  Xnames <- colnames(df)
-  Xs <- list()
-  tour_names <- vector(mode="character", length=p*(p-1)/2)
-  k <- 1
-  for (i in 1:(p-1)) {
-    for (j in (i+1):p) {
-      Xs[[k]] <- df[c(i,j,(1:p)[-c(i,j)])]
-      tour_names[k] <- paste(Xnames[i], Xnames[j], sep="&")
-      k <- k + 1
-    }
-  }
-  reordered <- list(Xs, tour_names)
-  return(reordered)
-}
-
-# Central mass index and projected data, XA
-# 'base' is a projection matrices from the 3rd slice of array components in the list tinterp
-# 'Xdf' is the scaled X matrix
-cmass_tour <- function(base, Xdf) {
-  X_matrix <- as.matrix(Xdf)
-  XA <- X_matrix%*%matrix(base, ncol=2) # (n by d)
-  cmass_index <- (sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1]-exp(-dim(XA)[2]/2))/(1-exp(-dim(XA)[2]/2))
-  list(rescale(XA), cmass_index)
-}
-
-# Holes index and projected data, XA
-holes_tour <- function(base, Xdf) {
-  X_matrix <- as.matrix(Xdf)
-  XA <- X_matrix%*%matrix(base, ncol=2) # (n by d)
-  holes_index <- (1-sum(exp(-0.5*diag(XA%*%t(XA))))/dim(XA)[1])/(1-exp(-dim(XA)[2]/2))
-  list(rescale(XA), holes_index)
-}
-
-# 't_tour' fn produces a list of p(p-1)/2 lists with varying lengths (depend on the length of each tour)
-# p(p-1)/2 is the number of combos for starting projections
-# 't_tour' collect together data on the projection pursuit index,
-# x and y co-ords for the tour projections and tour axes.
-# The bases are components in the list `tinterp`
-t_tour <- function(i, bases, Xdfs, index) {
-  if (index=="cmass") {
-    lapply(bases[[i]], cmass_tour, Xdfs[[i]])
-  } else if (index=="holes") {
-    lapply(bases[[i]], holes_tour, Xdfs[[i]])
-  }
-}
-
-# Function to collect variable required for the 'indexPlot'
-# ie. initial orthogonal projection used (init_pair), iteration step and pursuit index 
-# Sub-function: Unlists the proj pursuit index for each tour (stored within t_tour)
-pp_index <- function(j, a_tour) {unlist(a_tour[[j]][2])}
-# Apply pursuit_info to the first component of:
-# base = tinterp[[i]], t_name = tour_names[i], a_tour = t_tour[[i]]
-pursuit_info <- function(base, t_name, a_tour) {
-  # steps is the number of iterations for that tour
-  steps <- length(base)
-  init_pair <- rep(t_name, steps)
-  iteration <- 1:steps
-  pursuit_index <- do.call(c, lapply(1:steps, pp_index, a_tour))
-  pp_info <- list(data.frame(init_pair, iteration, pursuit_index))
-  return(pp_info)
-}
-
-# Extracts xy coords for "tour" projection plots of a single tour (ie. proj coords of a tour)
-XYsingle <- function (single_tour) {
-  n <- length(single_tour)
-  x <- c()
-  y <- c()
-  for(i in 1:n) {
-    x <- c(x, unlist(single_tour[[i]][[1]][,1]))
-    y <- c(y, unlist(single_tour[[i]][[1]][,2]))
-  }
-  XY <- data.frame(x=x, y=y, iteration = rep(1:n, each=length(x)/n))
-  # need to add ID=rep(rownames(dataset), n) if using sdT
-}
-
-# Extracts xy coords for "axes" plots of a single tour 
-AXsingle <- function (single_tinterp) {
-  n <- length(single_tinterp)
-  p <- dim(single_tinterp)[1] #number of real valued Xs
-  AX_x <- c()
-  AX_y <- c()
-  for(i in 1:n) {
-    # Take first 'p' values to be x-coords for axes
-    AX_x <- c(AX_x, unlist(single_tinterp[[i]][1:p])) 
-    # Take remaining 'p' values to be y-coords for axes
-    AX_y <- c(AX_y, unlist(single_tinterp[[i]][(p+1):(p+p)])) 
-  }
-  AX <- data.frame(x = AX_x, y = AX_y, iteration = rep(1:n, each = p),
-                   measure=rep(colnames(attr(single_tinterp, "data")), n))
-}
-
-# Functions for extracting last projection of a (single) tour (for scattermatrix)
-# Extract the last projection for a tour
-last_XY <- function(XY) {
-  m <- max(XY$iteration)
-  XY[which(XY$iteration==m), -3]
-}
-
-# Extract the last axes plot coords for a tour
-last_AX <- function(AX) {
-  m <- max(AX$iteration)
-  AX[which(AX$iteration==m), -3]
-}
-
-# Draws "tour" (proj) plot 
-tour_plot <- function(df) {
-  tx <- list(
-    title="", range = c(-0.1, 1.2), 
-    zeroline=F, showticklabels=F, showgrid=F
-  )
-  #All tour plots linked by brushing
-  df %>% SharedData$new(key=~ID, group = "2Dtour") %>% 
-    plot_ly(x=~x, y=~y, frame=~iteration, color=I("black")) %>%
-    add_markers(text=~ID, hoverinfo="text") %>%
-    layout(xaxis=tx, yaxis=tx, 
-           margin=list(l=0, r=0, b=0, t=0, pad=0))
-}
-
-# Draws tour "axes" plot
-# k is the tour number from the "plotly_click"
-tour_axes <- function(df, tour_cols, k) {
-  ax <- list(
-    title="", range=c(-1.1, 1.2), 
-    zeroline=F, showticklabels=F, showgrid=F
-  )
-  plot_ly(df, x=~x, y=~y, frame=~iteration, hoverinfo="none") %>%
-    add_segments(xend = 0, yend = 0, color = I(tour_cols[k]), size = I(1)) %>%
-    add_text(text = ~measure, color=I("black")) %>%
-    layout(xaxis = ax,
-           yaxis = list(title="", range=c(-2.1, 2.2), 
-                        zeroline=F, showticklabels=F, showgrid=F), 
-           margin=list(l=0, r=0, b=0, t=0, pad=0))
-}
-
-# Draws LAST "tour" (proj) plot for scattermatrix
-last_plot <- function(proj_list) {
-  names(proj_list) <- c("x", "y", "col")
-  df <- data.frame(x=proj_list$x, y=proj_list$y)
-  ggplot(df, aes(x=x, y=y)) +
-    geom_point(col=proj_list$col) +
-    scale_x_continuous(limits = c(-0.1, 1.1)) +
-    scale_y_continuous(limits = c(-0.1, 1.1)) +
-    theme_void() +
-    theme(legend.position = "none")
-}
-
-# Draws LAST tour proj's axes for scattermatrix
-last_axis_plot <- function(axis_list) {
-  names(axis_list) <- c("x", "y", "m", "col")
-  df <- data.frame(x=axis_list$x, y=axis_list$y, measure=axis_list$m)
-  ggplot(df, aes(x=x, y=y)) +
-    geom_segment(aes(xend=0, yend=0), colour=axis_list$col) +
-    geom_text(aes(label=measure)) +
-    scale_x_continuous(limits = c(-1.1, 1.1)) +
-    scale_y_continuous(limits = c(-1.1, 1.1)) +
-    theme_void()
-}
-
-guidedTour_app <- function(dataset, index="cmass", factors=2, PC=TRUE, ...) {
-  # Subset real-valued vars (type="double") for touring
-  realXs <- dataset[, which(sapply(dataset, typeof)=="double")]
-  rownames(realXs) <- rownames(dataset)
-  Xdataset <- as.data.frame(rescale(realXs))
-  if (PC) {
-    Xdataset <- as.data.frame(apply(predict(prcomp(Xdataset)), 2, scale))
-  }
-  # All possible combinations of pairs of Xs as first two variables
-  reordered <- col_reorder(Xdataset) 
-  Xdfs <- reordered[[1]]  
-  tour_names <- reordered[[2]] 
-  # Names for each tour using the initial pair's names (eg."PC1&PC2"). 
-  
-  # Save tour (rescale=F since already scaled to col to range [0,1])
-  if (index=="cmass") {
-    t <- lapply(Xdfs, function (x) save_history(x, guided_tour(cmass, d=2, max.tries = 50), rescale=FALSE, max=50, ...))
-  } else if (index=="holes") {
-    t <- lapply(Xdfs, function (x) save_history(x, guided_tour(holes, d=2, max.tries = 50), rescale=FALSE, max=50, ...))
-  } else {
-    stop("Invalid 'index' argument. Choose either: cmass or holes")
-  }
-  
-  # 'Inserting' initial base as orthogonal projection of first two measures
-  p <- ncol(Xdataset) # Number of real-valued Xs 
-  t0 <- matrix(c(1, rep(0, p), 1, rep(0, (p-2))), ncol = 2)
-  class(t0) <- "history_array"
-  t1 <- lapply(t, function (x) array(c(t0, x), dim = dim(x) + c(0,0,1)))
-  # Assign class and data attributes to new basis 
-  for (i in 1:length(t1)) {
-    class(t1[[i]]) <- "history_array"
-    attr(t1[[i]], "data") <- Xdfs[[i]]
-  }
-  tinterp <- lapply(t1, interpolate)
-  # t, t1, tinterp, t_tour, Xdfs are all lists with p(p-1)/2 components 
-  # The components contain info for the tour resulting from each starting position
-  
-  # t_tour contains data for the 'tour' plot and its subplots 'axes' and 'tour'. 
-  # t_tour contains data for the pursuit_index: for 'indexPlot'
-  t_tour <- lapply(1:length(tinterp), t_tour, tinterp, Xdfs, index)
-  
-  # pp_info contains data for the 'indexPlot'
-  pp_info <- do.call(rbind.data.frame, 
-                     mapply(FUN=pursuit_info, 
-                            base=tinterp, t_name=tour_names, a_tour=t_tour))
-  
-  # "tour" proj plot xy coords for ALL tours
-  XYall <- lapply(t_tour, XYsingle) 
-  # Last tour projection for each tour.
-  last_projs <- lapply(XYall, last_XY) # No need for ID since not in SharedData
-  
-  # Add "ID" variable, rownames of original dataset
-  XYall <- lapply(XYall, function (x) {
-    ID <- rownames(dataset)
-    cbind(x, ID)
-  })
-  
-  # "axes" plot coords for ALL tours
-  AXall <- lapply(tinterp, AXsingle)
-  
-  # Pull out last tour axes plot for each tour.
-  last_axes <- lapply(AXall, last_AX)
-  
-  # Colour scale used in the index ggplot2 plot
-  tour_cols <- hcl(h=seq(15, 360, 360/(p*(p-1)/2)), c=100, l=65)
-  # Colour each last tour projection to match index plot cols
-  if (p>5) {
-    index_cols <- tour_cols[1:10] # Maximum of 10 pairwise combos
-  } else {
-    index_cols <- tour_cols 
-  }
-  
-  # x, y, and col for each last proj is in a list
-  last_projs <- mapply(c, last_projs, as.list(index_cols), SIMPLIFY = FALSE)
-  last_axes <- mapply(c, last_axes, as.list(index_cols), SIMPLIFY = FALSE)
-  
-  P <- ifelse(p > 5, 5, p) # Maximum of 10 pairwise combos
-  # Reorder plots for last_axes so that the scattermatrix will be diagonally symmetrical
-  if (P==4) {
-    last_axes <- list(last_axes[[1]], last_axes[[2]], last_axes[[4]],
-                      last_axes[[3]], last_axes[[5]], last_axes[[6]])
-  } else if (P==5) {
-    last_axes <- list(last_axes[[1]], last_axes[[2]], last_axes[[5]],
-                      last_axes[[3]], last_axes[[6]], last_axes[[8]],
-                      last_axes[[4]], last_axes[[7]], last_axes[[9]],
-                      last_axes[[10]])
-  }
-  
-  # Scattermatrix plot data (max of 10 pairwise combos)
-  # Lower diagonal is final proj and upper diagonal its axes components
-  # List of P^2 (max 5) plots to plot using ggmatrix. 
-  # Plots on diagonals (i,i) are empty
-  diag_labels <- colnames(Xdfs[[1]])
-  scatt_list <- list(ggally_text(diag_labels[1])) 
-  tplot_list <- lapply(last_projs, last_plot)
-  aplot_list <- lapply(last_axes, last_axis_plot)
-  for (i in 1:(P-1)) {
-    scatt_list <- c(scatt_list, tplot_list[1:(P-i)],
-                    aplot_list[1:i], list(ggally_text(diag_labels[i+1]))) 
-    # (P-i) is the number of tour plots and i the # of axes plots for iteration i
-    # Delete merged plots
-    tplot_list <- tplot_list[-c(1:(P-i))]
-    aplot_list <- aplot_list[-c(1:i)]
-  }
-  # scatt_list contains all last projections (for each tour, up to 10 tours)
-  
-  # Subset categorical vars (for linked brushing by groups)
-  Fcols <- which(sapply(dataset, class)=="factor")
-  Fdataset <- as.data.frame(dataset[, Fcols])
-  if (factors <= length(Fdataset)) {
-    fac_n <- factors
-  } else if (length(Fdataset) >= 2) {
-    fac_n = 2 # Use default if 'factors' arg not sensible
-    warning("'factors' argument exceeds number of factors in data.")
-  } else {
-    fac_n = length(Fdataset)
-    warning("'factors' argument exceeds number of factors in data.")
-  }
-  colnames(Fdataset) <- attr(Fcols, "names")
-  Fdataset$ID <- rownames(dataset)
-  Fdataset$All <- factor(rep("1", nrow(dataset)))
-  
-  # SharedData for the factors plot
-  sdF <- SharedData$new(Fdataset, key=~ID, group="2Dtour") 
-  
-  ## Shiny app
-  ui <- fluidPage(
-    splitLayout(cellWidths = c("25%", "40%", "35%"),
-      plotlyOutput("indexPlot"),
-      plotlyOutput("tour"),
-      plotlyOutput("pairs")
-    ),
-    splitLayout(cellWidths = c("40%", "60%"),
-    plotOutput("scatter"),
-    plotlyOutput("factors")
-    )
-  )
-  server <- function(input, output, session) {
-  # Proj pursuit index plot 
-  output$indexPlot <- renderPlotly({
-    ggplot(pp_info, aes(x=iteration, y=pursuit_index, group=init_pair, col=init_pair)) +
-      geom_point() +
-      geom_line() +
-      labs(title="Pursuit index", subtitle="Click to select tour") +
-      #ggtitle("Pursuit index (click to select tour)") +
-      theme(legend.position="none") # Selecting by legend hard to reset.
-      ggplotly(source="index_plot", tooltip = c("x", "y", "group")) %>%
-        layout(autosize = F, width=350, height=400)
-  })
-  
-  output$tour <- renderPlotly({
-    s <- event_data("plotly_click", source = "index_plot")
-    if (length(s)) {k <- s$curveNumber + 1} else {k <- 1}
-    proj <- XYall[[k]]
-    basis <- AXall[[k]]
-    # tour plot
-    tour <- tour_plot(proj)
-    axes <- tour_axes(basis, tour_cols, k)
-    subplot(tour, axes, titleY=F, widths=c(0.7, 0.3), margin=0) %>%
-      animation_opts(33) %>% #33 milliseconds between frames
-      hide_legend() %>%
-      layout(dragmode="select",
-             margin=list(l=0, r=0, b=0, t=0, pad=0)) %>%
-      highlight(on="plotly_select", off="plotly_deselect", color="blue", 
-                persistent=T, dynamic=T)
-  })
-  
-  output$factors <- renderPlotly({
-    # facet_grid allows up to 4 factors to be crossed into groups
-    if (fac_n==1) {
-      gp <- ggplot(sdF, aes_string(x=names(Fdataset)[1])) +
-        geom_jitter(aes(y=Fdataset$All, label=ID), 
-                    width=0, height=0.25) +
-        labs(title="The first factor is displayed") 
-    } else if (fac_n==2) {
-      gp <- ggplot(sdF, aes_string(x=names(Fdataset)[1], y=names(Fdataset)[2])) +
-        geom_jitter(aes(label=ID), 
-                    width = 0.25, height = 0.25) +
-        labs(title="The first 2 factors are displayed") 
-    } else if (fac_n==3) {
-      gp <- ggplot(sdF, aes_string(x=names(Fdataset)[1], y=names(Fdataset)[2],
-                                  label1=names(Fdataset)[3])) +
-        geom_jitter(aes(label=ID), 
-                    width=0.2, height=0.2) +
-        labs(title="The first 3 factors are displayed") +
-        facet_grid(.~Fdataset[,3])
-    } else if (fac_n>3) {
-      gp <- ggplot(sdF, aes_string(x=names(Fdataset)[1], y=names(Fdataset)[2],
-                                  label1=names(Fdataset)[3],
-                                  label2=names(Fdataset)[4])) +
-        geom_jitter(aes(label=ID), 
-                    width = 0.2, height = 0.2) +
-        labs(title="The first 4 factors are displayed") +
-        facet_grid(Fdataset[,4]~Fdataset[,3], scales="free", space="free")
-    }
-    if (fac_n==0) { # fac_n=0 No factors in dataset
-      plotly_empty()
-      warning("There are no variables that are factors in the data set.")
-    } else {
-      ggplotly(gp, tooltip=c("x", "y", "label", "label1", "label2"), height=400, width=600) %>%
-        layout(dragmode="select") %>%
-        hide_legend() %>%
-        highlight(on="plotly_select", off="plotly_deselect", color="blue", 
-                  persistent=T)
-    }
-  })
-  
-  output$scatter <- renderPlot({
-    ggmatrix(scatt_list, P, P, byrow = F, showAxisPlotLabels = F,
-             title="Final tour projection and axes plots")
-  })
-  
-  output$pairs <- renderPlotly({
-    #realXs %>% 
-     # SharedData$new(key=~rownames(realXs), group="2Dtour") %>%
-    #  ggpairs(upper="blank") %>%
-      #ggpairs(lower="blank", upper=list(continuous = "points")) %>%
-    sdpairs <- SharedData$new(realXs, key=~rownames(realXs), group="2Dtour")
-    pairs_plot <- ggpairs(data=sdpairs, upper="blank")
-    #plot <- last_axis_plot(last_axes[[1]])
-    #pairs_plot[1, 2] <- plot
-      ggplotly(pairs_plot) %>%
-      layout(dragmode="select", title="Pairs plot", 
-             autosize = F, width=400, height=400) %>%
-      highlight(on="plotly_select", off="plotly_deselect", color="blue", 
-                persistent=T)
-  })
-  
-  }
-  shinyApp(ui, server)
-}
-
-# Exemplar applied to `crabs` data
-guidedTour_app(crabs, index = "holes")
-
-# Exemplar applied to Auckland schools dataset
-akl$Decile <- as.factor(akl$Decile)
-guidedTour_app(akl[-1], index = "holes") # Exclude School variable (factor)
-```
-
