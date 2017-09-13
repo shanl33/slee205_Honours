@@ -896,14 +896,18 @@ Does *interactivity* provide extra leverage that a static graphic cannot in EDA?
 * Advocates for more visuals for m-in-ds.
 
 ## References
-(Cook and Swayne, 2007)
+(Cook & Swayne, 2007)
 Cook and Swayne (2007)
 Unwin (2015)
 blindfold
+Wickham, Cook and Hofmann (2015)
 Wickham et al. (2015)
 tourr package
+(Wickham, Cook, Hofmann & Buja, 2011)
 Wickham et al. (2011)
+MASS book
+Venables and Ripley (2002)
 [^1]: Cook and Swayne (2007) R and GGobi book
-[^2]: Venables, Ripley (1999) MASS book
+[^2]: Venables and Ripley (2002) MASS book
 [^3]: Wickham, Cook, Hofmann (2015) Remove blindfold paper
 [^4]: Wickham, Cook, Hofmann, Buja (2011) tourr package paper

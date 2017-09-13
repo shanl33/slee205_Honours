@@ -7,7 +7,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
 # For tidying of NCEA data
 library(tidyr) 
 library(dplyr)
@@ -15,6 +15,8 @@ library(GGally)
 library(plotly)
 library(MASS)
 library(tourr)
+library(shiny)
+library(crosstalk)
 #library(gridExtra)
 ```
 
@@ -34,7 +36,7 @@ Only schools with achievement indicators across all four qualification levels we
 
 The focus of analysis will be on the Auckland subset because it is less affected by the unreliability of small sample sizes. The NZQA indicator of a "small" cohort was at a very low threshold of fewer than five candidates for any qualification level. Being the most populated city in New Zealand, Auckland has many of the larger schools, but there may still be some schools left in the analysis that have less than 30 candidates entered in a qualification level. The first few observations from the data set of 91 schools in the Auckland region are shown below.
 
-```{r, echo=FALSE}
+```{r}
 nzqa2016 <- read.csv("http://www.nzqa.govt.nz/assets/Studying-in-NZ/Secondary-school-and-NCEA/stats-reports/2016/Qualification-Statistics-School-2016-29032017.csv")
 # Drop vars that will not be used (eg. cumulative achievement)
 nzqa2016 <- nzqa2016[,-c(1,8,10)]
@@ -78,7 +80,7 @@ A question that naturally arises from the NCEA data is whether a school's perfor
 The pairs plot in Figure 1 shows the achievement rates at L1, L2 and L3 have a weak relationship with decile rating, but the positive correlation is strong at UE. There appears to be an increasing "lower bound" to achievement rates for L1, L2 and L3, as decile increases, but there is a lot of scatter above this boundary. In the bivariate scatterplots we can also see the spread of achievement rates varying across decile groups. The variation in achievement rates decreases as the decile increases (from one), across all qualification levels. We can see many schools approaching the maximum 100% achievement rate, for L1, L2 and L3, hence it is not surprising to see their univariate distributions are skewed to the left in Figure 2. The distribution of achievement rates for UE is less skewed and hints at two possible groupings. Furthermore performance across the qualification levels appear to be positively correlated, especially between L1 and L2. Hence the low-dimensional plots indicate non-normality, unequal spread between groups and multicollinearity.
 
 ##### Figure 1: Pairs plot for NCEA data on Auckland schools
-```{r, echo=FALSE}
+```{r}
 panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
 {
     usr <- par("usr"); on.exit(par(usr))
@@ -104,12 +106,12 @@ NCEA.hists <- mapply(NCEA_hist, akl[2:5], colnames(akl[2:5]))
 
 The pairs plot in Figure 2 provided a glimpse into the multivariate distribution of achievement rates across the four qualification levels. The parallel coordinates plot (PCP) shown below in Figure 3 allows us to further compare the multivariate distributions of achievement rates for different decile groups, as well as identify high dimensional clustering and outliers.
 
-The ordering of axes in a PCP greatly affects the quality of the graphical analysis (Unwin, 2015). In the case of the NCEA data, the natural ordering of the four qualification levels by difficulty, conincides with the recommendation from Cook and Swayne (2007) to order the axes based correlation. In addition, Unwin (2015) highlights the layering of colours also needs to be considered carefully, since the last group assigned a colour will dominate the other lines.
+The ordering of axes in a PCP greatly affects the quality of the graphical analysis (Unwin, 2015). In the case of the NCEA data, the natural ordering of the four qualification levels by difficulty, conincides with the recommendation from Cook and Swayne (2007) to order the axes based correlation. In addition, Unwin (2015) highlights the layering of colours also needs to be considered carefully, since the last group assigned a colour will dominate the other lines. Furthermore interactivity that enables the reordering of axes is also recommended. 
 
 The positive relationships previously identified in the pairs plot, should translate to parallel lines between axes in the PCP, as opposed to a "criss-cross" pattern for negative correlation. The static plot in Figure 3 questions whether the positive relationships hold true for schools with low achievement rates and in some decile groups. The higher decile schools in Auckland appear to dominate the high achievement rates across all qualification levels, while lower decile schools are inconsistent with each other in terms of their performance across the levels. Although there are only 91 observations (lines), it is quite difficult to identify even "ball park boundaries", on the 11-point decile scale, to distinguish between "higher" and "lower" decile schools when describing possible patterns.
 
 ##### Figure 3: Parallel coordinates plot for NCEA data on Auckland schools
-```{r, echo=FALSE}
+```{r}
 # Plot with consistent labels
 ggpcp <- function(x, a=1) {
   ggparcoord(data = x, columns = 2:5, scale = "uniminmax", 
@@ -128,29 +130,29 @@ ggpcp(nzqa) + ggtitle("Achievement of NZ schools in 2016")
 ```
 
 ##### Figure 5: Parallel coordinates plot with alpha blending
-```{r, echo=FALSE}
+```{r}
 nz.pcp <- ggpcp(nzqa, a=0.5) + ggtitle("Achievement of NZ schools in 2016")
 nz.pcp
 ```
 
 #### Leveraging static plots with interactivity
 
-Unwin (2015) advocates for the use of colour and interactive ordering of axes, in order to maximise the effectiveness of parallel coordinates plots. Similarly MASS (???) also suggests that without interactivity, such as identification and linked brushing, parallel plots are largely difficult to use. Figure 6 demonstrates how adding interactive filtering helps to further reduce the problems with overplotting and allows direct comparison between selected decile groups.
+The use of colour and interactive techniques are recommended for maximising the effectiveness of a PCP. Venables and Ripley (2002) argue parallel coordinate plots are "often too 'busy' without means of interaction" (p. 315). Figure 6 demonstrates how adding interactive filtering helps to further reduce the problems with overplotting and allows direct comparison between selected decile groups.
 
-One of the strengths of parallel coordinates plots is in identifying multivariate features, such as outliers (Cook and Swayne, 2007). Figure 3 suggests a school's performance can be unusual in two ways, either it performs inconsistently to the bivariate correlations between the qualification levels (this was previously noted as typical of "lower" decile schools), or its achievement rates across the levels are unusual compared to the rest of its decile group. The latter becomes difficult to see for the New Zealand dataset, in the static plots (Figures 4 and 5), even with alpha blending applied. The filtering feature of Figure 6 overcomes the problems caused by overplotting by allowing the user to isolate the distribution of each decile group (via a double-click on the legend). Furthermore the interactive tooltip feature enables the possible outliers to be identified by school name, or observation number, as shown in Figure 6. 
+One of the strengths of a PCP is in identifying multivariate features, such as outliers (Cook & Swayne, 2007). Figure 3 suggests a school's performance can be unusual in two ways, either it performs inconsistently to the bivariate correlations between the qualification levels (this was previously noted as typical of "lower" decile schools), or its achievement rates across the levels are unusual compared to the rest of its decile group. The latter becomes difficult to see for the New Zealand dataset, in the static plots (Figures 4 and 5), even with alpha blending applied. The filtering feature of Figure 6 overcomes the problems caused by overplotting by allowing the user to isolate the distribution of each decile group (via a double-click on the legend). Furthermore the interactive tooltip feature enables the possible outliers to be identified by school name, or observation number, as shown in Figure 6. 
 
 ##### Figure 6: Parallel coordinates plot with interactivity
 
-```{r, echo=FALSE}
+```{r}
 ggplotly(nz.pcp, tooltip=c("label1", "x", "y", "label"))
 ```
 
-The parallel coordinates plot in Figure 3 suggests that patterns of performance across decile groups, if they exist, are difficult to distinguish at the multivariate level for Auckland schools. 
-Principal component analysis provides an...
+The PCP in Figure 3 suggests that patterns of performance across decile groups, if they exist, are difficult to distinguish at the multivariate level for Auckland schools. Principal component analysis (PCA) provides a way to reveal interesting multivariate structure, through finding projections of the data that show maximal variability (Venables & Ripley, 2002). 
 
+A plot of the first two principal components of the Auckland schools dataset is shown in Figure 7. The decile of the schools is represented in the colour and plotting symbol. The axes for the original variables, reflecting the loadings of the principal components, indicate that the first principal component considers the schools' performance across all four qualification levels, while the second principal component contrasts performance in UE against the remaining qualifications. Not surprisingly the plot shows more spread across the first principal component since it explains a much greater proportion of the variation in the data. The first principal component reveals a division between the majority of schools and a smaller group, that is positioned away from the variable axes shown. We can see the smaller group of schools are decile five and below, except for one decile nine school. There is also a decile ten school that appears to be unusual when examining both principal components. The use of colour highlights the remaining decile nine and ten schools as similar in performance, as weighted by the principal components. On the other hand schools of other deciles seem to be more spread out from each other, as well as the variable axes.
 
-##### Figure 7: Plot of first two principal components for Auckland schools
-```{r, echo=FALSE}
+##### Figure 7: First two principal components for Auckland schools
+```{r}
 # Static PCA plot
 # Function for PCA and plot
 # scale.factor is an arbitary value that scales the loadings axes so that they can be on a comparable scale as the standardised PCs (scores). 
@@ -163,24 +165,23 @@ ncea_PCA <- function(df, scale.factor=20, nudge=-0.2) {
   # Scores (rotated principal components)
   scores <- data.frame(df[1], t(t(pca$x[, 1:2])*(pca$sdev[1:2]^-1)))
   scores$Decile <- as.factor(df$Decile)
-  #scores$Decile <- as.factor(as.character(df$Decile))
-  #scores$Decile <- factor(scores$Decile, levels(scores$Decile)[c(1, 2, 4:11, 3)])
   axis.limit <- c(-round(max(abs(scores[2:3])), 1), round(max(abs(scores[2:3])), 1))
+  # Set up for linked brushing in Fig 8
+  sdPCA <- SharedData$new(scores, key=~School, group="nceaPCA")
   # Variable axes (loadings)
   lambda <- pca$sdev[1:2]/sqrt(nrow(df)-1)
   loadings <- data.frame(varnames = rownames(pca$rotation), 
                               t(t(pca$rotation[, 1:2])*lambda*scale.factor))
-  # Plot of first to PCs
+  # Plot of first two PCs
   p <- ggplot(loadings) + 
-    geom_text(data=scores, aes(x=PC1, y=PC2, label=Decile, 
+    geom_text(data=sdPCA, aes(x=PC1, y=PC2, label=Decile, 
                                      colour=Decile, label1=School)) + 
     geom_segment(aes(x=0, y=0, xend=PC1, yend=PC2), colour="grey35") +
     geom_text(aes(x=PC1, y=PC2, label=varnames), colour="grey35", nudge_x=nudge) +
-    #coord_fixed() +
     labs(x=paste("PC1 (", exp.var[1], "% explained var.)", sep=""),
          y=paste("PC2 (", exp.var[2], "% explained var.)", sep="")) +
     scale_x_continuous(limits=axis.limit) +
-    scale_y_continuous(limits=axis.limit) +
+    scale_y_continuous(limits=axis.limit*1.1) +
     theme(
       panel.border = element_rect(colour="grey", fill=NA),
       panel.background = element_blank(),
@@ -188,42 +189,64 @@ ncea_PCA <- function(df, scale.factor=20, nudge=-0.2) {
   return(p)
 }
 # Static plot
-akl.PCA <- ncea_PCA(akl) + ggtitle("Achievement of Auckland schools in 2016")
-akl.PCA
+ncea_PCA(akl) + ggtitle("Achievement of Auckland schools in 2016")
 ```
 
-The static plot in Figure 7 highlights the usefulness of being able to directly identify unusual observations. Which schools are the two unusual decile 9 and 10 schools? The interactive tooltips in Figure 8.
+The principal components plot in Figure 7 provided a view of the multivariate distribution of the Auckland schools dataset that was less easily affected by overplotting than a static PCP. Hence refinements on observations were possible. From the parallel coordinate plots we observed that "higher" decile schools performed more consistently with each other and dominated across the four qualification levels, but it was difficult to quantify the decile "cut off" for such schools. The PCA suggests these are the decile nine and ten Auckland schools, with the exception of two schools. One cannot help but wonder: Which are the two unusual decile nine and ten Auckland schools? The interactive tooltips in Figure 8 instantly satifies this curiosity and hence demonstrates the usefulness of being able to directly identify unusual observations. The linked brushing between visual representations of the PCA model and the original variables, also enable confirmation of previous observations and a better understanding of the PCA model.
+- closer to variable axes means what? anything?
+- link to decile plot as well as pcp or pairs plot of performance across the 4 qualifications.
 
-##### Figure 8: Plot of first two principal components with interactivity
-```{r, echo=FALSE}
-ggplotly(akl.PCA, tooltip=c("label1"))
+```{r}
 # Linked brushing of PCA and decile plot
-# Will need to add akl to sharedData first.
+# Hide axes labels on PCA plot
+akl.PCA <- ncea_PCA(akl) + 
+  theme(axis.text=element_blank(),
+        axis.ticks=element_blank()) +
+  ggtitle("Achievement of Auckland schools in 2016")
+link.PC <- ggplotly(akl.PCA, tooltip=c("label1")) %>%
+  layout(dragmode="select") %>%
+  highlight(on="plotly_select", off="plotly_deselect", color="blue", persistent=T)
+
+sdPCA <- SharedData$new(scores, key=~School, group="nceaPCA")
 # Brush decile 6 to 8 schools and then brush the small group in the "biplot"
-sdAkl <- SharedData$new(akl, key=~School, group="aklPCA")
-# SharedData for the factors plot
-Fdataset <- data.frame(School=akl$School, Decile=as.factor(akl$Decile))
-sdF <- SharedData$new(Fdataset, key=~School, group="aklPCA") 
 
-decile <- ggplot(sdF, aes_string(x=names(Fdataset)[1])) +
-        geom_jitter(aes(y=Fdataset$All, label=ID), 
-                    width=0, height=0.25) +
-        labs(title="The first factor is displayed") 
+# SharedData for the decile plot
+sdDecile <- SharedData$new(
+  data.frame(School=akl$School, Decile=as.factor(akl$Decile)), 
+  key=~School, group="nceaPCA") 
 
-ggplotly(decile, tooltip=c("x", "y", "label", "label1", "label2"), height=400, width=600) %>%
-        layout(dragmode="select") %>%
-        hide_legend() %>%
-        highlight(on="plotly_select", off="plotly_deselect", color="blue", 
-                  persistent=T)
+decile.p <- ggplot(sdDecile) +
+  geom_jitter(aes(y=Decile, x=1, colour=Decile), width=0.1, height=0) +
+  labs(x="Decile", y="") +
+  scale_x_continuous(limits=c(0.7, 1.3)) +
+  #scale_y_discrete(position="right") +
+  theme(
+      panel.border=element_rect(colour="grey", fill=NA),
+      panel.background=element_blank(),
+      legend.position="none",
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank())
 
+link.decile <- ggplotly(decile.p, tooltip="none") %>%
+  layout(dragmode="select", yaxis=list(side="right"), margin=list(r=30)) %>%
+  highlight(on="plotly_select", off="plotly_deselect", color="blue", persistent=T) 
+
+subplot(link.PC, link.decile, widths=c(0.7, 0.3), margin=0, titleX=T, titleY=T)
+```
+
+##### Figure 8: First two principal components for Auckland schools with interactivity
+```{r}
+print(link.PC)
+print(link.decile)
 ```
 
 ### AKL figure
 ```{r}
-ggplotly(akl.PCA, tooltip=c("label1"))
+# Set up SharedData
+sd_akl <- SharedData
 ```
 
-Show how biplot above is related to initial orthogonal projection of tour (see Cook)
+Show how Fig 7/8 is related to initial orthogonal projection of tour (see Cook & Swayne, 2007 do it with a biplot)
 Rationale for launching tours from these initial bases:
 "The first k principal components span a subspace containing the 'best' k-dimensional view of the data" (p.303 Mass)
 
@@ -235,7 +258,12 @@ nz.PCA
 
 
 #### Dynamic and interactive multivariate visual representations
-Tours provide another visual perspective that is not restricted to orthogonal projections of the multivariate space. Wickham et al. (2015) highlight interactive visuals, such as tours, are more effective for exploring high-dimensional object than static plots. In addition, Cook and Swayne (2007) emphasise the important role of interactive graphics in interpreting, assessing and refining models obtained from numerical methods. Visuals in general allow us to "get under the hood" of black-box numerical methods to gain a better understanding of the process and the solutions produced (Wickham et al. 2015). A guided tour embodies the fusion of a numerical method, projection pursuit, in a dynamic visualisation. 
+Venables and Ripley (2002) highlight:
+"The first $k$ principal components span a subspace containing the 'best' $k$-dimensional view of the data." (p. 303)
+Furthermore projection pursuit indices are often measures of "interestingness" for sphered data, which can be achieved by first finding the principal components and then standardising to unit variance (p. 305).
+Using this idea the principal components were used the guided
+
+Tours provide another visual perspective that is not restricted to orthogonal projections of the multivariate space. Wickham, Cook and Hofmann (2015) highlight interactive visuals, such as tours, are more effective for exploring high-dimensional object than static plots. In addition, Cook and Swayne (2007) emphasise the important role of interactive graphics in interpreting, assessing and refining models obtained from numerical methods. Visuals in general allow us to "get under the hood" of black-box numerical methods to gain a better understanding of the process and the solutions produced (Wickham et al, 2015). A guided tour embodies the fusion of a numerical method, projection pursuit, in a dynamic visualisation. 
 
 Cook and Swayne (2007) used the `crabs` dataset to demonstrate how tours can be used effectively to perform cluster analysis when the clusters are clearly separated. The dataset consists of five physical measurements for 50 Australian female and male crabs of two colour forms, blue, `B`, and orange, `O`. This dataset and interactive techniques demonstrated by Cook and Swayne (2007) using `ggobi` helped to develop the guided tour shown in the final exemplar. Based on the analysis so far, the Auckland schools dataset is unlikely to contain distinct clusters, but the dynamic nature of tours may help shed more light on its complex multivariate distribution. Hence the dynamic and interactive environment of `ggobi` was explored to gain ideas for the exemplar. 
 
@@ -244,10 +272,11 @@ Cook and Swayne (2007) used the `crabs` dataset to demonstrate how tours can be 
 `ggobi` is an open-source software that showcases many interactive visualisation techniques. The flexibility and speed at which techniques can be applied in `ggobi` is yet to be paralleled by more recently developed interactive tools. For instance, linked brushing of "n-to-m" enables a variety of plots to be interactively linked in `ggobi` (Cook & Swayne, 2007). However the `SharedData()` function in the `crosstalk` package is limited to one-to-one brushing and hence currently unable to be applied to aggregate plots (RStudio, 2016). 
 
 Similarly tours are launched with ease via the graphical user interface (GUI) in `ggobi`. However the absence of code to document explorations makes it challenging to share and replicate findings found via interactive visual exploration in `ggobi`.  Furthermore the desire to review previous projections when viewing tours, was identified as another limitation. To some extend the `rggobi` package addresses the issue of code documention. Demostrations of dynamic data analysis in `ggobi` and `Mondrian` are often shared via pre-recordings. For example the analysis of the Tour de France using `Mondrian` by Theus (2016). Although the recordings are dynamic, the level of interactivity is limited to rewinding. The stochastic nature of tours begs for more user interaction than as a post-event observer. Being able to visually compare and launch several "live" tours on demand, places the signal of random process in the context of the inherent variation (Wickham et al. 2015).
++ Tour in GGobi (p. 33): Manual control of tour direction is possible through user interaction via mouse (as opposed to random search methods for determining tour direction when on a grand tour or guided tour). A manual tour allows further refinement of structures that are initially revealed by grand or guided tours. It also enables further investigation of how sensitive the multivariate structure is to changes in individual variables.
 
 #### Interactive techniques used in the exemplar
 
-The development of the guided tour in the exemplar began with static plots of the tour projections and axes positions, synced to an user controlled animation slider. Initially, only visualisations of single tours were considered. Initial trials of the single tour animation using the `crabs` dataset, did not seem to identify the separation between the two colour forms discussed by Cook and Swayne (2007). After further investigation it was found the ordering of the variables in the dataframe determined the orthogonal starting point used by the `tourr` package. The choice of starting point is very important in a guided tour, since a stochastic process is used to search the neighbourhood for a view that is more "interesting" than any previously seen, as judged by the pursuit index. If after a certain number of attempts no such view is found then the tour ends. Consequently a guided tour can get "stuck" at a local maxima, hence the need to examine tours from different starting points (Wickham et al. 2011). In order to maximise the tour coverage, orthogonal projections of all possible pairwise combinations of the variables were used to create different starting points in the guided tour of the exemplar. 
+The development of the guided tour in the exemplar began with static plots of the tour projections and axes positions, synced to an user controlled animation slider. Initially, only visualisations of single tours were considered. Initial trials of the single tour animation using the `crabs` dataset, did not seem to identify the separation between the two colour forms discussed by Cook and Swayne (2007). After further investigation it was found the ordering of the variables in the dataframe determined the orthogonal starting point used by the `tourr` package. The choice of starting point is very important in a guided tour, since a stochastic process is used to search the neighbourhood for a view that is more "interesting" than any previously seen, as judged by the pursuit index. If after a certain number of attempts no such view is found then the tour ends. Consequently a guided tour can get "stuck" at a local maxima, hence the need to examine tours from different starting points (Wickham, Cook, Hofmann & Buja, 2011). In order to maximise the tour coverage, orthogonal projections of all possible pairwise combinations of the variables were used to create different starting points in the guided tour of the exemplar. 
 
 The final projections and axes positions of the different tours (to a maximum of five) are visually summarised in a matrix of plots. This visual representations of members of a collection of a model, enable deeper insights than observing only one model (Wickham et al. 2015). The matrix shows the final projections of guided tours that identify the same clusters (e.g. the gender split) are sometimes related by 2D rotation. Furthermore the final axes positions indicate which variables are consistently more prominent in the views showing certain clusters.
 
@@ -257,7 +286,7 @@ At times one of the guided tours in the exemplar will result in a higher final i
 
 The projection pursuit index plot in the exemplar not only compares the index values reached by different tours, but also gives insight into how index values relate to their projected views. It allows the examination of the process underlying projection pursuits and not only the final model, as advocated by Wickham et al. (2015) when applying numerical methods. 
 
-A guided tour with the `holes` index was also applied to the Auckland schools data. As expected there were not any clearly separated clusters. However the projections from orthogonal principal component axes suggest a slight separation of a small group of schools from the majority. Brushing the smaller group in the tour projection view shows these points correspond to the scattered "tail" of generally lower achieving schools shown in the pairs plot. The linking with the plot showing classes of categorical variables, in this case deciles, shows these schools are generally decile five or below, with the exception of a couple of surprisingly high decile schools. It may have been possible to identify these high decile multivariate outliers in the parallel coordinates plot, but the tour provides extra information on which schools they are more similar to and hence a better understanding of why they are unusual. Linked brushing enabled patterns identified in complex high dimensional space to be related back to the original variables.
+A guided tour with the `holes` index was also applied to the Auckland schools data. As expected there were not any clearly separated clusters. However the projections from orthogonal principal component axes suggest a slight separation of a small group of schools from the majority. Brushing the smaller group in the tour projection view shows these points correspond to the scattered "tail" of generally lower achieving schools shown in the pairs plot. The linking with the plot showing classes of categorical variables, in this case deciles, shows these schools are generally decile five or below, with the exception of a couple of surprisingly high decile schools. It may have been possible to identify these high decile multivariate outliers in the PCP, but the tour provides extra information on which schools they are more similar to and hence a better understanding of why they are unusual. Linked brushing enabled patterns identified in complex high dimensional space to be related back to the original variables.
 
 ### Implications for teaching
 
@@ -267,7 +296,7 @@ The addition of one line of code to enable tooltip identification on the static 
 
 Linked brushing requires more effort to learn and apply, but the technique epitomises Aristotle's quote that "the whole is greater than the sum of its parts". The insights gained about NCEA performance for Auckland schools would have been difficult to see without linked brushing of the tour projections with the pairs plot and the decile factor plot. Both tooltip identification and linked brushing can add value to other interactive techniques, such as dynamic tours. Hence it is not surprising to see the availability of their functionality in both "classic" and more recently developed, interactive software.
 
-On the other hand interactive techniques like deleting or dragging points appear to be less general in their use and hence less frequently enabled in software. The commercial software `Alteryx` allows points to be dragged in its `Network Analysis` tool, but not in its other applications (`dashboards`). In comparison deletion and changing values via any scatterplot or parallel coordinates plot is possible in `ggobi`, but with a caveat to the user (Cook and Swayne). 
+On the other hand interactive techniques like deleting or dragging points appear to be less general in their use and hence less frequently enabled in software. The commercial software `Alteryx` allows points to be dragged in its `Network Analysis` tool, but not in its other applications (`dashboards`). In comparison deletion and changing values via any scatterplot or PCP is possible in `ggobi`, but with a caveat to the user (Cook & Swayne, 2007). 
 
 There appears to be a spectrum in terms of the level of customizability of interactive software and hence the flexibility they allow for taking a novel approach to applying interactive visualisation techniques. On one extreme are the fixed commerical GUIs of `Alteryx` and `Tableau` that make some of the decisions on how and when interactive techniques should be used for the user. This design is intended to make interactive techniques easy and fast to apply, which is a key selling point for the two commercial products. The open source `trelliscope` package uses code to launch its interactive userface, hence in some way similar to `Shiny`, but user customization of the interface is limited. However `trelliscope` is a prime example of how a highly effective static plot, the trellis plot, can be further leveraged with the addition of interactive techniques like linked brushing and filtering (Hafen, 2017).
 
