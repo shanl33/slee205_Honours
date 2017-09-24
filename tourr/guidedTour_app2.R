@@ -417,5 +417,5 @@ akl <- akl[-1]
 guidedTour_app(akl, factors=1, index="holes")
 # PC1&2 show a bit of a separation of a group of schools from the main group 
 # This group is mainly decile 5 and below, except for Grammar & Kings
-# They are generally in the "scattered tail" of schools in the paris plot.
+# They are generally in the "scattered tail" of schools in the pairs plot.
 # 'cmass' identifies outlier schools, where achievement across L1, 2, 3 and UE is inconsistent

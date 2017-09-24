@@ -26,7 +26,12 @@ for (i in 1:length(t1)) {
   attr(t1[[i]], "data") <- Xdfs[[i]]
 }
 tinterp <- lapply(t1, interpolate)
+t_tour <- lapply(1:length(tinterp), t_tour, tinterp, Xdfs, "holes")
+XYall <- lapply(t_tour, XYsingle)
+str(XYall[[1]])
 
+
+# Code for testing specific functions -------------------------------------
 # 't_tour' fn produces a list of p(p-1)/2 lists with varying lengths (depend on the length of each tour)
 # p(p-1)/2 is the number of combos for starting projections
 # 't_tour' collect together data on the projection pursuit index,

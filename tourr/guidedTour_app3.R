@@ -1,7 +1,7 @@
 library(ggplot2)
 library(plotly)
 library(tourr)
-library(crosstalk) # For (crosstalk+plotly) function
+library(crosstalk) 
 library(shiny)
 library(htmltools)
 library(MASS) # For crabs dataset
@@ -83,28 +83,21 @@ pursuit_info <- function(base, t_name, a_tour) {
 # Extracts xy coords for "tour" projection plots of a single tour (ie. proj coords of a tour)
 XYsingle <- function (single_tour) {
   n <- length(single_tour)
-  x <- c()
-  y <- c()
-  for(i in 1:n) {
-    x <- c(x, unlist(single_tour[[i]][[1]][,1]))
-    y <- c(y, unlist(single_tour[[i]][[1]][,2]))
-  }
+  #Below is equivalent? If so change AXsingle too.
+  #x <- sapply(1:n, function(i) {unlist(single_tour[[i]][[1]][, 1])})
+  x <- do.call(c, lapply(1:n, function(i) {unlist(single_tour[[i]][[1]][, 1])}))
+  y <- do.call(c, lapply(1:n, function(i) {unlist(single_tour[[i]][[1]][, 2])}))
   XY <- data.frame(x=x, y=y, iteration = rep(1:n, each=length(x)/n))
-  # need to add ID=rep(rownames(dataset), n) if using sdT
 }
 
 # Extracts xy coords for "axes" plots of a single tour 
 AXsingle <- function (single_tinterp) {
   n <- length(single_tinterp)
-  p <- dim(single_tinterp)[1] #number of real valued Xs
-  AX_x <- c()
-  AX_y <- c()
-  for(i in 1:n) {
-    # Take first 'p' values to be x-coords for axes
-    AX_x <- c(AX_x, unlist(single_tinterp[[i]][1:p])) 
-    # Take remaining 'p' values to be y-coords for axes
-    AX_y <- c(AX_y, unlist(single_tinterp[[i]][(p+1):(p+p)])) 
-  }
+  p <- dim(single_tinterp)[1] # Number of real valued Xs
+  # Take first 'p' values to be x-coords for axes
+  AX_x <- do.call(c, lapply(1:n, function(i) {unlist(single_tinterp[[i]][1:p])}))
+  # Take remaining 'p' values to be y-coords for axes
+  AX_y <- do.call(c, lapply(1:n, function(i) {unlist(single_tinterp[[i]][(p+1):(p+p)])}))
   AX <- data.frame(x = AX_x, y = AX_y, iteration = rep(1:n, each = p),
                    measure=rep(colnames(attr(single_tinterp, "data")), n))
 }

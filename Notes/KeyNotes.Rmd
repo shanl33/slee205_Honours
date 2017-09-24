@@ -134,6 +134,20 @@ such as complete linkage, average linkage or centroid (see next section).
     + PC are rotations of the original variables that best explain the variation in the data. If we only take the first k principal components then 'the subspace they span contains the best k-dimensional view of the data'. Since the covariance matrix is maximised and the residual sum of squares between the original points and their projections is minimised (p331) [^2]
         - To do: Double-check understanding of biplots as when k=2 (scatterplots with PC1 and PC2), so biplots are best 2D view of the data. Specific static projections of 2D tours are equivalent to biplots with axes rescaled to equal length (see p.35). [^1]
 
+## animint (R package)
+See: <https://github.com/tdhock/animint>
+* "Academic paper" found from link above looks like a draft of the draft from Paul.
+See: <https://tdhock.github.io/animint/#introduction>
+* Han's Rosling's World Bank example: <https://cpsievert.shinyapps.io/animintRmarkdown/>
+Code: <https://github.com/tdhock/animint/tree/master/inst/examples/rmarkdown>
+* Can brush aggregate plots.
+* Can brush pcp (timeseries).
+* dev version only.
+```{r, eval=FALSE, echo=TRUE}
+# Install dev version of animint package
+devtools::install_github("tdhock/animint", upgrade_dependencies=FALSE)
+```
+
 
 ## tourr (R package)
 * See: <https://www.jstatsoft.org/article/view/v040i02/v40i02.pdf> [^4]
