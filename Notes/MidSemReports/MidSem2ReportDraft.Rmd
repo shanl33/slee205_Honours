@@ -140,10 +140,14 @@ The use of colour and interactive techniques are recommended for maximising the 
 One of the strengths of a PCP is in identifying multivariate features, such as outliers (Cook & Swayne, 2007). Figure 3 suggests a school's performance can be unusual in two ways, either it performs inconsistently to the bivariate correlations between the qualification levels (this was previously noted as typical of "lower" decile schools), or its achievement rates across the levels are unusual compared to the rest of its decile group. The latter becomes difficult to see for the New Zealand dataset, in the static plots (Figures 4 and 5), even with alpha blending applied. The filtering feature of Figure 6 overcomes the problems caused by overplotting by allowing the user to isolate the distribution of each decile group (via a double-click on the legend). Furthermore the interactive tooltip feature enables the possible outliers to be identified by school name, or observation number, as shown in Figure 6. 
 
 **Difficult to "follow" individual observations (lines) across the variables without being able to brush** 
-+ Demonstrate w decile 1 or 10 schools only and trying to follow unusual schools.
-+ Look for reading where brushing of pcp was used (and animint?)
+* Demonstrate w decile 1 or 10 schools only and trying to follow unusual schools.
+* Brushing of pcp was used in the draft papers by Sievert (`plotly+crosstalk`?) and in this paper with `animint`.
 
 ##### Figure 6: Parallel coordinates plot with interactivity
+
+See Sievert's pcps where brushing is possible and individual identification (with correct label name):
+* Interactive: <https://pedestrians.cpsievert.me/missing-by-time/>
+* Code: <https://github.com/cpsievert/pedestrians/blob/master/docs/missing-by-time.R>
 
 ```{r}
 ggplotly(nz.pcp, tooltip=c("label1", "x", "y", "label"))
@@ -198,8 +202,8 @@ ncea_PCA(akl) + ggtitle("Achievement of Auckland schools in 2016")
 ```
 
 The principal components plot in Figure 7 provided a view of the multivariate distribution of the Auckland schools dataset that was less easily affected by overplotting than a static PCP. Hence refinements on observations were possible. From the parallel coordinate plots we observed that "higher" decile schools performed more consistently with each other and dominated across the four qualification levels, but it was difficult to quantify the decile "cut off" for such schools. The PCA suggests these are the decile nine and ten Auckland schools, with the exception of two schools. One cannot help but wonder: Who are the two unusual decile nine and ten Auckland schools? The interactive tooltips in Figure 8 instantly satifies this curiosity and hence demonstrates the usefulness of being able to directly identify unusual observations. The linked brushing between visual representations of the PCA model and the original variables, also enable confirmation of previous observations and a better understanding of the PCA model.
-+ closer to variable axes means what? Anything? Better performance at that level?
-+ link to decile plot as well as pcp or pairs plot of performance across the 4 qualifications.
+* closer to variable axes means what? Anything? Better performance at that level?
+* link to decile plot as well as pcp or pairs plot of performance across the 4 qualifications.
 
 ##### Figure 8: First two principal components for Auckland schools with interactivity
 ```{r}

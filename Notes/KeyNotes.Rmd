@@ -142,6 +142,7 @@ See: <https://tdhock.github.io/animint/#introduction>
 Code: <https://github.com/tdhock/animint/tree/master/inst/examples/rmarkdown>
 * Can brush aggregate plots.
 * Can brush pcp (timeseries).
+    + Also demonstrated by Sievert in his draft paper using plotly.
 * dev version only.
 ```{r, eval=FALSE, echo=TRUE}
 # Install dev version of animint package
