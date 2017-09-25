@@ -91,13 +91,14 @@ colnames(schools2016)
 schools2016 <- schools2016[c(2, 4, 10, 13:18, 34:36)]
 # Tidy up variable names
 colnames(schools2016)[9] <- "EuropeanPakeha"
+colnames(schools2016)[4] <- "Maori"
 # Keep only schools with secondary level students
 secondary2016 <- schools2016 %>%
   filter(!((Type=="Full Primary")|(Type=="Intermediate")))
 head(secondary2016)
 
 # Merge schools2016 and NCEA 2016 results -------------------------------------
-nzqa.sch <- merge(nzqa, schools2016, by.x="School", by.y="School.Name") # 347 schools left
+nzqa.sch <- merge(nzqa, secondary2016, by.x="School", by.y="School.Name") # 347 schools left
 head(nzqa.sch)
 colnames(nzqa.sch)
 summary(nzqa.sch)

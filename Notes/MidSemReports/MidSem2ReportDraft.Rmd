@@ -1,6 +1,7 @@
 ---
 title: "Code-based open-source software for teaching interactive data visualisation"
 author: "Shan-I Lee"
+runtime: shiny
 output: html_document
 ---
 
@@ -9,13 +10,18 @@ knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
 # For tidying of NCEA data
 library(tidyr) 
 library(dplyr)
+# For reading xls binary file for 2016 schools data
+library(gdata)
+# For plots
 library(GGally)
+# For interactivity
 library(plotly)
-library(MASS)
-library(tourr)
 library(shiny)
 library(crosstalk)
-#library(gridExtra)
+# For crabs data
+library(MASS)
+# For tours
+library(tourr)
 ```
 
 ## Introduction
@@ -94,7 +100,7 @@ pairs(akl[-1], lower.panel=panel.cor)
 
 ##### Figure 2: Univariate distributions for NCEA data on Auckland schools
 
-```{r, echo=FALSE}
+```{r}
 NCEA_hist <- function(x, title) {hist(x, xlab="Achievement rate", main=title)}
 layout(matrix(1:4, byrow=1, ncol=2))
 NCEA.hists <- mapply(NCEA_hist, akl[2:5], colnames(akl[2:5]))
@@ -163,20 +169,20 @@ A plot of the first two principal components of the Auckland schools dataset is 
 # Function for PCA and plot
 # scale.factor is an arbitary value that scales the loadings axes so that they can be on a comparable scale as the standardised PCs (scores). 
 # nudge argument also depends on the range of PC1 (used for enhancing the legibility of text labels on loadings axes).
-ncea_PCA <- function(df, scale.factor=20, nudge=-0.2, decile.pch=T) {
+ncea_PCA <- function(df, scale.factor=20, nudge=-0.2, decile.pch=T, gp="Decile", sd.group=NULL) {
   # Perform PCA
   pca <- prcomp(df[2:5], scale.=T)
   # Explained variance
   exp.var <- round(pca$sdev^2/sum(pca$sdev^2)*100, 1)
   # Scores (rotated principal components)
-  scores <- data.frame(df[1], t(t(pca$x[, 1:2])*(pca$sdev[1:2]^-1)))
+  scores <- data.frame(t(t(pca$x[, 1:2])*(pca$sdev[1:2]^-1)), df[-(2:5)], Group=df[, gp])
   scores$Decile <- as.factor(df$Decile)
-  axis.limit <- c(-round(max(abs(scores[2:3])), 1), round(max(abs(scores[2:3])), 1))
-  # Set up for linked brushing in Fig 8
-  sdPCA <- SharedData$new(scores, key=~School, group="nceaPCA")
+  axis.limit <- c(-round(max(abs(scores[1:2])), 1), round(max(abs(scores[1:2])), 1))
+  # Set up for linked brushing for Fig 8
+  sdPCA <- SharedData$new(scores, key=~School, group=sd.group)
   # Variable axes (loadings)
   lambda <- pca$sdev[1:2]/sqrt(nrow(df)-1)
-  loadings <- data.frame(varnames = rownames(pca$rotation), 
+  loadings <- data.frame(varnames = rownames(pca$rotation),
                               t(t(pca$rotation[, 1:2])*lambda*scale.factor))
   # Plot of first two PCs
   p <- ggplot(loadings) + 
@@ -189,11 +195,14 @@ ncea_PCA <- function(df, scale.factor=20, nudge=-0.2, decile.pch=T) {
     theme(
       panel.border = element_rect(colour="grey", fill=NA),
       panel.background = element_blank(),
-      legend.position = "none")
+      legend.position = "none",
+      axis.text=element_blank(),
+      axis.ticks=element_blank())
+  # Plot decile as character or colour by another variable
   if (decile.pch) {
     plot <- p + geom_text(data=sdPCA, aes(x=PC1, y=PC2, label=Decile, colour=Decile, label1=School))
   } else {
-    plot <- p + geom_point(data=sdPCA, aes(x=PC1, y=PC2, colour=Decile, label1=School))
+    plot <- p + geom_point(data=sdPCA, aes(x=PC1, y=PC2, colour=Group, label1=School))
   }
   return(plot)
 }
@@ -205,77 +214,142 @@ The principal components plot in Figure 7 provided a view of the multivariate di
 * closer to variable axes means what? Anything? Better performance at that level?
 * link to decile plot as well as pcp or pairs plot of performance across the 4 qualifications.
 
-##### Figure 8: First two principal components for Auckland schools with interactivity
 ```{r}
-# Linked brushing of PCA and decile plot
-akl.PCA <- ncea_PCA(akl, decile.pch=F) + 
-  theme(axis.text=element_blank(),
-        axis.ticks=element_blank()) +
-  ggtitle("Achievement of Auckland schools in 2016")
-
-# Link plot
-link.PC <- ggplotly(akl.PCA, tooltip=c("label1")) %>%
-  layout(dragmode="select") %>%
-  highlight(on="plotly_select", off="plotly_deselect", color="blue", persistent=T)
-
-# SharedData for the decile plot
-sdDecile <- SharedData$new(
-  data.frame(School=akl$School, Decile=as.factor(akl$Decile)), 
-  key=~School, group="nceaPCA") 
-
-decile.p <- ggplot(sdDecile) +
-  geom_jitter(aes(y=Decile, x=1, colour=Decile), width=0.1, height=0) +
-  labs(x="Decile", y="") +
-  scale_x_continuous(limits=c(0.7, 1.3)) +
-  #scale_y_discrete(position="right") +
-  theme(
+# Function for linked factor plot
+ncea_factor <- function(df, gp="Decile", sd.group="AKLncea") {
+  # Set up for linked brushing 
+  sdGroup <- SharedData$new(data.frame(df, Group=df[, gp]), key=~School, group=sd.group) 
+  # Static plot
+  factor.p <- ggplot(sdGroup) +
+    geom_jitter(aes(y=Group, x=1, colour=Group, label=School), width=0.1, height=0) +
+    labs(x=as.character(gp), y="") +
+    scale_x_continuous(limits=c(0.7, 1.3)) +
+    theme(
       panel.border=element_rect(colour="grey", fill=NA),
       panel.background=element_blank(),
       legend.position="none",
       axis.text.x=element_blank(),
       axis.ticks.x=element_blank())
+  # Interactive linked plot
+  link.factor <- ggplotly(factor.p, tooltip=c("colour", "label"))
+    #layout(yaxis=list(side="right"), margin=list(r=30))
+  return(link.factor)
+}
+```
 
-link.decile <- ggplotly(decile.p, tooltip="none") %>%
-  layout(dragmode="select", yaxis=list(side="right"), margin=list(r=30)) %>%
-  highlight(on="plotly_select", off="plotly_deselect", color="blue", persistent=T) 
+##### Figure 8: First two principal components for Auckland schools with interactivity
+```{r}
+# Linked brushing of PCA and decile plot
+akl$Decile <- as.factor(akl$Decile)
+akl.PCA <- ncea_PCA(akl, decile.pch=F, sd.group="AKLncea") + 
+  ggtitle("Achievement of Auckland schools in 2016")
 
-subplot(link.PC, link.decile, widths=c(0.7, 0.3), margin=0, titleX=T, titleY=T)
+# Link PCA plot
+link.PC <- ggplotly(akl.PCA, tooltip=c("label1")) 
+  #layout(dragmode="select") %>%
+  #highlight(on="plotly_select", off="plotly_deselect", color="blue", persistent=T)
+
+# Link decile plot
+link.decile <- ncea_factor(akl) %>%
+  layout(yaxis=list(side="right"), margin=list(r=30))
+
+subplot(link.PC, link.decile, widths=c(0.7, 0.3), margin=0, titleX=T, titleY=T) %>%
+  layout(dragmode="select") %>%
+  highlight(on="plotly_select", off="plotly_deselect", color="blue", persistent=T)
 ```
 
 ```{r}
-sdAkl <- SharedData$new(akl[2:5], group="nceaPCA")
+sdAkl <- SharedData$new(akl[2:5], group="AKLncea")
 Akl.pairs <- ggpairs(sdAkl)
 ggplotly(Akl.pairs) %>%
   layout(dragmode="select") %>%
-        highlight(on="plotly_select", off="plotly_deselect", color="blue", 
-                  persistent=T, dynamic=T)
+        highlight(on="plotly_select", off="plotly_deselect", color="blue", persistent=T, dynamic=T)
 ```
 
 #### NZ schools
-```{r}
-# Static plot
-ncea_PCA(nzqa) + ggtitle("Achievement of NZ schools in 2016")
-```
-
-Merge with other demongraphics on schools
+Data on school size by year group and ethnicity for 2016, was obtained from the government website, Education Counts (2017). 
 ```{r, eval=FALSE}
-# Download file from internet (updated September 2017)
-schools <- read.csv("https://www.educationcounts.govt.nz/__data/assets/file/0003/62571/Directory-School-current.csv", skip=3, header=T)
-# Tidy up variable names
-raw.cols <- readLines("schools.csv", n=4)[4] # Keep the fourth row only
-colnames(schools) <- gsub("[^a-zA-z0-9]", "", strsplit(raw.cols, ",")[[1]])
+# Download file on school demographics (includes counts by Year group)
+download.file("https://www.educationcounts.govt.nz/__data/assets/excel_doc/0005/152609/Student-rolls-by-School-2010-2016.xlsx", "schools.xlsx")
+# Takes a long time to extract 2016 data
+schools2016 <- read.xls("schools.xlsx", sheet="2016", skip=2, header=T)
 # Subset relevant variables
-schools <- schools[c(2, 10, 15, 16, 33:39)]
+schools2016 <- schools2016[c(2, 4, 10, 13:18, 34:36)]
+# Tidy up variable names
+colnames(schools2016)[9] <- "EuropeanPakeha"
+colnames(schools2016)[4] <- "Maori"
 # Keep only schools with secondary level students
-secondary <- schools %>%
-  filter(!((SchoolType=="Full Primary")|(SchoolType=="Intermediate")))
+schools2016 <- schools2016 %>%
+  filter(!((Type=="Full Primary")|(Type=="Intermediate")))
+head(schools2016)
 
-# Merge with NZQA data
-nzqa.sch <- merge(nzqa, secondary, by.x="School", by.y="Name") # 350 schools (left from 408)
+# Merge with NZQA data 
+# School ID number not available on NZQA data and some names have changed
+# (eg. Auckland Grammar)
+levels(schools2016$School.Name) <- c(levels(schools2016$School.Name), "Auckland Grammar School")
+schools2016[schools2016$School.Name=="Auckland Grammar", 1] <- "Auckland Grammar School"
+nzqa.sch <- merge(nzqa, schools2016, by.x="School", by.y="School.Name") # 348 schools left
 # Change ethinicity counts to proportions
 # MELAA refers to Middle Eastern/Latin American/African
-nzqa.sch[12:17] <- sapply(nzqa.sch[12:17], function(x) {round(x/nzqa.sch$TotalSchoolRoll, 2)})
-nzqa.sch$Other <- 1 - Reduce("+", nzqa.sch[12:16]) 
-head(nzqa.sch)
+nzqa.sch[10:15] <- sapply(nzqa.sch[10:15], function(x) {round(x/nzqa.sch$Total, 2)})
+nzqa.sch$Other <- 1 - Reduce("+", nzqa.sch[c(10:13, 15)]) 
+# Minimum cohort size for Yr 11 to 13
+nzqa.sch$Min.Cohort <- sapply(1:nrow(nzqa.sch), function(x) {min(nzqa.sch[x, 16:18])})
+nzqa.sch <- droplevels(nzqa.sch)
+save(nzqa.sch, file="nzqa.sch.RData")
+```
+The minimum cohort size for Year 11, 12 and 13 can be used as indicator of whether the achievement rates are based on small sample sizes. We can see the minimum cohort sizes for 
+```{r}
+# Load merge school data
+load("nzqa.sch.RData")
+nzqa.sch$Decile <- as.factor(nzqa.sch$Decile)
+summary(nzqa.sch$Min.Cohort)
 ```
 
+Use Shiny slider to investigate the effect of "small schools" on conclusions.
+```{r, eval=FALSE}
+inputPanel(
+  div(style="width: 600px;", sliderInput("cohort", label="Minimum size of Year 11, 12, 13 cohorts", min=0, max=100, step=10, value=0, animate=T))
+)
+
+output$pca <- renderPlotly({
+  static.pca <- subset(nzqa.sch, Min.Cohort>=input$cohort) %>% 
+    ncea_PCA(scale.factor=50, decile.pch=F) + ggtitle("Achievement of NZ schools in 2016")
+  ggplotly(static.pca, tooltip=c("label1")) %>%
+  layout(dragmode="select") %>%
+  highlight(on="plotly_select", off="plotly_deselect", color="blue", persistent=T)
+})
+
+renderUI({plotlyOutput("pca")})
+```
+
+"Cycle" other demographic vars to explore patterns
+Testing
+
+```{r}
+inputPanel(
+  div(style="width: 600px;", sliderInput("cohort2", label="Minimum size of Year 11, 12, 13 cohorts", min=0, max=100, step=10, value=0, animate=T)),
+  selectInput("group", "Select variable", choices=as.list(colnames(nzqa.sch)[6:15]), selected="Decile")
+)
+
+output$plots <- renderPlotly({
+  # Unique SharedData group depending on variable chosen
+  sd_group <- paste(input$group, "ncea", sep="")
+  # Static PCA plot
+  PCA <- ncea_PCA(subset(nzqa.sch, Min.Cohort>=input$cohort2), decile.pch=F, gp=input$group, scale.factor=50, sd.group=sd_group) + 
+  ggtitle("Achievement of NZ schools in 2016")
+
+  # Link PCA plot
+  link.PCA <- ggplotly(PCA, tooltip=c("label1"))
+
+  # Link group plot
+  link.group <- ncea_factor(subset(nzqa.sch, Min.Cohort>=input$cohort2), gp=input$group, sd.group=sd_group) %>%
+    layout(yaxis=list(side="right"), margin=list(r=150))
+  
+  subplot(link.PCA, link.group, widths=c(0.5, 0.5), margin=0, titleX=T, titleY=T) %>%
+    layout(dragmode="select", autosize = F, width=1000, height=500) %>%
+  highlight(on="plotly_select", off="plotly_deselect", color="red", persistent=T)
+})
+
+renderUI({plotlyOutput("plots")}) 
+```
