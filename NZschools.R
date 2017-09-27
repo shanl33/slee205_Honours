@@ -108,3 +108,18 @@ nzqa.sch[10:15] <- sapply(nzqa.sch[10:15], function(x) {round(x/nzqa.sch$Total, 
 nzqa.sch$Other <- 1 - Reduce("+", nzqa.sch[c(10:13, 15)]) 
 # Minimum cohort size for Yr 11 to 13
 nzqa.sch$Min.Cohort <- sapply(1:nrow(nzqa.sch), function(x) {min(nzqa.sch[x, 16:18])})
+
+# Scale data so intepretations are about "above" average etc
+nzqa.scale <- nzqa
+nzqa.scale[2:5] <- scale(nzqa[2:5])
+head(nzqa.scale)
+pcp.scale <- ggpcp(nzqa.scale, a=0.5, sd.group="pcp_scale") + 
+  geom_hline(yintercept=0, lty=2, colour="grey30") +
+  ggtitle("Standardised achievement of NZ schools in 2016") +
+  labs(x="Qualification level", y="Standard deviations")
+ggplotly(pcp.scale, tooltip=c("group", "colour", "x", "y")) %>%
+  highlight(on="plotly_select", off="plotly_deselect", color = "red",  
+            persistent=T, dynamic=T)
+
+guidedTour_app(nzqa.sch[nzqa.sch$Min.Cohort>30 ,2:6], "holes")
+guidedTour_app(akl, "holes")
