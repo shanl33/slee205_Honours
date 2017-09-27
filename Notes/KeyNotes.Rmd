@@ -696,6 +696,7 @@ https://github.com/ropensci/plotly/blob/51e159ba825b007657c1d7534825ef25afc7e7af
 ## Tips
 * Testing: Assign variable to interaction fn and print() the output.
 * Colour #RRGGBB__: http://sape.inf.usi.ch/quick-reference/ggplot2/colour
+* Brewer colour scheme: Qualitative, Sequential: Gradual distinctions (0 to 1), Diverging: Very obvious distinctions (-1, 0, 1)
 
 ### Virtual Machine
 * Software to have on VM:
