@@ -8,8 +8,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Questions
-* Apart from using `shiny`, how else can you be in a "reactive environment" (need this to explicitly retrieve SharedData details)
-eg. Use print(sd$data(withSelection=TRUE))
+* Can we be more "off the cuff" in the presentation? (ie. don't need to cite everything, some opinion-based comments)
+* Report itself is submitted in PDF format, but with supporting documentation (Rmd and files). Can't submit as html? (Static screen shot of filtering with PCP using plotly's default legend needed then)
 
 ### Answered
 * Is it sensible for `plotly` plots to render faster than `ggplot2`? Yes, plotly is lower-level to the javascript library it uses than using `ggplot()+ggplotly`.

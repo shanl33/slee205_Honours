@@ -1,5 +1,5 @@
 ---
-title: "Code-based open-source software for teaching interactive data visualisation"
+title: "Code-based, open source software for teaching interactive data visualisation"
 author: "Shan-I Lee"
 runtime: shiny
 output: html_document
