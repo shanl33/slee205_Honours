@@ -174,7 +174,7 @@ nz.pcp
 Although one of the strengths of a PCP is in identifying multivariate features, such as outliers (Cook & Swayne, 2007), the static plots in Figures \@ref(fig:pcpNZ) and \@ref(fig:pcpAlpha) do not allow these features to be explored, due to overplotting. The use of colour and interactive techniques are recommended for maximising the effectiveness of a PCP. Venables and Ripley (2002) argue parallel coordinate plots are "often too 'busy' without means of interaction" (p. 315). The interactive filtering feature in Figure \@ref(fig:pcpInt) addresses the problem of overplotting by allowing the user to isolate the distribution of each decile group (via a double-click on the legend). Furthermore, using the mouse to drag-and-select nodes on the parallel axes, brushes and links the acheivement rates of individual schools across all qualification levels. Lastly the hovering tooltip enables instant identification of indvidual schools by name.
 
 ***
-Interactive filtering alleviates issuses with overplotting when the number of observations increase.
+*Interactive filtering alleviates issuses with overplotting when the number of observations increase.*
 
 ***
 
@@ -199,7 +199,7 @@ include_graphics("files/pcp_L3.jpg", auto_pdf=F)
 The query made via linked brushing in Figure \@ref(fig:pcpL3) is similar to subsetting the data using the code shown below. A summary could be used to examine the performance of the subset of 42 schools across the other qualifications, but making sense of this summary would required comparison with statistics for the whole data set. Furthermore the summary hides the unusual performance of individual schools at certain qualification levels. The interactive techniques allowed us to gain insights about the NCEA data, that would have been difficult to ascertain from static plots or numeric summaries alone.
 
 ***
-Linked brushing and tooltip identification, quickly reveals further insight into patterns underlying unusual groups, or individuals.
+*Linked brushing and tooltip identification, quickly reveals further insight into patterns underlying unusual groups, or individuals.*
 
 ***
 
@@ -212,7 +212,7 @@ summary(L3all_achieve)
 However the ease and effectiveness of linked brushing can also be affected by overplotting. Figure \@ref(fig:pcpHard) demonstrates how an attempt to use persistent brushing to identify the UE success rate of the school with 100% achievement at L3, but unusually low performance at L2, resulted in accidentally brushing an observation with a similar L2 achievement rate. The `plotly` `R` package used in Figure \@ref(fig:pcpInt) allows observations to be "brushed" via the drag-and-select motion (that was used), or a mouse click. Only the latter enables the brushing of individual lines on a PCP and the two options cannot be made concurrently available on the same plot.  The `ggobi` graphical user interface (GUI) applies the same drag-and-select motion to brush both points and lines on a PCP (Cook & Swayne, 2007). This greater flexibility would have avoided the issues caused by overplotting in this case, but some of the challenges of large data sets for static graphical displays will persist, even with interactive techniques. In particular the speed of rendering plots for large data sets determines whether the techinques can be applied "fast enough to be considered interactive" (Unwin 2015, p.20).
 
 ***
-The effectiveness of interactive techniques for large data sets will be affected by rendering delays and limitations imposed by plot size and resolution.
+*The effectiveness of interactive techniques for large data sets will be affected by rendering delays and limitations imposed by plot size and resolution.*
 
 ***
 
@@ -331,7 +331,7 @@ include_graphics("files/link_group.jpg", auto_pdf=F)
 In a similar manner to Figure \@ref(fig:pcpHard), persistent brushing can be applied with different colours to further explore the multivariate features revealed by the PCA. The three outliers brushed in the PCA plot are at two extremes. Comparing their achievement rates on the PCP helps to explain why they are unusual in different ways. Two of the outliers had consistently high performance at the first three qualification levels, but there was a drastic drop in the UE achievement rate. Although, as previously observed, lower performance at UE was shared by the Auckland schools in general, the large differences between the two schools' achievement rates for UE and the remaining qualification levels, are still unexpected. The single outlier at the other extreme of the PCA plot, defies the general trend. Its L1 achievement rate was inconsistently lower than the other qualification levels, rather its UE rate. Although all three schools had unusual performance compared to Auckland schools in general, the inconsistencies in their performance differed. The linked brushing enabled us to further investigate the differences in "unusualness" and it also highlights how the multivariate outliers identified in the PCA are hidden in the PCP.
 
 *** 
-Linked brushing between plots allows different visual representations of the same data to be related together, so that abstract methods can be explored further to reveal more insights about the multivariate features.
+*Linked brushing between plots allows different visual representations of the same data to be related together, so that abstract methods can be explored further to reveal more insights about the multivariate features.*
 
 ***
 
@@ -424,7 +424,7 @@ shinyApp(
 Not surprisingly, as the minimum cohort size increases, the spread in the PCA plot decreases and the first principal component is able to explain more of the variation in the data. The biggest drop in unexplained variability occurs when the minimum cohort size is increased from 10 to 20. Once beyond 20 the variability in achievement rates continues to decrease but at a slower rate. The loadings, represented by the plot axes, remain reasonably consistent. The first principal component generally measures overall performance across the four qualification levels, while the second component contrasts L1 and L2 preformance against L3 and UE. (Screenshot comparing the static plots for n=10 and 20)
 
 ***
-Dynamic visualisation allows multiple analyses to be computed and compared quickly. The flexibility of being able to pause animations allows closer examination of details, as the need arises.
+*Dynamic visualisation allows multiple analyses to be computed and compared quickly. The flexibility of being able to pause animations allows closer examination of details, as the need arises.*
 
 ***
 
@@ -435,7 +435,7 @@ selectInput("group", "Select variable", choices=as.list(colnames(nzqa.sch)[6:15]
 ```
 
 ***
-When interactive techniques can be applied with ease, the trade-off between the effort required to implement the technique and the level of insight gained, is generally favourable.
+*When interactive techniques can be applied with ease, the trade-off between the effort required to implement the technique and the level of insight gained, is generally favourable.*
 
 ***
 
@@ -456,11 +456,11 @@ ggplotly(pcp.scale, tooltip=c("group", "colour", "x", "y")) %>%
 
 
 ***
-Key findings with regards to the use of interactive techniques in data analysis, or the teaching of interactive data visualisation, will be noted explicitly as they are demonstrated through worked examples.
+*Key findings with regards to the use of interactive techniques in data analysis, or the teaching of interactive data visualisation, will be noted explicitly as they are demonstrated through worked examples.*
 
 ***
 
 ***
-The insights into multidimensional data structures gained from individual static plots were leveraged and further explored when interactive techniques were applied. 
+*The insights into multidimensional data structures gained from individual static plots were leveraged and further explored when interactive techniques were applied.*
 
 ***
