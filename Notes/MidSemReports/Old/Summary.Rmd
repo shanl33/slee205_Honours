@@ -1,0 +1,86 @@
+---
+title: "Summary"
+author: "Shan-I Lee"
+date: "10/5/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+# For tidying of NCEA data
+library(tidyr) 
+library(dplyr)
+# For reading xls binary file for 2016 schools data
+library(gdata)
+# For plots
+library(GGally)
+# For interactivity
+library(plotly)
+library(shiny)
+library(crosstalk)
+# For crabs data
+library(MASS)
+# For tours
+library(tourr)
+```
+
+#### Introduction
+
+The two stages of this research project reflect a learning process that students may undertake for a semester-long graduate level course using code-based, open source software for interactive data visualisation. 
+
+#### Method
+
+The first stage of this research entailed a survey on interactive techniques and the range of open-source software currently available. The coverage of interactive techniques by each software, was used to determine the set of software tools to use for exploring the role of interactive visualisation in the data analysis cycle. This second stage of research applied interactive techniques to exploratory data analysis of a data set not previously examined in the literature.
+
+#### Findings
+
+Identification, different types of linked brushing and tours, were identified as commonly used techniques in interactive data visualisation. Utilising the `R` packages `plotly` and `crosstalk` together, or in combination with `Shiny` software, provided a code-based, open-source approach towards applying these interactive techniques. Awareness towards the limitations and code efficiency of each software, enabled the efficient application of interactive techniques to exploratory data analysis of a "real" data set. 
+
+Applying interactive data visualisation resulted in further insight into underlying multivariate structures. For example tooltip identification of outliers and linked brushing of individual and groups of observations, capitalised on the multivariate views offered by parallel coordinates plots. Furthermore interactive filtering helped to reduce problems caused by overplotting and allowed the effect of sample size on analysis to be explored.
+
+Interactive techniques also helped to develop a deeper understanding of abstract multivariate data analysis methods. Linked brushing between the visual projections of a guided tour and its respective projection pursuit index, prompted further exploration of the multidimensional data space from other projections.
+
+The benefits of utilising interactivity in data analysis outweighed the effort required to implement the interactive techniques. Once sufficient mastery of software was acquired, the interactive techniques could be applied to new analysis in novel ways. The ease of applying interactive techniques to gain deeper insight in analysis and a thorough understanding of underlying processes, justifies teaching interactive data visualisation to graduate students.
+
+### Survey of interactive techniques and software
+
+### The role of interactive visualisation in data analysis
+The data analysis process described by Cook and Swayne (2007) provided a structure and context for meaningful interactive data visualisation. They described and demonstrated how interactive techniques were useful for identifying the problem statement, preparing the data, enriching the exploratory and quantitative analysis, and lastly in the presentation of findings. This section examines the use of interactive techniques in exploratory data analysis of the performance of New Zealand schools in the National Certificate of Educational Achievement (NCEA) in 2016. 
+
+#### The NCEA data set
+Data on the achievement rates of schools across the four qualification levels, Level One, Two, Three (L1, L2, L3) and University Entrance (UE), were obtained from the New Zealand Qualifications Authority (NZQA) website. Students need to demonstrate sufficient mastery of standards at each respective level in order to be awarded the qualification. The UE qualification differs from L3, in that the standards need to be from "university endorsed" Level Three subjects, and specific requirements for literacy and numeracy need to be met.
+
+Information on the school decile, region and a "small" cohort warning, were also provided in the data. The decile rating is a measure of the general income level of the families of students attending the school. The socio-economic background of students increases as the decile increase from one to ten. A handful of schools have a decile rating of zero, due to unique circumstances that make them exempt from the socio-economic measure. The achievement rate of a school for each qualification level was quantified in a few ways. The achievement indicator chosen for this analysis was the proportion of students at the school who were successful in obtaining the qualification level, given that they were entered in enough standards to have the opportunity to earn the qualification in the 2016 school year. This is referred to as the "Current Year Achievement Rate" for the "Participating Cohort" by the NZQA (see <http://www.nzqa.govt.nz/assets/Studying-in-NZ/Secondary-school-and-NCEA/stats-reports/NZQA-Secondary-Statistics-Consolidated-Data-Files-Short-Guide.pdf>). 
+
+Only schools with achievement indicators across all four qualification levels were retained, thus reducing the dataset to 408 schools from around New Zealand. The focus of analysis will be on its subset of 91 Auckland schools, but the New Zealand dataset of 408 schools will be used to demonstrate how interactive techniques can be useful as the number of observations increases.
+
+The focus of analysis will be on the Auckland subset because it is less affected by the unreliability of small sample sizes. The NZQA indicator of a "small" cohort was at a very low threshold of fewer than five candidates for any qualification level. Being the most populated city in New Zealand, Auckland has many of the larger schools, but there may still be some schools left in the analysis that have less than 30 candidates entered in a qualification level. The first few observations from the data set of 91 schools in the Auckland region are shown below.
+
+#### Body (more detailed comments)
+
+Furthermore the accessibility of the software and output format of visualisations, made the analysis easy to share.  (Shiny crosstalk plotly)
+The standalone `ggobi` software provided a wide range of interactive techniques that could be easily applied via its graphical user interface. However the lack of code documentation and difficult installation requirements, were its main drawbacks.
+
+Familiar "small" datasets can be of use during this stage of the learning process since the focus is on mastering the software tools to enable the interactive techniques, rather than its use for data analysis. 
+
+However, the feasibility of applying interactive visualisation to "large" datasets, with the open-source tools examined (at their current stage of development), was affected by the same rendering time delays faced by static plots. 
+
+Furthermore, linked brushing between a visual representation of principal component analysis and the parallel coordinates plot enabled further insights into the multivariate structures underlying the data. 
+
+The experiences gained from utilising interactive techniques within the data analysis cycle reflects the educational value and contribution of interactive data visualisation towards providing deeper insights into data.
+
+
+Utilising code-based, open source software for teaching interactive data visualisation enables students to transfer the interactive techniques learnt to novel situations beyond the required coursework. 
+
+The flexibility of transferring interactive techniques and software tools previously acquired in the first stage of the learning process, was also demonstrated. The skills learnt to implement interactive sliders for visualising dynamic tours, were utilised for a different purpose of testing the sensitivity of the analysis to sample size. 
+The ease of extending and modifying existing code to interactively explore the data further, reflected the practicality of using interactive techniques in exploratory data analysis. 
+
+***
+Key findings with regards to the use of interactive techniques in data analysis, or the teaching of interactive data visualisation, will be noted explicitly as they are demonstrated through worked examples.
+
+***
+
+***
+The insights into multidimensional data structures gained from individual static plots were leveraged and further explored when interactive techniques were applied. 
+
+***

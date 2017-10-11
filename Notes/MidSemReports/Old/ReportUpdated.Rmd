@@ -223,7 +223,7 @@ ncea_PCA <- function(df, scale.factor=20, nudge=-0.2, decile.pch=T, gp="Decile",
 ncea_PCA(akl) + ggtitle("Achievement of Auckland schools in 2016")
 ```
 
-The principal components plot in Figure 7 provided a view of the multivariate distribution of the Auckland schools dataset that was less easily affected by overplotting than a static PCP. Hence refinements on observations were possible. From the parallel coordinate plots we observed that "higher" decile schools performed more consistently with each other and dominated across the four qualification levels, but it was difficult to quantify the decile "cut off" for such schools. The PCA suggests these are the decile nine and ten Auckland schools, with the exception of two schools. One cannot help but wonder: Who are the two unusual decile nine and ten Auckland schools? The interactive tooltips in Figure 8 instantly satifies this curiosity and hence demonstrates the usefulness of being able to directly identify unusual observations. The linked brushing between visual representations of the PCA model and the original variables, also confirms previous observations and supports a better understanding of the PCA model.
+The principal components plot in Figure 7 provided a view of the multivariate distribution of the Auckland schools dataset that was less easily affected by overplotting than a static PCP. Hence refinements on observations were possible. From the parallel coordinate plots we observed that "higher" decile schools performed more consistently with each other and dominated across the four qualification levels, but it was difficult to quantify the decile "cut off" for such schools. The PCA suggests these are the decile nine and ten Auckland schools, with the exception of two schools. One cannot help but wonder: Who are the two unusual decile nine and ten Auckland schools? The interactive tooltips in Figure 8 instantly satifies this curiosity and hence demonstrates the usefulness of being able to directly identify unusual observations. The linked brushing between visual representations of the PCA model and the original variables, also confirms previous observations and supports a better understanding of the abstract PCA model.
 
 ```{r}
 # Function for linked factor plot
@@ -309,7 +309,7 @@ save(nzqa.sch, file="nzqa.sch.RData")
 The minimum cohort size for Year 11, 12 and 13 will be used as indicator of whether the achievement rates are based on small sample sizes. 
 ```{r}
 # Load merge school data
-load("nzqa.sch.RData")
+load("files/nzqa.sch.RData")
 nzqa.sch$Decile <- as.factor(nzqa.sch$Decile)
 summary(nzqa.sch$Min.Cohort)
 summary(nzqa.sch[16:19])
@@ -363,4 +363,26 @@ ggplotly(pcp.scale, tooltip=c("group", "colour", "x", "y")) %>%
   highlight(on="plotly_select", off="plotly_deselect", color = "red",  
             persistent=T, dynamic=T)
 ```
+
+
+### Draft: Not used comments
+
+#### Body (more detailed comments)
+
+Furthermore the accessibility of the software and output format of visualisations, made the analysis easy to share.  (Shiny crosstalk plotly)
+The standalone `ggobi` software provided a wide range of interactive techniques that could be easily applied via its graphical user interface. However the lack of code documentation and difficult installation requirements, were its main drawbacks.
+
+Familiar "small" data sets can be of use during this stage of the learning process since the focus is on mastering the software tools to enable the interactive techniques, rather than its use for data analysis. 
+
+However, the feasibility of applying interactive visualisation to "large" data sets, with the open-source tools examined (at their current stage of development), was affected by the same rendering time delays faced by static plots. 
+
+Furthermore, linked brushing between a visual representation of principal component analysis and the parallel coordinates plot enabled further insights into the multivariate structures underlying the data. 
+
+The experiences gained from utilising interactive techniques within the data analysis cycle reflects the educational value and contribution of interactive data visualisation towards providing deeper insights into data.
+
+
+Utilising code-based, open source software for teaching interactive data visualisation enables students to transfer the interactive techniques learnt to novel situations beyond the required coursework. 
+
+The flexibility of transferring interactive techniques and software tools previously acquired in the first stage of the learning process, was also demonstrated. The skills learnt to implement interactive sliders for visualising dynamic tours, were utilised for a different purpose of testing the sensitivity of the analysis to sample size. 
+The ease of extending and modifying existing code to interactively explore the data further, reflected the practicality of using interactive techniques in exploratory data analysis. 
 
