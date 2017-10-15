@@ -30,12 +30,19 @@ library(MASS)
 library(tourr)
 ```
 
+# To do's:
++ Screenshot of shiny app and put it on shiny.
++ Add to intro.
++ Check all points are demonstrated in part 2.
+
+
 # Introduction
 
 The two stages of this research project reflect a learning process that students may undertake for a semester-long graduate level course using code-based, open source software for interactive data visualisation. 
 
 ## Method
 
+(add more details on method for surveying)
 The first stage of this research entailed a survey on interactive techniques and the range of open-source software currently available. The coverage of interactive techniques by each software was used to determine the set of software tools to use for exploring the role of interactive visualisation in the data analysis cycle. This second stage of research applied interactive techniques to exploratory data analysis of a data set not previously examined in the literature.
 
 ## Findings
