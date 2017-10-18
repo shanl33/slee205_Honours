@@ -1,0 +1,11 @@
+name: ncea
+title: NCEA
+account: shanl33
+server: shinyapps.io
+appId: 226403
+bundleId: 1032187
+url: https://shanl33.shinyapps.io/ncea/
+when: 1508308072.32944
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: ReportDraft.Rmd|Rplots.pdf|files/.DS_Store|files/link_group.jpg|files/link_outPCA.jpg|files/link_outPCP.jpg|files/pcp_hard.jpg|files/pcp_L3.jpg|files/pcp_outlier.jpg

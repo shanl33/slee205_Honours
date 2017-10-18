@@ -1,0 +1,513 @@
+---
+title: "Code-based, open-source software for teaching interactive data visualisation"
+author: "Shan-I Lee"
+#output: pdf_document
+output: 
+  bookdown::html_document2:
+    fig_caption: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, fig.pos='center')
+# For cross referencing in html
+library(bookdown)
+# For including static graphics
+library(knitr)
+# For tidying of NCEA data
+library(tidyr) 
+library(dplyr)
+# For reading xls binary file for 2016 schools data
+library(gdata)
+# For plots
+library(GGally)
+# For interactivity
+library(plotly)
+library(shiny)
+library(crosstalk)
+# For crabs data
+library(MASS)
+# For tours
+library(tourr)
+```
+
+# To do's:
++ Screenshot of shiny app and put it on shiny.
++ Add to intro.
++ Check all points are demonstrated in part 2.
+
+A literature review was undertaken to identify commonly used interactive techniques and hence the techniques that should be prioritised when teaching interactive data visualisation. The survey of current software tools was then guided by their ability to enable/deliver these techniques.
+
+NCEA - use tour on cmass and link to PCP. 
+Explore neighbourhood of PCA's for interesting views.
+See if schools have a common structure (high L1, high L2, low L3, low UE?). Not focus on using decile to explain structure. More complex than that. EDA forces us to see what we don't expect. Started with the intention of exploring a relationship between decile and NCEA achievement, but gained insights that went further than using a single factor to describe complex patterns. Started with a relatively surface question that lead to more indepth questions as a result of applying interactive techniques in EDA. Would this have been possible without the use of visuals? Interactive techniques?
+
+If using ggparcoord - cannot use linked brushing in plotly at all (only default tooltips and legend filtering possible).  Need to explicitly 
+
+# Introduction
+
+The two stages of this research project reflect a learning process that students may undertake for a semester-long graduate level course using code-based, open source software for interactive data visualisation. 
+
+## Method
+
+(add more details on method for surveying)
+The first stage of this research entailed a survey on interactive techniques and the range of open-source software currently available. The coverage of interactive techniques by each software was used to determine the set of software tools to use for exploring the role of interactive visualisation in the data analysis cycle. This second stage of research applied interactive techniques to exploratory data analysis of a data set not previously examined in the literature.
+
+## Findings
+
+Identification, filtering, different types of linked brushing and tours, were found to be commonly used techniques in interactive data visualisation. Utilising the `R` packages `plotly` and `crosstalk` together, or in combination with `Shiny` software, provided a code-based, open-source approach towards applying these interactive techniques. Awareness towards the limitations and code efficiency of each software, enabled the efficient application of interactive techniques to exploratory data analysis of a "real" data set. 
+
+Applying interactive techniques to data analysis resulted in further insight into underlying multivariate structures. For example tooltip identification of outliers and linked brushing of individual and groups of observations, capitalised on the multivariate views offered by parallel coordinates plots. Furthermore interactive filtering helped to reduce problems caused by overplotting and allowed the effect of sample size on analysis to be explored.
+
+Interactive techniques also helped to develop a deeper understanding of abstract multivariate data analysis methods. Linked brushing between the visual projections of a guided tour and its respective projection pursuit index, prompted further exploration of the multidimensional data space.
+
+The benefits of utilising interactivity in data analysis outweighed the effort required to implement the interactive techniques. Once sufficient mastery of software was acquired, the interactive techniques could be applied to new analysis in novel ways. The ease of applying interactive techniques to gain deeper insight in analysis and a thorough understanding of underlying processes, justifies teaching interactive data visualisation to graduate students.
+
+# Survey of interactive techniques and software
+## Commonly used interactive techniques
+The data analysis process described by Cook and Swayne (2007) provides a structure and context for meaningful interactive visualisation. They describe how visualisation fits into the process of identifying the problem statement, preparing the data, engaging in exploratory data analysis (EDA) and quantitative analysis, and lastly in the presentation of findings. 
+
+## Capabilites of current software
+**Discuss default settings for each (ease of use) and then compare the ease of the other techniques, in particular linked brushing**
+The tables below summarise the interactive techniques described by Cook and Swayne (2007) covered by the `R` packages researched so far. Linked brushing is summarised separately since there is a variety of ways to brush and link plots. 
+
+```{r table1, results='asis', fig.cap="Interactive techniques for Shiny, Plotly and Crosstalk."}
+tabl <- "
+| R Package | Talks back to R | Identification | Scaling | Subset selection | Drag points | Brushing |
+|-----------|:---------------:|:--------------:|:-------:|:----------------:|:-----------:|:--------:|
+| Shiny | Y | | | Y<br>(input objects) | | | 
+| Plotly | | Y<br>(tooltips) | Y | Y<br>(legend icons) | | Y |
+| Crosstalk &<br>htmlwidgets | Y | Y | Y | Y<br>(filtering) | Y<br>(D3) | Y |
+"
+cat(tabl)
+```
+
+```{r table2, results='asis', fig.cap="Linked brushing techniques."}
+tabl2 <- "
+| R Packages | Aggregate<br>brushing | Persistent<br>brushing | Brush lines | Brush points<br>(link 1-to-1) | Brush to<br>link n-to-m |
+|------------|:---------------------:|:----------------------:|:-----------:|:-----------------------------:|:-----------------------:|
+| Plotly+Crosstalk |  | Y |  | Y |  | 
+| Plotly+Shiny | Y | Y |  | Y |  |
+"
+cat(tabl2)
+```
+
+The `plotly` package provides a starting point that enables the application of a variety of interactive techniques. The default settings for a `plotly` object allows for tooltip identification and scaling. Students have the option of converting plots in `ggplot2` to  `plotly` objects or directly creating plots using `plot_ly()`. The `plot_ly` function takes a similar layered Grammar of Graphics (Wilkinson 2005) approach as `ggplot2`. Although the graphics of `ggplot2` are more comprehensive, creating plots via `plot_ly()` should also be utilised since they interact more directly with the `plotly.js` library (Sievert 2017).
+
+The `tooltip` argument for `plotly` objects allows for customisation of the information to display when hovering on a graphical feature. Brushing within a standalone `plotly` plot is possible on a pcp.  Combining `Plotly` with `Crosstalk` introduces the key interactive technique of brushing to link multiple plots. This can also be achieved by using `Plotly` and `Shiny` together, but the `SharedData` environment of the `crosstalk` package allows brushing to be initiated in any of the linked plots by default. However the `crosstalk` package is not appropriate for use with large data sets and currently supports only linked brushing and filtering views, for certain HTML widgets where observations are individually displayed (see <https://rstudio.github.io/crosstalk/>).  Further research into how the `htmlwidgets` package can be used with `Crosstalk`, with or without the `reactive` function in `Shiny`, is still required. The use of `D3` graphics with `crosstalk` will enable the interactive technique of dragging points.  
+
+Utilising the `plotly_click` mode in the `event_data` function for `plotly` objects in `shiny` apps allows for linked brushing on area plots of categorical variables. 
+
+# The role of interactive visualisation in data analysis
+The data analysis process described by Cook and Swayne (2007) provided a structure and context for meaningful interactive data visualisation. They described and demonstrated how interactive techniques were useful for identifying the problem statement, preparing the data, enriching the exploratory and quantitative analysis, and lastly in the presentation of findings. This section examines the use of interactive techniques in exploratory data analysis on the performance of New Zealand schools in the National Certificate of Educational Achievement (NCEA) in 2016. 
+
+## The NCEA data set
+Data on the achievement rates of schools across the four NCEA qualification levels, Level One, Two, Three (L1, L2, L3) and University Entrance (UE), were obtained from the New Zealand Qualifications Authority (NZQA) website. Students need to demonstrate sufficient mastery of standards at each respective NCEA level in order to be awarded the qualification. The UE qualification differs from L3, in that the standards need to be from "university endorsed" Level Three subjects, and specific requirements for literacy and numeracy must be met.
+
+Information on the school decile, region and a "small" cohort warning, were also provided in the data. The decile rating is a measure of the general income level of the families of students attending the school. The socio-economic background of students increases as the decile increase from one to ten. A handful of schools have a decile rating of zero, due to unique circumstances that make them exempt from the socio-economic measure. The achievement rate of a school for each qualification level was quantified in a few ways. The achievement indicator chosen for this analysis was the proportion of students at the school who were successful in obtaining the qualification level, given that they were entered in enough standards to have the opportunity to earn the qualification in the 2016 school year. This is referred to as the "Current Year Achievement Rate" for the "Participating Cohort" by the NZQA (see <http://www.nzqa.govt.nz/assets/Studying-in-NZ/Secondary-school-and-NCEA/stats-reports/NZQA-Secondary-Statistics-Consolidated-Data-Files-Short-Guide.pdf>). 
+
+Only schools with achievement indicators across all four qualification levels were retained, thus reducing the data set to 408 schools from around New Zealand. The focus of analysis will be on its subset of 91 Auckland schools, but the New Zealand data set of 408 schools will be used to demonstrate how interactive techniques can aid graphical analysis when observations increase. The sensitivity of analysis to samples size for the New Zealand schools data set will also be explored interactively.
+
+The focus of analysis will be on the Auckland subset because it is less affected by the unreliability of small sample sizes. Auckland has many of the larger schools since it is the most populated city in New Zealand. The first few observations from the data set of 91 schools in the Auckland region are shown below.
+
+```{r}
+nzqa2016 <- read.csv("http://www.nzqa.govt.nz/assets/Studying-in-NZ/Secondary-school-and-NCEA/stats-reports/2016/Qualification-Statistics-School-2016-29032017.csv")
+# Drop vars that will not be used (eg. cumulative achievement)
+nzqa2016 <- nzqa2016[,-c(1,8,10)]
+names(nzqa2016) <- c("Decile", "Region", "School", "Year", "Qualification", "Achieve_participate", "Achieve_roll", "Small_sch")
+levels(nzqa2016$Qualification) <- c("L1", "L2", "L3", "UE")
+# Subset to use only Year 11 with Level 1, etc
+nzqa <- nzqa2016 %>% filter(((Qualification=="L1") & (Year==11)) | 
+                          ((Year==12) & (Qualification=="L2")) |
+                          ((Year==13) & (Qualification=="L3")) | 
+                          ((Year==13) & (Qualification=="UE"))) %>%
+  # Reshape so that each row represents an observation (a school)
+  # Current.Achievement.Rate.Participation kept for analysis only
+  spread(Qualification, Achieve_participate, fill=0) %>%
+  group_by(School) %>%
+  summarise_at(c("L1", "L2", "L3", "UE"), sum) %>%
+  inner_join(nzqa2016[, c(1, 2, 3, 8)]) %>% # Add Decile and Region and Small_sch variables
+  distinct() %>% 
+  filter(!((L1==0)&(L2==0)&(L3==0))) #Remove schools with 0% achievement rate for all levels
+
+# Function to replace 0% with NA
+zeros <- function(col) {
+  replace(col, col==0, NA)
+}
+
+nzqa[2:5] <- sapply(nzqa[2:5], zeros)
+# Remove schools with 'small cohort' warning (obscures pattern in non-small cohorts).
+nzqa <- nzqa[nzqa$Small_sch=="",] # 439 school left
+nzqa <- nzqa[, -8] # Remove Small_sch var
+# Remove schools with any NA values 
+nzqa <- nzqa[complete.cases(nzqa),] # 408 NZ schools
+nzqa$Decile <- as.factor(nzqa$Decile)
+# Subset Auckland schools only
+akl <- as.data.frame(nzqa[nzqa$Region=="Auckland", -7]) # 91 AKL schools
+rownames(akl) <- akl$School # Need for tooltips in tour
+head(akl[-1], n=3)
+```
+
+## Static visual analysis
+
+A question that naturally arises from the NCEA data is whether a school's performance is related to its decile rating. (Comment on importance of starting with univariate displays and analysis, Cook)
+
+The pairs plot in Figure \@ref(fig:pairs) shows the achievement rates at L1, L2 and L3 have a weak relationship with decile rating, but the positive correlation is strong at UE. There appears to be an increasing "lower bound" to achievement rates for L1, L2 and L3, as decile increases, but there is a lot of scatter above this boundary. In the bivariate scatterplots we can also see the spread of achievement rates varying across decile groups. The variation in achievement rates decreases as the decile increases (from one), across the L1, L2 and L3 qualification levels. We can see many schools approaching the maximum 100% achievement rate, for L1, L2 and L3, hence it is not surprising to see their univariate distributions are skewed to the left in Figure \@ref(fig:hists). The distribution of achievement rates for UE is less skewed and hints at two possible groupings. Furthermore performance across the qualification levels appear to be positively correlated, especially between L1 and L2. Hence the low-dimensional plots indicate non-normality, unequal spread between groups and multicollinearity.
+
+```{r pairs, fig.cap="Pairs plot for NCEA data on Auckland schools."}
+panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
+{
+    usr <- par("usr"); on.exit(par(usr))
+    par(usr = c(0, 1, 0, 1))
+    r <- cor(x, y)
+    txt <- format(c(r, 0.123456789), digits = digits)[1]
+    txt <- paste0(prefix, txt)
+    if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+    text(0.5, 0.5, txt, cex = cex.cor * r)
+}
+#pairs(akl[-1], upper.panel=panel.cor)
+pairs(akl[-1], lower.panel=panel.cor)
+```
+
+```{r hists, fig.cap="Univariate distributions for NCEA data on Auckland schools."}
+NCEA_hist <- function(x, title) {hist(x, xlab="Achievement rate", main=title)}
+layout(matrix(1:4, byrow=1, ncol=2))
+NCEA.hists <- mapply(NCEA_hist, akl[2:5], colnames(akl[2:5]))
+```
+
+## Multivariate visual representations
+
+The pairs plot in Figure \@ref(fig:pairs) provided a glimpse into the multivariate distribution of achievement rates across the four qualification levels. The parallel coordinates plot (PCP) shown below in Figure \@ref(fig:pcpAkl) allows us to further compare the multivariate distributions of achievement rates for different decile groups, as well as identify high dimensional clusters and outliers, if they exist.
+
+The ordering of axes in a PCP greatly affects the quality of the graphical analysis, hence interactivity that enables reordering of axes is recommended (Unwin, 2015). In the case of the NCEA data, the natural ordering of the four qualification levels by difficulty, conincides with the recommendation from Cook and Swayne (2007) to order the axes based on correlation. In addition, Unwin (2015) highlights the layering of colours also needs to be considered carefully, since the last group assigned a colour will dominate the other lines.
+
+The positive relationships previously identified in the pairs plot, should translate to approximately horizontal lines between the parallel axes in the PCP, as opposed to sloped or "criss-crossed" lines for negative correlation. The static plot in Figure \@ref(fig:pcpAkl) questions whether the positive relationships hold true for Auckland schools with low achievement rates and in some decile groups. In particular, there appears to be a negative relationship between achievement rates at L3 and UE for many schools. The achievement rates for UE are clearly the most variable.
+
+The higher decile schools in Auckland appear to dominate the high achievement rates across all qualification levels, while lower decile schools are less consistent with each other in terms of their performance across the levels. Although there are only 91 observations (lines), it is quite difficult to identify even "ball park boundaries", on the 10-point decile scale, to distinguish between "higher" and "lower" decile schools when describing possible patterns.
+
+```{r pcpAkl, fig.cap="Parallel coordinates plot for NCEA data on Auckland schools."}
+# Transform data frame to plot PCP
+ggpcp <- function(df, a=1, sd.group=NULL) {
+  # Transform df
+  long <- data.frame(School=rep(df$School, 4),
+                     Decile=rep(df$Decile, 4),
+                     Qualification=do.call(c, lapply(c("L1", "L2", "L3", "UE"), rep_len, nrow(df))),
+                     Achievement=c(unlist(c(df[c("L1", "L2", "L3", "UE")]))))
+  # Static PCP
+  pcp.static <- long %>% SharedData$new(key=~School, group=sd.group) %>%
+  ggplot(aes(x=Qualification, y=Achievement, group=School, colour=Decile)) +
+    geom_line(alpha=a) +
+    geom_point(alpha=a, size=0.01) +
+    labs(x="Qualification level", y="Achievement rate")
+  return(pcp.static)
+}
+
+ggpcp(akl) + ggtitle("Achievement of Auckland schools in 2016")
+```
+
+The following two plots demonstrate how alpha blending can help minimise the effects of overplotting as the number of observations increase. It is easier to check whether the patterns identified in Auckland schools extend to the 408 schools across New Zealand, using Figure \@ref(fig:pcpAlpha) where alpha blending is applied, rather than Figure \@ref(fig:pcpNZ). The performance of high achieving lower decile schools is less "drowned out" by the dominance of their higher decile counterparts, when alpha blending is used. Figure \@ref(fig:pcpAlpha) reveals a group of schools converging at 100% achievement for L3, but with varying levels of success at L2 and UE. It would be of interest to compare the achievement rates of these schools across the qualification levels. Similarly, we would be interested in tracking the performance of the school with the lowest achievement rate at L1. The school appears to make a convincing recovery in performance at L2, but it is impossible to follow its progress further in a static PCP due to overplotting. Interactive techniques will be later used to explore these points of interest.
+
+```{r pcpNZ, fig.cap="Parallel coordinates plot for New Zealand schools, without alpha blending."}
+ggpcp(nzqa) + ggtitle("Achievement of NZ schools in 2016")
+```
+
+```{r pcpAlpha, fig.cap="Parallel coordinates plot for New Zealand schools, with alpha blending."}
+nz.pcp <- ggpcp(nzqa, a=0.5, sd.group="NZpcp") + 
+  ggtitle("Achievement of NZ schools in 2016")
+nz.pcp
+```
+
+## Leveraging static plots with interactivity
+
+Although one of the strengths of a PCP is in identifying multivariate features, such as outliers (Cook & Swayne, 2007), the static plots in Figures \@ref(fig:pcpNZ) and \@ref(fig:pcpAlpha) do not allow these features to be explored, due to overplotting. The use of colour and interactive techniques are recommended for maximising the effectiveness of a PCP. Venables and Ripley (2002) argue parallel coordinate plots are "often too 'busy' without means of interaction" (p. 315). The interactive filtering feature in Figure \@ref(fig:pcpInt) addresses the problem of overplotting by allowing the user to isolate the distribution of each decile group (via a double-click on the legend). Furthermore, using the mouse to drag-and-select nodes on the parallel axes, brushes and links the acheivement rates of individual schools across all qualification levels. Lastly the hovering tooltip enables instant identification of indvidual schools by name.
+
+***
+*Interactive filtering alleviates issuses with overplotting when the number of observations increase.*
+
+***
+
+```{r pcpInt, fig.cap="Parallel coordinates plot with interactivity.", fig.width=10, fig.height=7}
+# Interactive
+ggplotly(nz.pcp, tooltip=c("group", "colour", "x", "y")) %>%
+  highlight(on="plotly_select", off="plotly_deselect", color = "red",  persistent=T, dynamic=T)
+```
+
+Figure \@ref(fig:pcpOut) demonstrates the use of interactive techniques to explore the outlier at L1, previously identified in Figure \@ref(fig:pcpAlpha). The tooltip identifies the school and the linked brushing reveals that despite its poor performance at L1, the school had 100% achievement rates at L2 and L3. 
+
+```{r pcpOut, fig.cap="Linked brushing to examine outliers.", out.width="700px"}
+include_graphics("files/pcp_outlier.jpg", auto_pdf=F)
+```
+
+Cook and Swayne (2007) describe how linked brushing enables dynamic database querying and direct comparisons between subsets of data and the general distribution. Figure \@ref(fig:pcpL3) illustrates how brushing the point where L3=100% on the interactive PCP, highlights the extent of the variability in performance at the other qualification levels. Surprisingly, the distribution of UE achievement rates for schools with 100% achievement at L3, is just as spread out as the overall performance of New Zealand schools in the data set. Many of these schools also obtained 100% achievement rates at L2, but again there is surprisingly variable success at L1.
+
+```{r pcpL3, fig.cap="Linked brushing to subset groups of interest.", out.width="700px"}
+include_graphics("files/pcp_L3.jpg", auto_pdf=F)
+```
+
+The query made via linked brushing in Figure \@ref(fig:pcpL3) is similar to subsetting the data using the code shown below. A summary could be used to examine the performance of the subset of 42 schools across the other qualifications, but making sense of this summary would required comparison with statistics for the whole data set. Furthermore the summary hides the unusual performance of individual schools at certain qualification levels. The interactive techniques allowed us to gain insights about the NCEA data, that would have been difficult to ascertain from static plots or numeric summaries alone.
+
+***
+*Linked brushing and tooltip identification, quickly reveals further insight into patterns underlying unusual groups, or individuals.*
+
+***
+
+```{r, echo=TRUE}
+L3all_achieve <- nzqa[nzqa$L3==1, c("L1", "L2", "UE")]
+nrow(L3all_achieve)
+summary(L3all_achieve)
+```
+
+However the ease and effectiveness of linked brushing can also be affected by overplotting. Figure \@ref(fig:pcpBusy) demonstrates how an attempt to use persistent brushing to identify the UE success rate of the school with 100% achievement at L3, but unusually low performance at L2, resulted in accidentally brushing an observation with a similar L2 achievement rate. The `plotly` `R` package used in Figure \@ref(fig:pcpInt) allows observations to be "brushed" via the drag-and-select motion (that was used), or a mouse click. Only the latter enables the brushing of individual lines on a PCP and the two options cannot be made concurrently available on the same plot.  The `ggobi` graphical user interface (GUI) applies the same drag-and-select motion to brush both points and lines on a PCP (Cook & Swayne, 2007). This greater flexibility would have avoided the issues caused by overplotting in this case, but some of the challenges of large data sets for static graphical displays will persist, even with interactive techniques. In particular the speed of rendering plots for large data sets determines whether the techinques can be applied "fast enough to be considered interactive" (Unwin 2015, p.20).
+
+***
+*The effectiveness of interactive techniques for large data sets will be affected by rendering delays and limitations imposed by plot size and resolution.*
+
+***
+
+```{r pcpBusy, fig.cap="Accuracy of brushing is affected by overplotting.", out.width="700px"}
+include_graphics("files/pcp_busy.jpg", auto_pdf=F)
+```
+
+The PCP in Figure \@ref(fig:pcpAkl) suggests that patterns of performance across decile groups, if they exist, are difficult to distinguish at the multivariate level for Auckland schools. Principal component analysis (PCA) provides a way to reveal interesting multivariate structure, through finding projections of the data that show maximal variability (Venables & Ripley, 2002). 
+
+A plot of the first two principal components of the Auckland schools data set is shown in Figure \@ref(fig:pcaAkl). The decile ratings of the schools are represented by colour. The axes for the original variables, reflecting the loadings of the principal components, indicate that the first principal component reflects the schools' general performance across all four qualification levels, while the second principal component contrasts performance in UE against the remaining qualifications. Not surprisingly the plot shows more spread across the first principal component since it explains a much greater proportion of the variation in the data. 
+
+```{r pcaAkl, fig.cap="First two principal components for Auckland schools"}
+# Static PCA plot
+# Function for PCA and plot
+# scale.factor is an arbitary value that scales the loadings axes so that they can be on a comparable scale as the standardised PCs (scores). 
+# nudge argument also depends on the range of PC1 (used for enhancing the legibility of text labels on loadings axes).
+ncea_PCA <- function(df, scale.factor=20, nudge=-0.2, gp="Decile", sd.group=NULL) {
+  # Perform PCA
+  pca <- prcomp(df[2:5], scale.=T)
+  # Explained variance
+  exp.var <- round(pca$sdev^2/sum(pca$sdev^2)*100, 1)
+  # Scores (rotated principal components)
+  scores <- data.frame(t(t(pca$x[, 1:2])*(pca$sdev[1:2]^-1)), df[-(2:5)], Group=df[, gp])
+  scores$Decile <- as.factor(df$Decile)
+  axis.limit <- c(-round(max(abs(scores[1:2])), 1), round(max(abs(scores[1:2])), 1))
+  # Set up for linked brushing for Fig 8
+  sdPCA <- SharedData$new(scores, key=~School, group=sd.group)
+  # Variable axes (loadings)
+  lambda <- pca$sdev[1:2]/sqrt(nrow(df)-1)
+  loadings <- data.frame(varnames = rownames(pca$rotation),
+                              t(t(pca$rotation[, 1:2])*lambda*scale.factor))
+  # Plot of first two PCs
+  PCAplot <- ggplot(loadings) + 
+    geom_segment(aes(x=0, y=0, xend=PC1, yend=PC2), colour="grey35") +
+    geom_text(aes(x=PC1, y=PC2, label=varnames), colour="grey35", nudge_x=nudge) +
+    geom_point(data=sdPCA, aes(x=PC1, y=PC2, colour=Group, label1=School)) +
+    labs(x=paste("PC1 (", exp.var[1], "% explained var.)", sep=""),
+         y=paste("PC2 (", exp.var[2], "% explained var.)", sep="")) +
+    scale_x_continuous(limits=axis.limit) +
+    scale_y_continuous(limits=axis.limit*1.1) +
+    theme(
+      panel.border=element_rect(colour="grey", fill=NA),
+      panel.background=element_blank(),
+      legend.position="none",
+      axis.text=element_blank(),
+      axis.ticks=element_blank())
+  return(PCAplot)
+}
+# Static plot (with no legend)
+akl.PCA <- ncea_PCA(akl, sd.group="AKLncea") + 
+  labs(title="Achievement of Auckland schools in 2016")
+
+akl.PCA + 
+  theme(legend.position = "right", legend.key=element_rect(fill="white")) +
+  guides(colour=guide_legend("Decile", reverse=TRUE))
+```
+
+The colour scheme in \@ref(fig:pcaAkl) highlights that apart from two schools, decile nine and ten schools performed similarly. Meanwhile schools from the remaining deciles were more spread out from each other in the PCA plot. It is difficult not to be affected by the colour scheme when identifying patterns in Figure \@ref(fig:pcaAkl). Unwin(???) emphasised the influence of colour choice can have on conclusions drawn during graphical data analysis. 
+
+Finding a colour scheme that sufficiently distinguishes between the 11 levels of the decile factor and avoids "dominating colours", would be challenging, if not impossible. Furthermore since there is a sequential order to the decile levels, trends such as those identified for higher decile schools would be hard to see in Figure \@ref(fig:pcaAkl), if a purely qualitative colour scheme had been applied.
+
+Linked brushing in Figure ?? enables subset selection by decile level. 
+
+```{r}
+# Static PCA already defined (akl.PCA)
+
+# Interactive PCA plot
+link.PCA <- ggplotly(akl.PCA, tooltip=c("label1")) %>% 
+  layout(showlegend=FALSE)
+
+# Interactive decile plot
+link.decile <- ncea_factor(akl, sd.group="AKLncea") %>%
+  layout(yaxis=list(side="right"), margin=list(r=30))
+
+# Linked brushing of PCA and decile plot
+subplot(link.PCA, link.decile, widths=c(0.7, 0.3), margin=0, titleX=T, titleY=T) %>%
+  layout(dragmode="select") %>%
+  highlight(on="plotly_select", off="plotly_deselect", color="blue", persistent=T)
+```
+
+
+Confirms then grouping of decile 9 and 10?
+
+```{r}
+include_graphics("files/akl9_10.jpg", auto_pdf=F)
+```
+
+
+The principal components plots provided a view of the multivariate distribution of the Auckland schools data set that was less easily affected by overplotting than a static PCP. Hence refinements on observations were possible. From the parallel coordinate plots we observed that "higher" decile schools performed more consistently with each other and dominating across the four qualification levels, but it was difficult to quantify the decile "cut off" for such schools. The PCA suggests these schools are the decile nine and ten schools in Auckland, with the exception of two schools. Again interactive tooltips enable instant identification of these two unusual observations, in Figure \@ref(fig:pcaInt).
+
+Furthermore the two plots in Figure \@ref(fig:pcaInt) are interactively linked by brushing. Individual or groups of points in the PCA plot can be brushed via a drag-and-select motion using the mouse. The "Lasso Select" option can be activated from the hovering menu on the top right hand corner, if the region of points to be selected is irregular rather than rectangular. The original achievement rates of the selected schools will be highlighted in the PCP, while the lines for the unselected schools will be dimmed. Similarly brushing on the nodes of the PCP highlights the observations on the PCA plot.
+
+```{r}
+# Function for linking a plot showing the levels of a factor
+ncea_factor <- function(df, gp="Decile", sd.group=NULL) {
+  # Set up for linked brushing 
+  sdGroup <- SharedData$new(data.frame(df, Group=df[, gp]), key=~School, group=sd.group) 
+  # Static plot
+  factor.p <- ggplot(sdGroup) +
+    geom_jitter(aes(y=Group, x=1, colour=Group, label=School), width=0.1, height=0) +
+    labs(x=as.character(gp), y="") +
+    scale_x_continuous(limits=c(0.7, 1.3)) +
+    theme(
+      panel.border=element_rect(colour="grey", fill=NA),
+      panel.background=element_blank(),
+      legend.position="none",
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank())
+  # Interactive linked plot
+  link.factor <- ggplotly(factor.p, tooltip=c("colour", "label"))
+  return(link.factor)
+}
+
+# Static PCA already defined (akl.PCA)
+
+# Interactive PCA plot
+link.PCA <- ggplotly(akl.PCA, tooltip=c("label1")) %>% 
+  layout(showlegend=FALSE)
+
+# Interactive decile plot
+link.decile <- ncea_factor(akl, sd.group="AKLncea") %>%
+  layout(yaxis=list(side="right"), margin=list(r=30))
+
+# Linked brushing of PCA and decile plot
+subplot(link.PCA, link.decile, widths=c(0.7, 0.3), margin=0, titleX=T, titleY=T) %>%
+  layout(dragmode="select") %>%
+  highlight(on="plotly_select", off="plotly_deselect", color="blue", persistent=T)
+```
+
+```{r pcaInt, fig.cap="First two principal components for Auckland schools with interactivity."}
+# PCP below is linked with PCA above
+# Static plot
+AKL.pcp <- ggpcp(akl, sd.group="AKLncea")
+# Interactive plot
+ggplotly(AKL.pcp, tooltip=c("group", "colour", "x", "y")) %>%
+  layout(dragmode="select", showlegend=FALSE) %>%
+  highlight(on="plotly_select", off="plotly_deselect", color = "blue", persistent=T, dynamic=T)
+```
+
+Figure \@ref(fig:brushGroup) demonstrates the use of the lasso brush to highlight the original variable values of the central group of points in the PCA plot. The linked brushing and tooltip identification reveals that these Auckland schools have at least 80% achievement rates at all four qualification levels, except for UE. We are also able to identify the only decile one school in this group.
+
+```{r brushGroup, fig.cap="Brushing a central group of points in the PCA plot links with the decile and achievement rates of the selected schools.", out.width="500px"}
+include_graphics("files/link_group.jpg", auto_pdf=F)
+```
+
+In a similar manner to Figure \@ref(fig:pcpBusy), persistent brushing can be applied with different colours to further explore the multivariate features revealed by the PCA. The three outliers brushed in the PCA plot are at two extremes. Comparing their achievement rates on the PCP helps to explain why they are unusual in different ways. Two of the outliers had consistently high performance at the first three qualification levels, but there was a drastic drop in the UE achievement rate. Although, as previously observed, lower performance at UE was shared by the Auckland schools in general, the large differences between the two schools' achievement rates for UE and the remaining qualification levels, are still unexpected. The single outlier at the other extreme of the PCA plot, defies the general trend. Its L1 achievement rate was inconsistently lower than the other qualification levels, rather its UE rate. Although all three schools had unusual performance compared to Auckland schools in general, the inconsistencies in their performance differed. The linked brushing enabled us to further investigate the differences in "unusualness" and it also highlights how the multivariate outliers identified in the PCA are hidden in the PCP.
+
+*** 
+*Linked brushing between plots allows different visual representations of the same data to be related together, so that abstract methods can be explored further to reveal more insights about the multivariate features.*
+
+***
+
+```{r brushOutPCA, fig.cap="Brushing outliers on the PCA plot identifies inconsistent patterns of achievement on the PCP.", out.width="500px"}
+include_graphics("files/link_outPCA.jpg", auto_pdf=F)
+```
+
+Initiating the linked brushing from the PCP is also useful. Figure \@ref(fig: linkOutPCP) confirms the outliers visible in the PCP are also identified as outliers in the PCA. The PCP highlights schools that have unusually low achievement rates at a particular qualification level, while the outliers from the PCA encompasses these schools, as well as those that are unusual in terms of patterns of performance. (Comment on use of different multivariate representations in analysis, Unwin).
+
+```{r brushOutPCP, fig.cap="Brushing outliers on the PCP confirms their status as also outliers in the PCA plot.", out.width="500px"}
+include_graphics("files/link_outPCP.jpg", auto_pdf=F)
+```
+
+The NZQA indicator of a "small" cohort was at a very low threshold of fewer than five candidates at any qualification level. Hence information on the number of Year 11, 12 and 13 students at each school in 2016, was sourced from the New Zealand government website, Education Counts (2017). The minimum cohort size for the three senior year levels will be used as indicator of whether the NCEA achievement rates were based on small sample sizes. The website also provided information on the ethnic composition of the New Zealand schools in terms of six general categories: Maori, Pasifika, Asian, Middle Eastern/Latin American/African (MELAA), Other and European/Pakeha. Hence the merged data set contained information on the NCEA achievement rates, region, type and total roll size of each New Zealand school, as well as the proportions of students in the six ethnic categories and a minimum cohort size based on the number of students at the senior year levels. The first few observations of the merged data set are shown below. 
+
+```{r, eval=FALSE}
+# Download file on school demographics (includes counts by Year group)
+download.file("https://www.educationcounts.govt.nz/__data/assets/excel_doc/0005/152609/Student-rolls-by-School-2010-2016.xlsx", "schools.xlsx")
+# Takes a long time to extract 2016 data
+schools2016 <- read.xls("schools.xlsx", sheet="2016", skip=2, header=T)
+# Subset relevant variables
+schools2016 <- schools2016[c(2, 4, 10, 13:18, 34:36)]
+# Tidy up variable names
+colnames(schools2016)[9] <- "EuropeanPakeha"
+colnames(schools2016)[4] <- "Maori"
+# Keep only schools with secondary level students
+schools2016 <- schools2016 %>%
+  filter(!((Type=="Full Primary")|(Type=="Intermediate")))
+
+# Merge with NZQA data 
+# School ID number not available on NZQA data and some names have changed
+# (eg. Auckland Grammar)
+levels(schools2016$School.Name) <- c(levels(schools2016$School.Name), "Auckland Grammar School")
+schools2016[schools2016$School.Name=="Auckland Grammar", 1] <- "Auckland Grammar School"
+nzqa.sch <- merge(nzqa, schools2016, by.x="School", by.y="School.Name") # 348 schools left
+# Change ethinicity counts to proportions
+# MELAA refers to Middle Eastern/Latin American/African
+nzqa.sch[10:15] <- sapply(nzqa.sch[10:15], function(x) {round(x/nzqa.sch$Total, 2)})
+nzqa.sch$Other <- 1 - Reduce("+", nzqa.sch[c(10:13, 15)]) 
+# Minimum cohort size for Yr 11 to 13
+nzqa.sch$Min.Cohort <- sapply(1:nrow(nzqa.sch), function(x) {min(nzqa.sch[x, 16:18])})
+nzqa.sch <- droplevels(nzqa.sch)
+save(nzqa.sch, file="nzqa.sch.RData")
+```
+
+```{r}
+# Load merge school data
+load("files/nzqa.sch.RData")
+nzqa.sch$Decile <- as.factor(nzqa.sch$Decile)
+head(nzqa.sch, n=3)
+```
+
+Figure \@ref(fig:pcaSize) allows the effect of sample size on PCA to be explored via an interactive slider that filters schools according to their minimum cohort size. The effect of varying the sample size can be dynamically viewed by selecting the "play" icon on the slider, as shown in Figure \@ref(fig:pcaSize).
+
+```{r pcaSize, fig.cap="Interactivity to explore the effect of sample size. See <https://shanl33.shinyapps.io/ncea/>.", out.width="500px"}
+# See NCEAsize.R for code for Shiny App
+include_graphics("files/pca_shiny0.jpg", auto_pdf=F)
+```
+
+The pattern previously noted for Auckland schools, where decile nine and ten schools were more consistent with each other in performance than the other deciles, appears to hold for New Zealand schools in general, as we vary the minimum cohort size of schools considered in the PCA. Not surprisingly, as the minimum cohort size increases, the spread in the PCA plot decreases and the first principal component is able to explain more of the variation in the data. The loadings, represented by the plot axes, remain reasonably consistent. The first principal component generally measures overall performance across the four qualification levels, while the second component contrasts L1 and L2 preformance against L3 and UE. 
+
+***
+*Dynamic visualisation allows multiple analyses to be computed and compared quickly. The flexibility of being able to pause animations allows closer examination of details, as the need arises.*
+
+***
+
+The interactive drop-down menu also allows us to quickly verify whether there are any underlying relationships between achievement rates and demographics other than decile, that are worth further investigation. Although the other demographic variables did not reveal any further insight, the ease with which these additional variables could be interactively linked to the PCA plot, justified their inclusion in the exploratory data analysis. Enabling the interactive drop-down menu in Figure \@ref(fig:pcaSize) involved adding the following single command to the code.
+
+```{r, echo=TRUE, eval=FALSE}
+selectInput("group", "Select variable", choices=as.list(colnames(nzqa.sch)[6:15]), selected="Decile")
+```
+
+***
+*When interactive techniques can be applied with ease, the trade-off between the effort required to implement the technique and the level of insight gained, is generally favourable.*
+
+***
+
+** In addition, or not, could using min cohort size to explore standardised PCP **
+Explore whether conclusions about above and below average schools across deciles hold (eg. the spread in decile 1 schools due to small sizes?  Decile 5 really the "average school"?)
+```{r}
+nzqa.scale <- nzqa
+nzqa.scale[2:5] <- scale(nzqa[2:5])
+head(nzqa.scale)
+pcp.scale <- ggpcp(nzqa.scale, a=0.5, sd.group="pcp_scale") + 
+  geom_hline(yintercept=0, lty=2, colour="grey30") +
+  ggtitle("Standardised achievement of NZ schools in 2016") +
+  labs(x="Qualification level", y="Standard deviations")
+ggplotly(pcp.scale, tooltip=c("group", "colour", "x", "y")) %>%
+  highlight(on="plotly_select", off="plotly_deselect", color = "red",  
+            persistent=T, dynamic=T)
+```
+
+
+***
+*Key findings with regards to the use of interactive techniques in data analysis, or the teaching of interactive data visualisation, will be noted explicitly as they are demonstrated through worked examples.*
+
+***
+
+***
+*The insights into multidimensional data structures gained from individual static plots were leveraged and further explored when interactive techniques were applied.*
+
+***
