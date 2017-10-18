@@ -10,7 +10,17 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Report questions
 + Use examples to explain what the techniques are in the survey part? If so use crabs to do it?
 + In survey of software can just focus on plotly, Shiny and Crosstalk? (Can include only these in the table and no others?) But mention ggobi (not code based), trelliscope (very specific application), both more GUIs orientated rather than code.
-* Focus on comparisons between the 3 packages instead? In terms ease and level of modification possible.
+* Focus on comparisons between the 3 packages instead? In terms of ease and level of modification possible.
+* In survey of techniques can focus on unpacking the three techniques: subset selection, linked brushing and tours? Mention identification, but not much to discuss.
+
+# To do's:
++ Check all points are demonstrated in part 2.
+
+NCEA - use tour on cmass and link to PCP. 
+Explore neighbourhood of PCA's for interesting views.
+See if schools have a common structure (high L1, high L2, low L3, low UE?). Not focus on using decile to explain structure. More complex than that. EDA forces us to see what we don't expect. Started with the intention of exploring a relationship between decile and NCEA achievement, but gained insights that went further than using a single factor to describe complex patterns. Started with a relatively surface question that lead to more indepth questions as a result of applying interactive techniques in EDA. Would this have been possible without the use of visuals? Interactive techniques?
+
+If using ggparcoord - cannot use linked brushing in plotly at all (only default tooltips and legend filtering possible).  Need to explicitly 
 
 # Uploading shiny app
 Retrieve key on shiny account (linked to github)
