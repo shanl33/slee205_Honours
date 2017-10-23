@@ -122,7 +122,7 @@ tour_plot <- function(df) {
     zeroline=F, showticklabels=F, showgrid=F
   )
   #All tour plots linked by brushing
-  df %>% SharedData$new(key=~ID, group = "2Dtour") %>% 
+  df %>% SharedData$new(key=~ID, group="2Dtour") %>% 
     plot_ly(x=~x, y=~y, frame=~iteration, color=I("black")) %>%
     add_markers(text=~ID, hoverinfo="text") %>%
     layout(xaxis=tx, yaxis=tx, 

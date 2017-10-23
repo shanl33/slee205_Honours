@@ -1,0 +1,22 @@
+div.boxed {
+  font-style: italic;
+  padding: 2em 4em 1em 4em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  background: #dbe4f0;
+}
+
+div.figure {
+   margin-top: 2em;
+   margin-bottom: 2em;
+}
+
+div.figcaption {
+  margin-top: 2em;
+}
+
+div.table {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+

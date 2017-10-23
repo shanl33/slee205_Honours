@@ -2,24 +2,31 @@
 title: "Code-based, open-source software for teaching interactive data visualisation"
 author: "Shan-I Lee"
 #output: pdf_document
+bibliography: ["HonoursProject.bib"]
+biblio-style: "apalike"
+link-citations: true
 output: 
   bookdown::html_document2:
     fig_caption: yes
+    css: ["style.css"]
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, fig.pos='center')
+#options(knitr.table.format = "html")  # Can change globally to "latex" for pdf
 # For cross referencing in html
 library(bookdown)
 # For including static graphics
 library(knitr)
+# For tables
+library(kableExtra)
 # For tidying of NCEA data
 library(tidyr) 
 library(dplyr)
 # For reading xls binary file for 2016 schools data
 library(gdata)
 # For plots
-library(GGally)
+library(ggplot2)
 # For interactivity
 library(plotly)
 library(shiny)
@@ -28,9 +35,18 @@ library(crosstalk)
 library(MASS)
 # For tours
 library(tourr)
+#library(htmltools) Needed for tours?
 ```
 
 # Introduction
+
+@EDA famously stated "The greatest value of a picture is when it **forces** us to notice what we never expected to see." (p vi).
+
+Visualisation has always been an integral part of data analysis. @Cook define data visualisation as the use of graphics to "support and enrich the statistical processes of data exploration, modeling and inference" (p. 3).  In addition, *interactive* data visualisation allows the user to interact with graphical features in order to achieve fast and flexible analysis [@GDA]. However @GDA highlights one of the challenges of interactive data visualisation is in documenting the analysis. Hence the focus of this research project is on code-based software. 
+
+This section examines the different types of software available and a toolbox of interactive techniques, before focusing on a set of "current" software tools for enabling commonly used interactive techniques.
+
+
 
 The two stages of this research project reflect a learning process that students may undertake for a semester-long graduate level course using code-based, open source software for interactive data visualisation. 
 
@@ -40,7 +56,7 @@ The first stage of this research entailed a survey on interactive techniques and
 
 ## Findings
 
-Identification, filtering, different types of linked brushing and tours, were found to be commonly used techniques in interactive data visualisation. Utilising the `R` packages `plotly` and `crosstalk` together, or in combination with `Shiny` software, provided a code-based, open-source approach towards applying these interactive techniques. Awareness towards the limitations and code efficiency of each software, enabled the efficient application of interactive techniques to exploratory data analysis of a "real" data set. 
+Identification, filtering, different types of linked brushing and tours, were found to be commonly used techniques in interactive data visualisation. Utilising the `R` packages **plotly** and **crosstalk** together, or in combination with **shiny** software, provided a code-based, open-source approach towards applying these interactive techniques. Awareness towards the limitations and code efficiency of each software, enabled the efficient application of interactive techniques to exploratory data analysis of a "real" data set. 
 
 Applying interactive techniques to data analysis resulted in further insight into underlying multivariate structures. For example tooltip identification of outliers and linked brushing of individual and groups of observations, capitalised on the multivariate views offered by parallel coordinates plots. Furthermore interactive filtering helped to reduce problems caused by overplotting and allowed the effect of sample size on analysis to be explored.
 
@@ -48,51 +64,184 @@ Interactive techniques also helped to develop a deeper understanding of abstract
 
 The benefits of utilising interactivity in data analysis outweighed the effort required to implement the interactive techniques. Once sufficient mastery of software was acquired, the interactive techniques could be applied to new analysis in novel ways. The ease of applying interactive techniques to gain deeper insight in analysis and a thorough understanding of underlying processes, justifies teaching interactive data visualisation to graduate students.
 
-# Survey of interactive techniques and software
-The data analysis process described by Cook and Swayne (2007) provided a structure and context for meaningful interactive data visualisation. They emphasised the role of interactive techniques in identifying the problem statement, preparing the data, enriching the exploratory and quantitative analysis, and lastly in the presentation of findings. Cook and Swayne (2007) demonstrated how interactive subset selection, different types of linked brushing and tours, were useful in exploring the nature of missing values and the effects of imputation. Furthermore these techniques were used to evaluate models from numerical methods, as well as to provide graphical approaches towards supervised classification and cluster analysis. Other interactive techniques, such as scaling, were encorporated at times, but the three interactive techniques of subset selection, linked brushing and tours, were repeatedly utilised across a variety of problems. Similarly Wickham (blindfold) applied the three techniques to encourage the visualisation of statistical models in data space and explore the processes underlying "black box" methods. They demonstrated how linked brushing between visual representations of summary statistics and displays of models, such as parallel coordinate plots, allows subsets of models to be compared. Interactive subset selection manages the volume of data generated by algorithmic methods, to make it useful.
-Tours are seen as one of the essential tools for visualising real-valued multivariate data space (Wickham tourr).
+# A survey of interactive techniques and software
 
-## Commonly used interactive techniques
+## Literature review of interactive techniques
+The data analysis process described by @Cook provided a structure and context for meaningful interactive data visualisation. They emphasised the role of interactive techniques in identifying the problem statement, preparing the data, enriching the exploratory and quantitative analysis, and lastly in the presentation of findings. The interactive techniques introduced by @Cook will form the basis of discussion, intermixed with contributions from other literature. 
+
+### Different types of interactive techniques
+In their worked examples, @Cook primarily used the interactive data visualisation software, **GGobi**. Although **GGobi** is an open-source software, it is not code-based. The R packages **plotly**, **crosstalk** and **shiny** were used to create the examples in this section. References to the strengths and weaknesses of these software will be mentioned, but discussed in more detail and summarised in the next section (Section ??).
+
+The **crabs** dataset will be used to demonstrate interactive techniques. The data consists of information on the **species** (Blue or Orange), **sex** and five physical measurements of 200 Australian crabs: frontal lobe (**FL**), rear width (**RW**), carapace length (**CL**), carapace width (**CW**) and body depth (**BD**).
+
+```{r crabs}
+data("crabs")
+crabs <- crabs[-3] # Drop "index" variable since not used.
+colnames(crabs)[1] <- "species"
+kable(crabs[c(1,2, 51, 52, 101, 102, 151, 152), ], booktabs=TRUE, caption="A subset of the **crabs** dataset. The data consists of two categorical variables and five real-valued variables.")
+```
+
+#### Linked brushing
+The interactive technique of linked brushing involves using the mouse to select one or more graphical features, which then prompts related features in the same plot and/or other plots to be highlighted in the same colour [@Cook]. There are different types of linked brushing, depending on the linking rule used. The most basic form of linking is one-to-one. Figures \@ref(fig:one2one) and \@ref(fig:one2one2) demonstrate linked brushing between a plot representing the two categorical variables of the **crabs** dataset and a scatterplot of the carapace length and rear width. The linking can be initiated by brushing points in either plot. The brushed regions are marked by a dashed boundary. Figure \@ref(fig:one2one2) also demonstrates persistent brushing, where the results from previous selections are retained in subsequent brushing. Cases linked by different "brushes" are also distinguished by colour in Figure \@ref(fig:one2one2).
+
+```{r, eval=FALSE}
+# Code for interactive plots
+# Use rownames as linking key
+crabsSD <- SharedData$new(crabs, key=~rownames(crabs), group="one2one")
+
+sex_sp <- ggplot(crabsSD, aes(x=species, y=sex)) +
+  geom_jitter(width=0.25, height=0.25)
+
+CL_RW <- ggplot(crabsSD, aes(x=CL, y=RW)) +
+  geom_point()
+subplot(sex_sp, CL_RW, titleX=TRUE, titleY=TRUE, margin=0.06) %>%
+  highlight(on="plotly_select", off="plotly_deselect", persistent=TRUE, dynamic=TRUE)
+```
+
+```{r one2one, fig.cap="The group of points representing male crabs of the Blue species is brushed to link with their carapace length and rear width measurements in the scatterplot.", out.width="700px"}
+include_graphics("files/one2one.jpg", auto_pdf=F)
+```
+
+```{r one2one2, fig.cap="An example of one-to-one linking and persistent brushing. The crab with the largest rear width measurement was first brushed, followed by the group of three smaller crabs. The sex and species of the four crabs are highlighted corresponding to the colours used in the brushing.", out.width="700px"}
+include_graphics("files/one2one2.jpg", auto_pdf=F)
+```
+
+Instead of linking by case, a categorical variable can also be used to define the linking rule. This results in all members of the same level being highlighted, once one member is brushed [@Cook]. Figure demonstrates categorical brushing being applied within a scatterplot. 
+
+```{r}
+# Should I bother with this???
+```
 
 
-## Capabilites of current software
+compared to Figure where two plots are linked to achieve the same result.
+
+For web-based software, brushing on visuals representing aggregated data, such as the bar plot in Figure, is more challenging than linking by case (RStudio/Cheng, crosstalk website). Although not impossible, the user needs to explicitly communicate details of the aggregation. This becomes more challenging when continuous variables are aggregated, or mosaic plots involving several categorical variables are used. The web-based R package **animint** attempts to make the implementation of aggregate brushing easier, but it is currently limited to discrete values and does not incorporate the flexibility of brushing by case (Hock paper).
+
+Linked brushing within a parallel coordinates plot (PCP) provides an example of *m*-to-*n* linking. A PCP displays multiple variables in a single plot by using parallel axes, rather than being restricted to two orthogonal axes, as in a scatterplot. Variable values on adjacent axes belonging to the same observation are joined by line segments. The parallel axes are typically scaled individually to maximise use of space on the plot, but global values can be used to establish a common scale for all axes as well [@GDA]. Figure \@ref(fig:m2nuni) uses five vertical axes, scaled individually to the range of each physical measurement recorded in the **crabs** dataset. The edges joining the nodes are relatively horizontal which suggests positive correlation between adjacent variables. Brushing the highest value on the **RW** axis links together the five physical measurements of the crab with the largest rear width. Hence linking together *m* nodes with *n* edges.
+
+```{r, eval=FALSE}
+# Code for interactive PCPs for crabs dataset
+# Function to create interactive PCP
+crabs_pcp <- function(df) {
+  df$ID <- rownames(df)
+  # Transform to a long data frame
+  pcp <- gather(df, "Measurement", "Length", 3:7) %>%
+    SharedData$new(key=~ID, group="crabs.pcp") %>%
+    ggplot(aes(x=Measurement, y=Length, group=ID, label=sex, label1=species)) +
+    geom_line() +
+    geom_point(size=0.01) 
+  pcp.int <- ggplotly(pcp, tooltip=c("x", "y", "label", "label1")) %>%
+  highlight(on="plotly_select", off="plotly_deselect", color = "red") 
+return(pcp.int)
+}
+
+# PCP with univariate min-max scaling
+# Standardise each column 
+crabs2 <- cbind(crabs[1:2], rescale(crabs[3:7]))
+crabs_pcp(crabs2)
+
+# PCP with global min-max scaling
+crabs_pcp(crabs)
+```
+
+```{r m2nuni, fig.cap="An example of m-to-n linking and identification. The five physical measurements of the crab with the largest rear width are linked together by brushing. Tooltips identify the crab as a female Orange crab."}
+include_graphics("files/m2n_uni.jpg", auto_pdf=F)
+```
+
+#### Identification
+
+Identification using tooltips is also demonstrated in Figure \@ref(fig:m2nuni). Labels containing variable values appear as the mouse "hovers" over graphical features representing the values. TourdeFrance (???) refers to this technique as "querying" the data and applies it to quickly answer basic questions during exploratory data analysis.
+
+### Scaling
+
+The use of different scales in visual displays can reveal different features of the data [@Cook]. Figure \@ref(fig:m2nglobal) displays the same data as in Figure \@(fig:m2nuni), but uses the overall range of the five physical measurements to apply a common scale to the parallel axes. The crab with the largest rear width is again brushed and identified. The change in scaling makes the correlation between variables more difficult to see in the figure below and the nodes even harder to brush individually, than the previous plot.
+
+```{r m2nglobal, fig.cap="Applying a global scale hides the correlation between variables and causes the plot to become easily overplotted."}
+include_graphics("files/m2n_pcp1.jpg", auto_pdf=F)
+```
+
+TourdeFrance (??) uses a PCP to analyse the time taken by cyclists to finish each stage of the 2013 Tour de France competition. He uses the **Mondrian** software's graphical user interface (GUI) to interactively change the scaling on the parallel axes to make a variety of comparisons between different stages of the race and the progress of competitors (see website as footnote). 
+
+Being able to zoom in or out of a plot provides another mode of interactive scaling. This can be particularly useful for viewing busy regions of a plot [@Cook]. By default, all interactive plots created using the **plotly** package have zoom and pan controls that are accessible via its hovering menu of interactive techniques, at the top of the plot (Carson ??).
+
+#### Line segments
+Line segments are essential to visualisations involving longitudinal data and are often used to represent models [@Cook]. @blindfold analysed a clustering algorithm by creating a dynamic visualisation using grid lines to represent models generated at each iteration. In network graphs, line segements define characteristics of connections between nodes. For example the weight of line segments between nodes (people) in a social network can reflect the frequency of exchanges between two people. Hence being able to brush and query line segments would be useful when applying interactive data visualisation to network analysis [@Cook]. 
+
+Unlike **GGobi**, the web-based software tools examined were unable to brush lines. The linked brushing previously demonstrated in the PCP was achieved by brushing a node on the **RW** variable's axis. Similarly, the **Mondrian** software limits brushing on a PCP to the nodes (Mondrian website). Linked brushing on dendrograms, using the **plotly** function `plot_dendro()`, is also restricted to brushing the nodes (see demonstration on <https://vimeo.com/189670650>)
+
+### Subset selection
+Subset selection involves using only a portion of the data for visualisation and/or analysis. This technique can help elleviate the computational strain and overplotting caused by large datasets [@Cook]. The **shiny** software provides different interactive input controls for subsetting data before mapping to graphical features or performing statistical analysis. Furthermore since interactive visuals created with **shiny** are connected to an active R session, it allows for analysis to be dynamically updated (Shiny).
+
+### Tours: A dynamic multivariate visual representation
+@tourr highlight tours as essential for gaining insight into the structures underlying real-valued multivariate data. A tour is an animation consisting of static low-dimensional projections of the high-dimensional data space. The projections to include in a tour can be manually determined, randomly chosen, or guided by algorithms, such as projection pursuits [@Cook]. The latter two options are referred to as grand tours and guided tours, respectively. Figure \@ref(fig:crabtour) shows a guided tour of 2D projections of the five dimensional space spanned by the real-valued variables of the **crabs** dataset. The "holes" projection pursuit index and geodesic interpolation between static projections provided by the R package **tourr**, were applied.
+
+```{r, eval=FALSE}
+# Code in separate R file
+source("files/guidedTour.R")
+guidedTour_app(crabs, index="holes")
+crabLog <- cbind(crabs[1:2], log(crabs[3:7]))
+guidedTour_app(crabLog, index="holes", PC=TRUE)
+```
+
+
+```{r crabtour}
+
+```
+
+
+@Cook demonstrated how linked brushing between projections of a tour enabled purely graphical approaches towards supervised classification and cluster analysis. Although the animation required for tours can be achieved in **shiny**, this "spin and brush" technique cannot be facilitated due to each projection being independently rendered. Instead **plotly** and **crosstalk** were used to implement linked brushing between projections. The **tourr** package enables all data for the tour projections to be pre-generate before compilation as an interactive visual. 
+
+## Applications of interactive techniques
+Other interactive techiques are out there but the techniques discussed were commonly used.
+@Cook demonstrated how interactive subset selection, different types of linked brushing and tours, were useful in exploring the nature of missing values and the effects of imputation. Furthermore these techniques were used to evaluate models from numerical methods, as well as to provide graphical approaches towards supervised classification and cluster analysis. Other interactive techniques, such as scaling, were encorporated at times, but the three interactive techniques of subset selection, linked brushing and tours, were repeatedly utilised across a variety of problems. Similarly @blindfold applied the three techniques to encourage the visualisation of statistical models in data space and explore the processes underlying "black box" methods. They demonstrated how linked brushing between visual representations of summary statistics and displays of models, such as parallel coordinate plots, allows subsets of models to be compared. Interactive subset selection helped to make the volume of data generated by algorithmic methods manageable and useful.
+
+# A survey of code-based software tools
+The demonstrations of interactive techniques described by @Cook in Section XXX, show that a code-based approach towards achieving the scope of techniques possible in **GGobi**, requires the use of more than one software. This section compares the ease of application, development progress and coverage of interactive techniques, for a range of code-based software tools. Consequently leading to the recommendation of using the R packages **plotly**, **crosstalk** and **shiny**, as the main software tools for introducing interactive techniques in teaching.
+
+## Types of interactive software
+@Lang described two types of interactive data visualisation software, those with a direct manipulation graphical environment and those driven by a command-line interface. **GGobi** and **Mondrian** are examples of software programmes that have a graphical user interface (GUI) for direct manipulation. GUI environments provide immediate response to user actions, but without technical knowledge of the underlying low-level language, it is difficult to modify or extend these types of software [@Lang]. On the other hand, command-line interfaces, such as **R**, not only allow modification of existing capabilities, but also the creation of new functions. Furthermore the R environment provides access to a vast range of techniques and tools for statistical analysis [@GDA]. R packages for interactive data visualisation aim to reap the benefits of direct manipulation, the extensibility of a scripting language and the statistical power of the R environment. The package **rggobi** connects the **GGobi** GUI with R, to enable complex interactive graphical analyses that would be difficult, if not impossible, to carry out without a command-line interface [@Lawrence]. Meanwhile packages like **plotly**, **crosstalk** and **shiny**, utilise the interactive graphics provided by the web, alongside the statistical functions accessible in R. The use of web browsers minimises the software requirements for utilising these packages. In contrast **rggobi** is dependent on the installation of **GGobi** and the specific software required for building the **GGobi** GUI. Consequently the ease of access to **rggobi** is at a disadvantage to the other R packages. @GDA highlights that the shift towards web-based software helps to make sharing and presenting analyses from interactive data visualisations easier.
+
+Other R packages for interactive data visualisation include **trelliscopejs** and **animint**. Like **plotly** these software build on the comprehensive graphing system provided by the R package **ggplot2** (Wickham, 2009?). By adding interactive functions, **trelliscopejs**, **animint** and **plotly**, convert static **ggplot2** objects into web-based interactive plots. The **trelliscopejs** package focuses on adding interactive techniques to trellis plots. (Hafen ???) describes **trelliscopejs** as enabling "interactivity for free" and emphasises that adding interactivity should require little time and effort beyond that needed to create the static plot. The design behind **animint** reflects a similar sentiment but enables interactivity for a wider range of plot types. It enables linked brushing by introducing additional arguments to the mapping system used in **ggplot2**. However currently this interactive technique can only be activated by conditioning on categorical or discrete variables (Hockings git). Furthermore all calculations are pre-computed before plot compilation and hence genuine "real-time" analysis in response to interactivity, is not possible.  The **plotly** package shares this limitation, but it enables additional interactive techniques, such as zooming and when paired with other software it is able to achieve more types of brushing. Furthermore **plotly** appears to be further along in its development, since it is the only package out of the three that is currently available on the Comprehensive R Archive Network (CRAN). For the purposes of teaching, it may be challenging to introduce software that is still underdevelopment.
+Instead of adding interactive components to **ggplot2** objects, the **ggvis** package shares a similar syntax, inspired by the grammar of graphics (ggvis web). The interactive features enabled by **ggvis** are similar to those available through **shiny**. For example the `input_slider()` function in **ggvis** creates an interactive slider equivalent to the functionality of **shiny**'s `sliderInput()`. Both software tools need to be connected to a R session in order for the interactive plots to be active. When applying interactive data visualisation for exploration and early stages of analysis, this is particularly useful because it allows the statistical analysis in R to respond directly to interactive inputs from the visuals (ggvis web). However for the purpose of presentation, interactive graphics created using **ggvis** or **shiny** would need to be hosted on a server. In contrast, interactive **plotly** plots are easy to share as a standalone HTML (Seivert git). In comparision to **shiny**, more aspects of **ggvis** are still underdevelopment and hence there may be significant changes to its current interfaces (ggvis web). Furthermore, **shiny** has the extra advantage of being compatible with a range of other software, such as **plotly** and **crosstalk**, whilst providing similar interactive functionality as **ggvis**. 
+
+Ease of application, development progress and coverage of interactive techniques were the main criterion used to identify **plotly**, **crosstalk** and **shiny** as an appropriate set of software tools for teaching interactive data visualisation.
+
+Compare the effort
+
+## A set of software tools
+In discussing the technical tools available to statisticians, @Tukey highlighted: "Today, software and hardware together provide far more powerful factories than most statisticians realize, factories that many of today's most able young people find exciting and worth learning about on their own." (p. 25). Although Tukey's comments in 1965 were in response to the potential impact of computers on statistical practices at the time, his comments are still relevant for examining the effects of the internet and web-based graphics on interactive data visualisation. The three packages of primary focus...
+
+
+### Coverage of interactive techniques
 **Discuss default settings for each (ease of use) and then compare the ease of the other techniques, in particular linked brushing**
 The tables below summarise the interactive techniques described by Cook and Swayne (2007) covered by the `R` packages researched so far. Linked brushing is summarised separately since there is a variety of ways to brush and link plots. 
 
-```{r table1, results='asis', fig.cap="Interactive techniques for Shiny, Plotly and Crosstalk."}
-tabl <- "
+Table: (\#tab:techniques) Interactive techniques for Shiny, Plotly and Crosstalk.
+
 | R Package | Talks back to R | Identification | Scaling | Subset selection | Drag points | Tours |
 |-----------|:---------------:|:--------------:|:-------:|:----------------:|:-----------:|:--------:|
 | Shiny | Y | | | Y<br>(input objects) | | | 
 | Plotly | | Y<br>(tooltips) | Y | Y<br>(legend icons) | | Y |
 | Crosstalk &<br>htmlwidgets | Y | Y | Y | Y<br>(filtering) | Y<br>(D3) | Y |
-"
-cat(tabl)
-```
 
-```{r table2, results='asis', fig.cap="Linked brushing techniques."}
-tabl2 <- "
+Table: (\#tab:brushing) Linked brushing techniques.
 | R Packages | Spin and<br>brush | Persistent<br>brushing | Brush lines | Brush points<br>(link 1-to-1) | Categorical<br>brushing |
 |------------|:---------------------:|:----------------------:|:-----------:|:-----------------------------:|:-----------------------:|
-| Plotly+Crosstalk |  | Y |  | Y |  | 
-| Plotly+Shiny | Y | Y |  | Y | Y |
-"
-cat(tabl2)
-```
+| Plotly+Crosstalk | Y | Y |  | Y |  | 
+| Plotly+Shiny |  | Y |  | Y | Y |
 
-The `plotly` package provides a starting point that enables the application of a variety of interactive techniques. The default settings for a `plotly` object allows for tooltip identification and scaling. Students have the option of converting plots in `ggplot2` to  `plotly` objects or directly creating plots using `plot_ly()`. The `plot_ly` function takes a similar layered Grammar of Graphics (Wilkinson 2005) approach as `ggplot2`. Although the graphics of `ggplot2` are more comprehensive, creating plots via `plot_ly()` should also be utilised since they interact more directly with the `plotly.js` library (Sievert 2017).
+The **plotly** package provides a starting point that enables the application of a variety of interactive techniques. The default settings for a **plotly** object allows for tooltip identification and scaling. Students have the option of converting plots in `ggplot2` to  **plotly** objects or directly creating plots using `plot_ly()`. The `plot_ly` function takes a similar layered Grammar of Graphics (Wilkinson 2005) approach as `ggplot2`. Although the graphics of `ggplot2` are more comprehensive, creating plots via `plot_ly()` should also be utilised since they interact more directly with the `plotly.js` library (Sievert 2017).
 
-The `tooltip` argument for `plotly` objects allows for customisation of the information to display when hovering on a graphical feature. Brushing within a standalone `plotly` plot is possible on a pcp.  Combining `Plotly` with `Crosstalk` introduces the key interactive technique of brushing to link multiple plots. This can also be achieved by using `Plotly` and `Shiny` together, but the `SharedData` environment of the `crosstalk` package allows brushing to be initiated in any of the linked plots by default. However the `crosstalk` package is not appropriate for use with large data sets and currently supports only linked brushing and filtering views, for certain HTML widgets where observations are individually displayed (see <https://rstudio.github.io/crosstalk/>).  Further research into how the `htmlwidgets` package can be used with `Crosstalk`, with or without the `reactive` function in `Shiny`, is still required. The use of `D3` graphics with `crosstalk` will enable the interactive technique of dragging points.  
+The `tooltip` argument for **plotly** objects allows for customisation of the information to display when hovering on a graphical feature. Brushing within a standalone **plotly** plot is possible on a pcp.  Combining **plotly** with **crosstalk** introduces the key interactive technique of brushing to link multiple plots. This can also be achieved by using **plotly** and **shiny** together, but the `SharedData` environment of the **crosstalk** package allows brushing to be initiated in any of the linked plots by default. However the **crosstalk** package is not appropriate for use with large data sets and currently supports only linked brushing and filtering views, for certain HTML widgets where observations are individually displayed (see <https://rstudio.github.io/crosstalk/>).  Further research into how the `htmlwidgets` package can be used with **crosstalk**, with or without the `reactive` function in **shiny**, is still required. The use of `D3` graphics with **crosstalk** will enable the interactive technique of dragging points.  
 
-Utilising the `plotly_click` mode in the `event_data` function for `plotly` objects in `shiny` apps allows for linked brushing on area plots of categorical variables. 
 
 # The role of interactive visualisation in data analysis
 The importance of visuals to exploratory data analysis was clearly highlighted by Tukey (1977) when he stated: "The greatest value of a picture is when it **forces** us to notice what we never expected to see" (p.vi). This section examines the use of interactive visualisation techniques in exploratory data analysis on the performance of New Zealand schools in the National Certificate of Educational Achievement (NCEA) in 2016. The role of interactive techniques in enhancing analysis and gaining further insight than static plots, will be be highlighted and demonstrated through worked examples. 
 
-***
-*Key findings with regards to the use of interactive techniques in data analysis, or the teaching of interactive data visualisation, will be noted explicitly as they are demonstrated using the NCEA data set.*
 
-***
+```{block, type="boxed", echo=TRUE}
+Key findings with regards to the use of interactive techniques in data analysis, or the teaching of interactive data visualisation, will be noted explicitly as they are demonstrated using the NCEA data set.
+```
 
 ## The NCEA data set
 Data on the achievement rates of schools across the four NCEA qualification levels, Level One, Two, Three (L1, L2, L3) and University Entrance (UE), were obtained from the New Zealand Qualifications Authority (NZQA) website. Students need to demonstrate sufficient mastery of standards at each respective NCEA level in order to be awarded the qualification. The UE qualification differs from L3, in that the standards need to be from "university endorsed" Level Three subjects, and specific requirements for literacy and numeracy must be met.
@@ -143,7 +292,7 @@ head(akl[-1], n=3)
 
 ## Static visual analysis
 
-A question that naturally arises from the NCEA data is whether a school's performance is related to its decile rating. Using graphics in data analysis entails considering multiple views of the data, starting with simple low dimensional representations before examining complex multivariate structures (Unwin, Cook).
+A question that naturally arises from the NCEA data is whether a school's performance is related to its decile rating. Using graphics in data analysis entails considering multiple views of the data, starting with simple low dimensional representations before examining complex multivariate structures [@Unwin @Cook].
 
 The pairs plot in Figure \@ref(fig:pairs) shows the achievement rates at L1, L2 and L3 have a weak relationship with decile rating, but the positive correlation is strong at UE. There appears to be an increasing "lower bound" to achievement rates for L1, L2 and L3, as decile increases, but there is a lot of scatter above this boundary. In the bivariate scatterplots we can also see the spread of achievement rates varying across decile groups. The variation in achievement rates decreases as the decile increases (from one), across the L1, L2 and L3 qualification levels. We can see many schools approaching the maximum 100% achievement rate, for L1, L2 and L3, hence it is not surprising to see their univariate distributions are skewed to the left in Figure \@ref(fig:hists). The distribution of achievement rates for UE is less skewed and hints at two possible groupings. Furthermore performance across the qualification levels appear to be positively correlated, especially between L1 and L2. Hence the low-dimensional plots indicate non-normality, unequal spread between groups and multicollinearity.
 
@@ -158,7 +307,6 @@ panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
     if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
     text(0.5, 0.5, txt, cex = cex.cor * r)
 }
-#pairs(akl[-1], upper.panel=panel.cor)
 pairs(akl[-1], lower.panel=panel.cor)
 ```
 
@@ -181,11 +329,8 @@ The higher decile schools in Auckland appear to dominate the high achievement ra
 ```{r pcpAkl, fig.cap="Parallel coordinates plot for NCEA data on Auckland schools."}
 # Transform data frame to plot PCP
 ggpcp <- function(df, a=1, sd.group=NULL) {
-  # Transform df
-  long <- data.frame(School=rep(df$School, 4),
-                     Decile=rep(df$Decile, 4),
-                     Qualification=do.call(c, lapply(c("L1", "L2", "L3", "UE"), rep_len, nrow(df))),
-                     Achievement=c(unlist(c(df[c("L1", "L2", "L3", "UE")]))))
+  # Transform df to a long data frame
+  long <- gather(df, "Qualification", "Achievement", c("L1", "L2", "L3", "UE"))
   # Static PCP
   pcp.static <- long %>% SharedData$new(key=~School, group=sd.group) %>%
   ggplot(aes(x=Qualification, y=Achievement, group=School, colour=Decile)) +
@@ -214,10 +359,9 @@ nz.pcp
 
 Although one of the strengths of a PCP is in identifying multivariate features, such as outliers (Cook & Swayne, 2007), the static plots in Figures \@ref(fig:pcpNZ) and \@ref(fig:pcpAlpha) do not allow these features to be explored, due to overplotting. The use of colour and interactive techniques are recommended for maximising the effectiveness of a PCP. Venables and Ripley (2002) argue parallel coordinate plots are "often too 'busy' without means of interaction" (p. 315). The interactive filtering feature in Figure \@ref(fig:pcpInt) addresses the problem of overplotting by allowing the user to isolate the distribution of each decile group (via a double-click on the legend). Furthermore, using the mouse to drag-and-select nodes on the parallel axes, brushes and links the acheivement rates of individual schools across all qualification levels. Lastly the hovering tooltip enables instant identification of indvidual schools by name.
 
-***
-*Interactive filtering alleviates issuses with overplotting when the number of observations increase.*
-
-***
+```{block, type="boxed", echo=TRUE}
+Interactive filtering alleviates issuses with overplotting when the number of observations increase.
+```
 
 ```{r pcpInt, fig.cap="Parallel coordinates plot with interactivity.", fig.width=10, fig.height=7}
 # Interactive
@@ -239,10 +383,9 @@ include_graphics("files/pcp_L3.jpg", auto_pdf=F)
 
 The query made via linked brushing in Figure \@ref(fig:pcpL3) is similar to subsetting the data using the code shown below. A summary could be used to examine the performance of the subset of 42 schools across the other qualifications, but making sense of this summary would required comparison with statistics for the whole data set. Furthermore the summary hides the unusual performance of individual schools at certain qualification levels. The interactive techniques allowed us to gain insights about the NCEA data, that would have been difficult to ascertain from static plots or numeric summaries alone.
 
-***
-*Linked brushing and tooltip identification, quickly reveals further insight into patterns underlying unusual groups, or individuals.*
-
-***
+```{block, type="boxed", echo=TRUE}
+Linked brushing and tooltip identification, quickly reveals further insight into patterns underlying unusual groups, or individuals.
+```
 
 ```{r, echo=TRUE}
 L3all_achieve <- nzqa[nzqa$L3==1, c("L1", "L2", "UE")]
@@ -250,12 +393,11 @@ nrow(L3all_achieve)
 summary(L3all_achieve)
 ```
 
-However the ease and effectiveness of linked brushing can also be affected by overplotting. Figure \@ref(fig:pcpBusy) demonstrates how an attempt to use persistent brushing to identify the UE success rate of the school with 100% achievement at L3, but unusually low performance at L2, resulted in accidentally brushing an observation with a similar L2 achievement rate. The `plotly` `R` package used in Figure \@ref(fig:pcpInt) allows observations to be "brushed" via the drag-and-select motion (that was used), or a mouse click. Only the latter enables the brushing of individual lines on a PCP and the two options cannot be made concurrently available on the same plot.  The `ggobi` graphical user interface (GUI) applies the same drag-and-select motion to brush both points and lines on a PCP (Cook & Swayne, 2007). This greater flexibility would have avoided the issues caused by overplotting in this case, but some of the challenges of large data sets for static graphical displays will persist, even with interactive techniques. In particular the speed of rendering plots for large data sets determines whether the techinques can be applied "fast enough to be considered interactive" (Unwin 2015, p.20).
+However the ease and effectiveness of linked brushing can also be affected by overplotting. Figure \@ref(fig:pcpBusy) demonstrates how an attempt to use persistent brushing to identify the UE success rate of the school with 100% achievement at L3, but unusually low performance at L2, resulted in accidentally brushing an observation with a similar L2 achievement rate. The **plotly** R package used in Figure \@ref(fig:pcpInt) allows only the nodes of the PCP to be brushed. The **ggobi** GUI applies the same drag-and-select motion to brush both points and lines on a PCP (Cook & Swayne, 2007). This greater flexibility would have avoided the issues caused by overplotting in this case, but some of the challenges of large data sets for static graphical displays will persist, even with interactive techniques. In particular the speed of rendering plots for large data sets determines whether the techinques can be applied "fast enough to be considered interactive" (Unwin 2015, p.20).
 
-***
-*The effectiveness of interactive techniques for large data sets will be affected by rendering delays and limitations imposed by plot size and resolution.*
-
-***
+```{block, type="boxed", echo=TRUE}
+The effectiveness of interactive techniques for large data sets will be affected by rendering delays and limitations imposed by plot size and resolution.
+```
 
 ```{r pcpBusy, fig.cap="Accuracy of brushing is affected by overplotting.", out.width="700px"}
 include_graphics("files/pcp_busy.jpg", auto_pdf=F)
@@ -373,10 +515,9 @@ include_graphics("files/link_group.jpg", auto_pdf=F)
 
 In a similar manner to Figure \@ref(fig:pcpBusy), persistent brushing can be applied with different colours to further explore the multivariate features revealed by the PCA. The three outliers brushed in the PCA plot are at two extremes. Comparing their achievement rates on the PCP helps to explain why they are unusual in different ways. Two of the outliers had consistently high performance at the first three qualification levels, but there was a drastic drop in the UE achievement rate. Although, as previously observed, lower performance at UE was shared by the Auckland schools in general, the large differences between the two schools' achievement rates for UE and the remaining qualification levels, are still unexpected. The single outlier at the other extreme of the PCA plot, defies the general trend. Its L1 achievement rate was inconsistently lower than the other qualification levels, rather its UE rate. Although all three schools had unusual performance compared to Auckland schools in general, the inconsistencies in their performance differed. The linked brushing enabled us to further investigate the differences in "unusualness" and it also highlights how the multivariate outliers identified in the PCA are hidden in the PCP.
 
-*** 
-*Linked brushing between plots allows different visual representations of the same data to be related together, so that abstract methods can be explored further to reveal more insights about the multivariate features.*
-
-***
+```{block, type="boxed", echo=TRUE}
+Linked brushing between plots allows different visual representations of the same data to be related together, so that abstract methods can be explored further to reveal more insights about the multivariate features.
+```
 
 ```{r brushOutPCA, fig.cap="Brushing outliers on the PCA plot identifies inconsistent patterns of achievement on the PCP.", out.width="500px"}
 include_graphics("files/link_outPCA.jpg", auto_pdf=F)
@@ -436,10 +577,9 @@ include_graphics("files/pca_shiny0.jpg", auto_pdf=F)
 
 The pattern previously noted for Auckland schools, where decile nine and ten schools were more consistent with each other in performance than the other deciles, appears to hold for New Zealand schools in general, as we vary the minimum cohort size of schools considered in the PCA. Not surprisingly, as the minimum cohort size increases, the spread in the PCA plot decreases and the first principal component is able to explain more of the variation in the data. The loadings, represented by the plot axes, remain reasonably consistent. The first principal component generally measures overall performance across the four qualification levels, while the second component contrasts L1 and L2 preformance against L3 and UE. 
 
-***
-*Dynamic visualisation allows multiple analyses to be computed and compared quickly. The flexibility of being able to pause animations allows closer examination of details, as the need arises.*
-
-***
+```{block, type="boxed", echo=TRUE}
+Dynamic visualisation allows multiple analyses to be computed and compared quickly. The flexibility of being able to pause animations allows closer examination of details, as the need arises.
+```
 
 The interactive drop-down menu also allows us to quickly verify whether there are any underlying relationships between achievement rates and demographics other than decile, that are worth further investigation. Although the other demographic variables did not reveal any further insight, the ease with which these additional variables could be interactively linked to the PCA plot, justified their inclusion in the exploratory data analysis. Enabling the interactive drop-down menu in Figure \@ref(fig:pcaSize) involved adding the following single command to the code.
 
@@ -447,10 +587,9 @@ The interactive drop-down menu also allows us to quickly verify whether there ar
 selectInput("group", "Select variable", choices=as.list(colnames(nzqa.sch)[6:15]), selected="Decile")
 ```
 
-***
-*When interactive techniques can be applied with ease, the trade-off between the effort required to implement the technique and the level of insight gained, is generally favourable.*
-
-***
+```{block, type="boxed", echo=TRUE}
+When interactive techniques can be applied with ease, the trade-off between the effort required to implement the technique and the level of insight gained, is generally favourable.
+```
 
 ** In addition, or not, could using min cohort size to explore standardised PCP **
 Explore whether conclusions about above and below average schools across deciles hold (eg. the spread in decile 1 schools due to small sizes?  Decile 5 really the "average school"?)
@@ -468,7 +607,6 @@ ggplotly(pcp.scale, tooltip=c("group", "colour", "x", "y")) %>%
 ```
 
 
-***
-*The insights into multidimensional data structures gained from individual static plots were leveraged and further explored when interactive techniques were applied.*
-
-***
+```{block, type="boxed", echo=TRUE}
+The insights into multidimensional data structures gained from individual static plots were leveraged and further explored when interactive techniques were applied.
+```

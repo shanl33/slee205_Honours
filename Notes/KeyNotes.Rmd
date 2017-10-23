@@ -7,6 +7,26 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## References
+**How to cite comments on package if author not clear? ie. ggvis.**
+**Should use author (Hock for animint, Seivert for plotly etc..) to reference comments?**
++ plotly <https://github.com/ropensci/plotly>
++ crosstalk <https://rstudio.github.io/crosstalk/authoring.html>
++ Shiny
++ ggvis: <http://ggvis.rstudio.com/>
++ Mondrian: <http://www.theusrus.de/Mondrian/>
++ Animint: <https://tdhock.github.io/animint/#introduction>
+    - "Draft version" of unpublished paper on github. Retrieved from: <https://github.com/tdhock/animint-paper/blob/master/HOCKING-animint.pdf?raw=true>
++ Trelliscope: <https://hafen.github.io/trelliscopejs/#why_trelliscope>
++ Need to reference all packages used in report (eg. tidy?)
++ Use: knitr::write_bib(c("knitr", "stringr"), "packages.bib", width = 60) to generate bibtex file
++ Add to YAML: bibliography: ["HonourProj.bib", "packages.bib"]
++ May also need to add this in YAML so the packages (which are not cited explicitly) show up:
++ nocite: | 
+#  @R-bookdown
++ Delete or keep pipeline in HonourProj.bib?
++ Need to explain what a PCP is?
+
 ## Report questions
 + Use examples to explain what the techniques are in the survey part? If so use crabs to do it?
 + In survey of software can just focus on plotly, Shiny and Crosstalk? (Can include only these in the table and no others?) But mention ggobi (not code based), trelliscope (very specific application), both more GUIs orientated rather than code.
@@ -172,8 +192,8 @@ such as complete linkage, average linkage or centroid (see next section).
 ## animint (R package)
 See: <https://github.com/tdhock/animint>
 * "Academic paper" found from link above looks like a draft of the draft from Paul.
-See: <https://tdhock.github.io/animint/#introduction>
-* Han's Rosling's World Bank example: <https://cpsievert.shinyapps.io/animintRmarkdown/>
+See: <https://tdhock.github.io/animint/#introduction> (not that useful)
+* Han's Rosling's World Bank example: <https://cpsievert.shinyapps.io/animintRmarkdown/> (not that useful)
 Code: <https://github.com/tdhock/animint/tree/master/inst/examples/rmarkdown>
 * Can brush aggregate plots.
 * Can brush pcp (timeseries).
