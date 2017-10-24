@@ -97,13 +97,13 @@ include_graphics("files/one2one.jpg", auto_pdf=F)
 include_graphics("files/one2one2.jpg", auto_pdf=F)
 ```
 
-Instead of linking by case, a categorical variable can also be used to define the linking rule. This results in all members of the same level being highlighted, once one member is brushed [@Cook]. 
+Instead of linking by case, a categorical variable can also be used to define the linking rule. This results in all members of the same level being highlighted, once one member is brushed [@Cook]. Gender is used as the linking rule in Figure \@ref(fig:catbrush) so that brushing one female crab links to highlighting points for all female crabs in the same plot.
 
-```{r catbrush}
-
+```{r catbrush, fig.cap="Categorical brushing where brushing one female crab highlights all points representing female crabs.", out.width="700px"}
+include_graphics("files/catbrush.jpg", auto_pdf=F)
 ```
 
-For web-based software, brushing on visuals representing aggregated data, such as bar plots, is more challenging than linking by case [@crosstalk]. Although not impossible, the user needs to explicitly communicate details of the aggregation. This becomes more challenging when continuous variables are aggregated, or mosaic plots involving several categorical variables are used. The web-based R package **animint** attempts to make the implementation of aggregate brushing easier, but it is currently limited to discrete values and does not incorporate the flexibility of brushing by case [@animint].
+The query resulting from the categorical brushing in Figure \@ref(fig:catbrush) can also be achieved by brushing on a bar chart for the gender of the crabs and linking to the points in the scatterplot shown. For web-based software, brushing on visuals representing aggregated data, such as bar plots, is more challenging than linking by case [@crosstalk]. Although not impossible, the user needs to explicitly communicate details of the aggregation. This becomes more challenging when continuous variables are aggregated, or mosaic plots involving several categorical variables are used. The web-based R package **animint** attempts to make the implementation of aggregate brushing easier, but it is currently limited to discrete values and does not incorporate the flexibility of brushing by case [@animint].
 
 Linked brushing within a parallel coordinates plot (PCP) provides an example of *m*-to-*n* linking. A PCP displays multiple variables in a single plot by using parallel axes, rather than being restricted to two orthogonal axes, as in a scatterplot. Variable values on adjacent axes belonging to the same observation are joined by line segments. The parallel axes are typically scaled individually to maximise use of space on the plot, but global values can be used to establish a common scale for all axes as well [@GDA]. Figure \@ref(fig:m2nuni) uses five vertical axes, scaled individually to the range of each physical measurement recorded in the **crabs** dataset. The edges joining the nodes are relatively horizontal which suggests positive correlation between adjacent variables. Brushing the highest value on the **RW** axis links together the five physical measurements of the crab with the largest rear width. Hence linking together *m* nodes with *n* edges.
 
