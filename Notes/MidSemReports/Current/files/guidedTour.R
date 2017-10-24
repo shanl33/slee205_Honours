@@ -6,6 +6,7 @@ library(shiny)
 library(htmltools)
 library(MASS) # For crabs dataset
 library(tidyr) # For PCs reshaping output for plot
+library(GGally)
 
 # 'factors=n' argument specifies number of factors to include in the plot for brushing groups
 # The first 'n' factors will be used.

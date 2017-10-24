@@ -9,6 +9,8 @@ div.boxed {
 div.figure {
    margin-top: 2em;
    margin-bottom: 2em;
+   margin-right: auto;
+   margin-right: auto;
 }
 
 div.figcaption {
@@ -18,5 +20,21 @@ div.figcaption {
 div.table {
     margin-top: 2em;
     margin-bottom: 2em;
+}
+
+div.site-header {
+  font-size: 2em;
+}
+
+h1 {
+    font-size: 1.8em;
+}
+
+h2 {
+    font-size: 1.4em;
+}
+
+h3 {
+  font-size: 1.2em;
 }
 
