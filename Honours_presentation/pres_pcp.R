@@ -3,6 +3,7 @@ library(plotly)
 library(shiny)
 library(tidyr) # For PCs reshaping output for plot
 library(crosstalk)
+#library(tourr) # For rescale function for univariate_minmax
 
 # Load Auckland schoos data
 load("files/akl.RData")
@@ -37,7 +38,8 @@ server <- function(input, output, session) {
     if (input$scaling == "Standardise") {
       nzqa.scale <- cbind(akl[6], scale(akl[2:5]))
     } else if (input$scaling == "Univariate_minmax") {
-      nzqa.scale <- cbind(akl[6], rescale(akl[2:5]))
+      scaled <- apply(akl[2:5], 2, function(x) (x - min(x))/diff(range(x)))
+      nzqa.scale <- cbind(akl[6], scaled)
     } else {
       nzqa.scale <- akl
     }

@@ -3,9 +3,9 @@ title: presentation_pcp
 account: shanl33
 server: shinyapps.io
 appId: 232342
-bundleId: 1060886
+bundleId: 1063775
 url: https://shanl33.shinyapps.io/presentation_pcp/
-when: 1509957055.69802
+when: 1510090005.12961
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: .Rapp.history|HonoursProject.bib|HonsPresentation.aux|HonsPresentation.bbl|HonsPresentation.blg|HonsPresentation.log|HonsPresentation.nav|HonsPresentation.out|HonsPresentation.pdf|HonsPresentation.snm|HonsPresentation.synctex.gz|HonsPresentation.tex|HonsPresentation.toc|multiple.html|multiple.Rmd|files/PCApcp.jpg|files/pcp.jpeg
+ignoredFiles: .Rapp.history|HonoursProject.bib|HonsPresentation.aux|HonsPresentation.bbl|HonsPresentation.blg|HonsPresentation.log|HonsPresentation.nav|HonsPresentation.out|HonsPresentation.pdf|HonsPresentation.snm|HonsPresentation.synctex.gz|HonsPresentation.tex|HonsPresentation.toc|multiple.html|multiple.Rmd|files/pcp.jpeg
