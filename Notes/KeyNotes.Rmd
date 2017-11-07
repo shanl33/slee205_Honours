@@ -8,8 +8,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## References
-**How to cite comments on package if author not clear? ie. ggvis.**
-**Should use author (Hock for animint, Seivert for plotly etc..) to reference comments?**
+Use for generating bibtex for packages:
+citation(package = "cluster")
++ tourr package
++ggplot2
 + plotly <https://github.com/ropensci/plotly>
 + crosstalk <https://rstudio.github.io/crosstalk/authoring.html>
 + Shiny

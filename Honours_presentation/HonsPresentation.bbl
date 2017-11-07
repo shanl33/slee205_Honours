@@ -1,0 +1,35 @@
+\begin{thebibliography}{}
+
+\bibitem[Chang et~al., 2017]{shiny_R}
+Chang, W., Cheng, J., Allaire, J., Xie, Y., and McPherson, J. (2017).
+\newblock {\em shiny: Web Application Framework for R}.
+\newblock R package version 1.0.3.
+
+\bibitem[Cheng, 2017]{crosstalk_R}
+Cheng, J. (2017).
+\newblock {\em crosstalk: Inter-Widget Interactivity for HTML Widgets}.
+\newblock R package version 1.0.1.
+
+\bibitem[Cook and Swayne, 2007]{Cook}
+Cook, D. and Swayne, D.~F. (2007).
+\newblock {\em Interactive and Dynamic Graphics for Data Analysis With R and
+  GGobi}.
+\newblock Springer Publishing Company, Incorporated, 1st edition.
+
+\bibitem[{R Core Team}, 2013]{R}
+{R Core Team} (2013).
+\newblock {\em R: A Language and Environment for Statistical Computing}.
+\newblock R Foundation for Statistical Computing, Vienna, Austria.
+
+\bibitem[Sievert et~al., 2017]{plotly_R}
+Sievert, C., Parmer, C., Hocking, T., Chamberlain, S., Ram, K., Corvellec, M.,
+  and Despouy, P. (2017).
+\newblock {\em plotly: Create Interactive Web Graphics via 'plotly.js'}.
+\newblock R package version 4.7.0.
+
+\bibitem[Tukey, 1965]{Tukey}
+Tukey, J.~W. (1965).
+\newblock The technical tools of statistics.
+\newblock {\em The American Statistician}, 19(2):23--28.
+
+\end{thebibliography}

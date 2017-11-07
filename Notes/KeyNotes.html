@@ -120,10 +120,48 @@ $(document).ready(function () {
 </div>
 
 
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Use for generating bibtex for packages: citation(package = “cluster”) + tourr package +ggplot2 + plotly <a href="https://github.com/ropensci/plotly" class="uri">https://github.com/ropensci/plotly</a> + crosstalk <a href="https://rstudio.github.io/crosstalk/authoring.html" class="uri">https://rstudio.github.io/crosstalk/authoring.html</a> + Shiny + ggvis: <a href="http://ggvis.rstudio.com/" class="uri">http://ggvis.rstudio.com/</a> + Mondrian: <a href="http://www.theusrus.de/Mondrian/" class="uri">http://www.theusrus.de/Mondrian/</a> + Animint: <a href="https://tdhock.github.io/animint/#introduction" class="uri">https://tdhock.github.io/animint/#introduction</a> - “Draft version” of unpublished paper on github. Retrieved from: <a href="https://github.com/tdhock/animint-paper/blob/master/HOCKING-animint.pdf?raw=true" class="uri">https://github.com/tdhock/animint-paper/blob/master/HOCKING-animint.pdf?raw=true</a> + Trelliscope: <a href="https://hafen.github.io/trelliscopejs/#why_trelliscope" class="uri">https://hafen.github.io/trelliscopejs/#why_trelliscope</a> + Need to reference all packages used in report (eg. tidy?) + Use: knitr::write_bib(c(“knitr”, “stringr”), “packages.bib”, width = 60) to generate bibtex file + Add to YAML: bibliography: [“HonourProj.bib”, “packages.bib”] + May also need to add this in YAML so the packages (which are not cited explicitly) show up: + nocite: | # <span class="citation">@R-bookdown</span> + Delete or keep pipeline in HonourProj.bib? + Need to explain what a PCP is?</p>
+</div>
+<div id="report-questions" class="section level2">
+<h2>Report questions</h2>
+<ul>
+<li>Use examples to explain what the techniques are in the survey part? If so use crabs to do it?</li>
+<li>In survey of software can just focus on plotly, Shiny and Crosstalk? (Can include only these in the table and no others?) But mention ggobi (not code based), trelliscope (very specific application), both more GUIs orientated rather than code.</li>
+<li>Focus on comparisons between the 3 packages instead? In terms of ease and level of modification possible.</li>
+<li>In survey of techniques can focus on unpacking the three techniques: subset selection, linked brushing and tours? Mention identification, but not much to discuss.</li>
+</ul>
+</div>
+<div id="to-dos" class="section level1">
+<h1>To do’s:</h1>
+<ul>
+<li>Check all points are demonstrated in part 2.</li>
+</ul>
+<p>NCEA - use tour on cmass and link to PCP. Explore neighbourhood of PCA’s for interesting views. See if schools have a common structure (high L1, high L2, low L3, low UE?). Not focus on using decile to explain structure. More complex than that. EDA forces us to see what we don’t expect. Started with the intention of exploring a relationship between decile and NCEA achievement, but gained insights that went further than using a single factor to describe complex patterns. Started with a relatively surface question that lead to more indepth questions as a result of applying interactive techniques in EDA. Would this have been possible without the use of visuals? Interactive techniques?</p>
+<p>If using ggparcoord - cannot use linked brushing in plotly at all (only default tooltips and legend filtering possible). Need to explicitly</p>
+</div>
+<div id="uploading-shiny-app" class="section level1">
+<h1>Uploading shiny app</h1>
+<p>Retrieve key on shiny account (linked to github) Open app, run it to check and can use blue “Publish” button or run commands: library(rsconnect) deployApp()</p>
+<div id="github-pages" class="section level2">
+<h2>github pages</h2>
+<ul>
+<li>Write the yaml in RStudio and just save as .yml</li>
+<li>Follow these instructions <a href="http://nickstrayer.me/RMarkdown_Sites_tutorial/" class="uri">http://nickstrayer.me/RMarkdown_Sites_tutorial/</a></li>
+<li>Stick to the same file names.</li>
+<li>Can have as many pithub pages as you want.</li>
+</ul>
+</div>
+<div id="knit-to-pdf-without-plots-being-annoying" class="section level2">
+<h2>Knit to pdf without plots being annoying</h2>
+<p>Put the following in the “Yaml” so that the figures won’t float. And put the fig.pos=“H” in the chunk options. — header-includes: -  —</p>
+</div>
 <div id="questions" class="section level2">
 <h2>Questions</h2>
 <ul>
-<li>Apart from using <code>shiny</code>, how else can you be in a “reactive environment” (need this to explicitly retrieve SharedData details) eg. Use print(sd$data(withSelection=TRUE))</li>
+<li>Can we be more “off the cuff” in the presentation? (ie. don’t need to cite everything, some opinion-based comments)</li>
+<li>Report itself is submitted in PDF format, but with supporting documentation (Rmd and files). Can’t submit as html? (Static screen shot of filtering with PCP using plotly’s default legend needed then).</li>
 </ul>
 <div id="answered" class="section level3">
 <h3>Answered</h3>
@@ -154,7 +192,7 @@ $(document).ready(function () {
 </ul>
 </div>
 </div>
-<div id="to-dos" class="section level2">
+<div id="to-dos-1" class="section level2">
 <h2>To do’s</h2>
 <ul>
 <li>See if projection pursuit values are saved (invisibly) in output from tourr, if so use it to save running time for app. (Profiling shows the index calc in code takes some mem and time, otherwise the time is mostly being chewed up by the stochastic process within tourr fns)</li>
@@ -262,7 +300,7 @@ $(document).ready(function () {
 <li>Can <code>subplot()</code> be used with (<code>plotly</code>+<code>shiny</code>)? YES</li>
 </ul></li>
 <li>(<code>plotly</code>+<code>crosstalk</code>): Use Firefox browser if have multiple linked plots. Some other browsers may not show all plots.</li>
-<li>Guided tour = combining grand tour and projection pursuit. This results in choosing new projections with respect to maximising an index of interest, rather than at random <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</li>
+<li>Guided tour = combining grand tour and projection pursuit. This results in choosing new projections with respect to maximising an index of interest, rather than at random [^3].</li>
 </ul>
 <div id="my-function-for-2d-guided-tours" class="section level4">
 <h4>My function for 2D Guided Tours</h4>
@@ -286,15 +324,15 @@ $(document).ready(function () {
 <ul>
 <li>Plot for projection pursuit index:
 <ul>
-<li>Similarities with Fig 14 on p.216 <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>:
+<li>Similarities with Fig 14 on p.216 [^3]:
 <ul>
 <li>Link index value with the 2D tour projection.</li>
 <li>Use the index plot to compare local optimal projections from different tours and see if they are consistent. (An example of a wider theme of: Using visuals to gain insight into the consistency of random processes. eg. tours, cross-validation,..).</li>
-<li>Visualising the path of projection matrices in covering the data space is difficult since it involves a p-D hypersphere <a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>. To do: See <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a> and try the hypersphere interactive visualisation describe in <code>ggobi</code>.</li>
+<li>Visualising the path of projection matrices in covering the data space is difficult since it involves a p-D hypersphere [^3]. To do: See [^4] and try the hypersphere interactive visualisation describe in <code>ggobi</code>.</li>
 </ul></li>
-<li>Differences with Fig 14 on p.216 <a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a>:
+<li>Differences with Fig 14 on p.216 [^3]:
 <ul>
-<li>Use of principal components “shortcuts” the guided tours. Similar to the effect of launching a new tour from a ‘particularly good projection’ as described in Fig. 16 p.217 <a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a>.</li>
+<li>Use of principal components “shortcuts” the guided tours. Similar to the effect of launching a new tour from a ‘particularly good projection’ as described in Fig. 16 p.217 [^3].</li>
 <li>Comparing the local optimal projections of starting for pairwise combinations of PCs rather than random initial bases.</li>
 <li>Hence additional plots and relevant info on PCs required.</li>
 </ul></li>
@@ -302,13 +340,13 @@ $(document).ready(function () {
 <li>Use of principal components and PCs plot (or Use of the Fisher linear discriminant and LDA index plot):
 <ul>
 <li>First check the variables are on comparable scales, rescale to unit variance if needed (default).</li>
-<li>When using PCs we are interested in comparing the standard deviations of the PCs. We expect the first PC to have the greatest sd and the variation to decrease for subsequent PCs, but the size of differences in variation is of interest (p.357) <a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a>.</li>
-<li>The coefficients of each PC indicate which combinations of variables are being compared with each other (p.357 example of interpreting PCs for <code>crabs</code> data) <a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a>.</li>
-<li>Tours compliment numerical algorithms that find ‘interesting linear combinations of data. These linear combinations might be fed into a tour or re-created directly using manual manipulation, after which their neighborhoods can be explored to see whether some nearby projection is even more informative’ (p.34) <a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a>.</li>
-<li>‘The first few principal components are often useful to reveal structure in the data’ (p.331). <a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a> So we only need to explore pairwise combinations of the first few PCs as starting bases for guided tours (?) BUT we still need to p number of PCs for the tour in order to explore the p-dimnesional data space (NB: p = # of X-vars). ie. Want k=p (see below about k)</li>
-<li>PC are rotations of the original variables that best explain the variation in the data. If we only take the first k principal components then ‘the subspace they span contains the best k-dimensional view of the data’. Since the covariance matrix is maximised and the residual sum of squares between the original points and their projections is minimised (p331) <a href="#fn11" class="footnoteRef" id="fnref11"><sup>11</sup></a>
+<li>When using PCs we are interested in comparing the standard deviations of the PCs. We expect the first PC to have the greatest sd and the variation to decrease for subsequent PCs, but the size of differences in variation is of interest (p.357) [^2].</li>
+<li>The coefficients of each PC indicate which combinations of variables are being compared with each other (p.357 example of interpreting PCs for <code>crabs</code> data) [^2].</li>
+<li>Tours compliment numerical algorithms that find ‘interesting linear combinations of data. These linear combinations might be fed into a tour or re-created directly using manual manipulation, after which their neighborhoods can be explored to see whether some nearby projection is even more informative’ (p.34) [^1].</li>
+<li>‘The first few principal components are often useful to reveal structure in the data’ (p.331). [^2] So we only need to explore pairwise combinations of the first few PCs as starting bases for guided tours (?) BUT we still need to p number of PCs for the tour in order to explore the p-dimnesional data space (NB: p = # of X-vars). ie. Want k=p (see below about k)</li>
+<li>PC are rotations of the original variables that best explain the variation in the data. If we only take the first k principal components then ‘the subspace they span contains the best k-dimensional view of the data’. Since the covariance matrix is maximised and the residual sum of squares between the original points and their projections is minimised (p331) [^2]
 <ul>
-<li>To do: Double-check understanding of biplots as when k=2 (scatterplots with PC1 and PC2), so biplots are best 2D view of the data. Specific static projections of 2D tours are equivalent to biplots with axes rescaled to equal length (see p.35). <a href="#fn12" class="footnoteRef" id="fnref12"><sup>12</sup></a></li>
+<li>To do: Double-check understanding of biplots as when k=2 (scatterplots with PC1 and PC2), so biplots are best 2D view of the data. Specific static projections of 2D tours are equivalent to biplots with axes rescaled to equal length (see p.35). [^1]</li>
 </ul></li>
 </ul></li>
 </ul>
@@ -316,10 +354,16 @@ $(document).ready(function () {
 </div>
 </div>
 </div>
+<div id="animint-r-package" class="section level2">
+<h2>animint (R package)</h2>
+<p>See: <a href="https://github.com/tdhock/animint" class="uri">https://github.com/tdhock/animint</a> * “Academic paper” found from link above looks like a draft of the draft from Paul. See: <a href="https://tdhock.github.io/animint/#introduction" class="uri">https://tdhock.github.io/animint/#introduction</a> (not that useful) * Han’s Rosling’s World Bank example: <a href="https://cpsievert.shinyapps.io/animintRmarkdown/" class="uri">https://cpsievert.shinyapps.io/animintRmarkdown/</a> (not that useful) Code: <a href="https://github.com/tdhock/animint/tree/master/inst/examples/rmarkdown" class="uri">https://github.com/tdhock/animint/tree/master/inst/examples/rmarkdown</a> * Can brush aggregate plots. * Can brush pcp (timeseries). + Also demonstrated by Sievert in his draft paper using plotly. * dev version only.</p>
+<pre class="r"><code># Install dev version of animint package
+devtools::install_github(&quot;tdhock/animint&quot;, upgrade_dependencies=FALSE)</code></pre>
+</div>
 <div id="tourr-r-package" class="section level2">
 <h2>tourr (R package)</h2>
 <ul>
-<li>See: <a href="https://www.jstatsoft.org/article/view/v040i02/v40i02.pdf" class="uri">https://www.jstatsoft.org/article/view/v040i02/v40i02.pdf</a> <a href="#fn13" class="footnoteRef" id="fnref13"><sup>13</sup></a></li>
+<li>See: <a href="https://www.jstatsoft.org/article/view/v040i02/v40i02.pdf" class="uri">https://www.jstatsoft.org/article/view/v040i02/v40i02.pdf</a> [^4]</li>
 <li>Double arrow operator (&lt;&lt;-) allows assignmnet to parent levels (outside of current function or enviroment). The usual single arrow operator (&lt;-) only allows assignment to current level.</li>
 </ul>
 <div id="tours" class="section level3">
@@ -1190,6 +1234,7 @@ observeEvent(input$new, {
 <ul>
 <li>Testing: Assign variable to interaction fn and print() the output.</li>
 <li>Colour #RRGGBB__: <a href="http://sape.inf.usi.ch/quick-reference/ggplot2/colour" class="uri">http://sape.inf.usi.ch/quick-reference/ggplot2/colour</a></li>
+<li>Brewer colour scheme: Qualitative, Sequential: Gradual distinctions (0 to 1), Diverging: Very obvious distinctions (-1, 0, 1)</li>
 </ul>
 <div id="virtual-machine" class="section level3">
 <h3>Virtual Machine</h3>
@@ -1457,7 +1502,7 @@ observeEvent(input$new, {
 </ul></li>
 </ul>
 <div id="interactive-and-dynamic-graphics-for-data-analysis-1" class="section level3">
-<h3>Interactive and Dynamic Graphics for Data Analysis <a href="#fn14" class="footnoteRef" id="fnref14"><sup>14</sup></a></h3>
+<h3>Interactive and Dynamic Graphics for Data Analysis [^1]</h3>
 <ul>
 <li>Website for book: <a href="http://www.ggobi.org/book/index.html" class="uri">http://www.ggobi.org/book/index.html</a>
 <ul>
@@ -1514,39 +1559,20 @@ observeEvent(input$new, {
 </ul>
 </div>
 <div id="modern-applied-statstics-with-s-plus-2" class="section level3">
-<h3>Modern Applied Statstics with S-plus <a href="#fn15" class="footnoteRef" id="fnref15"><sup>15</sup></a></h3>
+<h3>Modern Applied Statstics with S-plus [^2]</h3>
 </div>
 <div id="visualizing-statistical-models-removing-the-blindfold-3" class="section level3">
-<h3>Visualizing Statistical Models: Removing the Blindfold <a href="#fn16" class="footnoteRef" id="fnref16"><sup>16</sup></a></h3>
+<h3>Visualizing Statistical Models: Removing the Blindfold [^3]</h3>
 <ul>
 <li>Distinction between visualising models in the data space (m-in-ds) and the data in the model space, which is more common.</li>
 <li>Advocates for more visuals for m-in-ds.</li>
 </ul>
 </div>
 </div>
-<div id="references" class="section level2">
+<div id="references-1" class="section level2">
 <h2>References</h2>
+<p>(Cook &amp; Swayne, 2007) Cook and Swayne (2007) Unwin (2015) blindfold Wickham, Cook and Hofmann (2015) Wickham et al. (2015) tourr package (Wickham, Cook, Hofmann &amp; Buja, 2011) Wickham et al. (2011) MASS book Venables and Ripley (2002) [^1]: Cook and Swayne (2007) R and GGobi book [^2]: Venables and Ripley (2002) MASS book [^3]: Wickham, Cook, Hofmann (2015) Remove blindfold paper [^4]: Wickham, Cook, Hofmann, Buja (2011) tourr package paper</p>
 </div>
-<div class="footnotes">
-<hr />
-<ol>
-<li id="fn1"><p>Wickham, Cook, Hofmann (2015) Remove blindfold paper<a href="#fnref1">↩</a></p></li>
-<li id="fn2"><p>Wickham, Cook, Hofmann (2015) Remove blindfold paper<a href="#fnref2">↩</a></p></li>
-<li id="fn3"><p>Wickham, Cook, Hofmann (2015) Remove blindfold paper<a href="#fnref3">↩</a></p></li>
-<li id="fn4"><p>Wickham, Cook, Hofmann, Buja (2011) tourr package paper<a href="#fnref4">↩</a></p></li>
-<li id="fn5"><p>Wickham, Cook, Hofmann (2015) Remove blindfold paper<a href="#fnref5">↩</a></p></li>
-<li id="fn6"><p>Wickham, Cook, Hofmann (2015) Remove blindfold paper<a href="#fnref6">↩</a></p></li>
-<li id="fn7"><p>Venables, Ripley (1999) MASS book<a href="#fnref7">↩</a></p></li>
-<li id="fn8"><p>Venables, Ripley (1999) MASS book<a href="#fnref8">↩</a></p></li>
-<li id="fn9"><p>Cook and Swayne (2007) R and GGobi book<a href="#fnref9">↩</a></p></li>
-<li id="fn10"><p>Venables, Ripley (1999) MASS book<a href="#fnref10">↩</a></p></li>
-<li id="fn11"><p>Venables, Ripley (1999) MASS book<a href="#fnref11">↩</a></p></li>
-<li id="fn12"><p>Cook and Swayne (2007) R and GGobi book<a href="#fnref12">↩</a></p></li>
-<li id="fn13"><p>Wickham, Cook, Hofmann, Buja (2011) tourr package paper<a href="#fnref13">↩</a></p></li>
-<li id="fn14"><p>Cook and Swayne (2007) R and GGobi book<a href="#fnref14">↩</a></p></li>
-<li id="fn15"><p>Venables, Ripley (1999) MASS book<a href="#fnref15">↩</a></p></li>
-<li id="fn16"><p>Wickham, Cook, Hofmann (2015) Remove blindfold paper<a href="#fnref16">↩</a></p></li>
-</ol>
 </div>
 
 
@@ -1572,7 +1598,7 @@ $(document).ready(function () {
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>

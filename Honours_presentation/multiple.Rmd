@@ -1,0 +1,112 @@
+---
+title: ''
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE, fig.align='center')
+library(ggplot2)
+library(plotly)
+library(crosstalk)
+library(tidyr) # For PCs reshaping output for plot
+load("files/akl.RData")
+```
+
+### Achievement rates of Auckland schools in 2016
+
+```{r}
+# Static PCA plot
+# Function for PCA and plot
+# scale.factor is an arbitary value that scales the loadings axes so that they can be on a comparable scale as the standardised PCs (scores). 
+# nudge argument also depends on the range of PC1 (used for enhancing the legibility of text labels on loadings axes).
+ncea_PCA <- function(df, scale.factor=20, nudge=-0.2, decile.pch=T, gp="Decile", sd.group=NULL) {
+  # Perform PCA
+  pca <- prcomp(df[2:5], scale.=T)
+  # Explained variance
+  exp.var <- round(pca$sdev^2/sum(pca$sdev^2)*100, 1)
+  # Scores (rotated principal components)
+  scores <- data.frame(t(t(pca$x[, 1:2])*(pca$sdev[1:2]^-1)), df[-(2:5)], Group=df[, gp])
+  scores$Decile <- as.factor(df$Decile)
+  axis.limit <- c(-round(max(abs(scores[1:2])), 1), round(max(abs(scores[1:2])), 1))
+  # Set up for linked brushing for Fig 8
+  sdPCA <- SharedData$new(scores, key=~School, group=sd.group)
+  # Variable axes (loadings)
+  lambda <- pca$sdev[1:2]/sqrt(nrow(df)-1)
+  loadings <- data.frame(varnames = rownames(pca$rotation),
+                              t(t(pca$rotation[, 1:2])*lambda*scale.factor))
+  # Plot of first two PCs
+  p <- ggplot(loadings) + 
+    geom_segment(aes(x=0, y=0, xend=PC1, yend=PC2), colour="grey35") +
+    geom_text(aes(x=PC1, y=PC2, label=varnames), colour="grey35", nudge_x=nudge) +
+    labs(x=paste("PC1 (", exp.var[1], "% explained var.)", sep=""),
+         y=paste("PC2 (", exp.var[2], "% explained var.)", sep="")) +
+    scale_x_continuous(limits=axis.limit) +
+    scale_y_continuous(limits=axis.limit*1.1) +
+    theme(
+      panel.border = element_rect(colour="grey", fill=NA),
+      panel.background = element_blank(),
+      legend.position = "none",
+      axis.text=element_blank(),
+      axis.ticks=element_blank())
+  # Plot decile as character or colour by another variable
+  if (decile.pch) {
+    plot <- p + geom_text(data=sdPCA, aes(x=PC1, y=PC2, label=Decile, colour=Decile, label1=School))
+  } else {
+    plot <- p + geom_point(data=sdPCA, aes(x=PC1, y=PC2, colour=Group, label1=School))
+  }
+  return(plot)
+}
+
+# Function for linking a plot showing the levels of a factor
+ncea_factor <- function(df, sd.group=NULL) {
+  # Set up for linked brushing 
+  sdGroup <- SharedData$new(data.frame(df, Decile=df$Decile), key=~School, group=sd.group)
+  # Static plot
+  factor.p <- ggplot(sdGroup) +
+    geom_jitter(aes(y=Decile, x=1, colour=Decile, label=School), width=0.1, height=0) +
+    labs(x="Decile", y="") +
+    scale_x_continuous(limits=c(0.7, 1.3)) +
+    theme(
+      panel.border=element_rect(colour="grey", fill=NA),
+      panel.background=element_blank(),
+      legend.position="none",
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank())
+  # Interactive linked plot
+  link.factor <- ggplotly(factor.p, tooltip=c("colour", "label"))
+  return(link.factor)
+}
+
+# Transform data frame to plot PCP
+ggpcp <- function(df, a=1, sd.group=NULL) {
+  # Transform df to a long data frame
+  df$ID <- rownames(df)
+  long <- gather(df, "Qualification", "Achievement", c("L1", "L2", "L3", "UE")) %>%
+    SharedData$new(key=~ID, group=sd.group)
+  # Static PCP
+  pcp.static <- ggplot(long, aes(x=Qualification, y=Achievement, colour=Decile, group=ID)) +
+    geom_line(alpha=a) +
+    geom_point(alpha=a, size=0.01) +
+    labs(x="Qualification level", y="Achievement rate") 
+    #theme(legend.position="none")
+  return(pcp.static)
+}
+
+# Static plots
+akl.PCA <- ncea_PCA(akl, decile.pch=F, sd.group="AKLncea")
+akl.PCP <- ggpcp(akl, sd.group="AKLncea")
+
+# Interactive plots
+link.PCA <- ggplotly(akl.PCA, tooltip=c("label1")) 
+link.decile <- ncea_factor(akl, sd.group="AKLncea") %>%
+  layout(yaxis=list(side="right"), margin=list(r=30))
+link.PCP <- ggplotly(akl.PCP, tooltip=c("group", "colour", "x", "y")) %>%
+  layout(dragmode="select", showlegend=FALSE) %>%
+  highlight(on="plotly_select", off="plotly_deselect", color = "blue", persistent=T, dynamic=T)
+# PCA with decile plot
+PCAdecile <- subplot(link.PCA, link.decile, widths=c(0.7, 0.3), margin=0, titleX=T, titleY=T) %>%
+  layout(dragmode="select") %>%
+  highlight(on="plotly_select", off="plotly_deselect", color="blue", persistent=T, dynamic=T)
+
+bscols(widths=c(7, 5), PCAdecile, link.PCP)
+```

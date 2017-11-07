@@ -1,0 +1,7 @@
+\frametitle{A focal set of software}
+		\begin{center}
+			\begin{tabular}{l c c c c c c}
+				R package & Active R session & Tooltip  Identification & Scaling & Subset  selection & Linked  brushing & Animation (for tours)} \\
+				Shiny & Yes & & & & Yes  & Yes \\
+			\end{tabular}
+		\end{center}
