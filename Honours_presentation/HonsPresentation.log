@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.12.8)  12 NOV 2017 17:24
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.12.8)  12 NOV 2017 21:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -946,7 +946,7 @@ thkerncmss.
 
 ] [5
 
-] <files/pcp.jpeg, id=217, 613.29124pt x 364.36125pt>
+] <files/pcp.jpeg, id=228, 613.29124pt x 364.36125pt>
 File: files/pcp.jpeg Graphic file (type jpg)
 
 <use files/pcp.jpeg>
@@ -955,7 +955,7 @@ Package pdftex.def Info: files/pcp.jpeg used on input line 85.
  [6
 
  <./files/pcp.jpeg>]
-<files/tour_hole.jpeg, id=254, 563.10374pt x 384.43625pt>
+<files/tour_hole.jpeg, id=266, 563.10374pt x 384.43625pt>
 File: files/tour_hole.jpeg Graphic file (type jpg)
 
 <use files/tour_hole.jpeg>
@@ -964,14 +964,14 @@ Package pdftex.def Info: files/tour_hole.jpeg used on input line 91.
  [7
 
  <./files/tour_hole.jpeg>]
-<files/tour_brushed2.jpeg, id=288, 573.14125pt x 375.4025pt>
+<files/tour_brushed2.jpeg, id=300, 573.14125pt x 375.4025pt>
 File: files/tour_brushed2.jpeg Graphic file (type jpg)
 
 <use files/tour_brushed2.jpeg>
 Package pdftex.def Info: files/tour_brushed2.jpeg used on input line 97.
 (pdftex.def)             Requested size: 131.8197pt x 86.34076pt.
 
-<files/link_brush.jpeg, id=289, 1335.99126pt x 405.515pt>
+<files/link_brush.jpeg, id=301, 1335.99126pt x 405.515pt>
 File: files/link_brush.jpeg Graphic file (type jpg)
 
 <use files/link_brush.jpeg>
@@ -987,13 +987,13 @@ Overfull \hbox (13.35458pt too wide) in paragraph at lines 97--97
  <./files/tour_brushed2.jpeg> <./files/link_brush.jpeg>] [9
 
 ]
-<files/table.jpeg, id=352, 824.07875pt x 315.1775pt>
+<files/table.jpeg, id=368, 844.15375pt x 266.9975pt>
 File: files/table.jpeg Graphic file (type jpg)
  <use files/table.jpeg>
-Package pdftex.def Info: files/table.jpeg used on input line 143.
-(pdftex.def)             Requested size: 313.15318pt x 119.76869pt.
+Package pdftex.def Info: files/table.jpeg used on input line 144.
+(pdftex.def)             Requested size: 312.332pt x 98.78752pt.
 
-Overfull \hbox (5.86331pt too wide) in paragraph at lines 143--143
+Overfull \hbox (5.04213pt too wide) in paragraph at lines 144--144
  [] 
  []
 
@@ -1020,26 +1020,26 @@ Overfull \hbox (5.86331pt too wide) in paragraph at lines 143--143
 \tf@snm=\write8
 \openout8 = `HonsPresentation.snm'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 171.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 171.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 172.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 172.
 
 (./HonsPresentation.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 171.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 171.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 172.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 172.
 Package rerunfilecheck Info: File `HonsPresentation.out' has not changed.
-(rerunfilecheck)             Checksum: 43B3328414F80A070228E626F0AD753C;232.
+(rerunfilecheck)             Checksum: 56247F7FA4AB8560281D53F0C651BBF0;261.
 
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 1.0pt have occurred.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 171.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 172.
  ) 
 Here is how much of TeX's memory you used:
- 17223 strings out of 493014
- 331864 string characters out of 6133351
- 402534 words of memory out of 5000000
- 20317 multiletter control sequences out of 15000+600000
+ 17230 strings out of 493014
+ 331926 string characters out of 6133351
+ 402554 words of memory out of 5000000
+ 20322 multiletter control sequences out of 15000+600000
  9392 words of font info for 34 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  56i,15n,61p,413b,575s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1050,10 +1050,10 @@ usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><
 /usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb><
 /usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/symbols/msam7.pf
 b>
-Output written on HonsPresentation.pdf (15 pages, 712617 bytes).
+Output written on HonsPresentation.pdf (15 pages, 697090 bytes).
 PDF statistics:
- 581 PDF objects out of 1000 (max. 8388607)
- 534 compressed objects within 6 object streams
- 42 named destinations out of 1000 (max. 500000)
- 108 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 603 PDF objects out of 1000 (max. 8388607)
+ 555 compressed objects within 6 object streams
+ 44 named destinations out of 1000 (max. 500000)
+ 116 words of extra memory for PDF output out of 10000 (max. 10000000)
 
