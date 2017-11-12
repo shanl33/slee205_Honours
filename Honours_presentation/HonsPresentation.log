@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.12.8)  8 NOV 2017 08:20
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.12.8)  12 NOV 2017 14:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -957,42 +957,27 @@ Package pdftex.def Info: files/pcp.jpeg used on input line 83.
  <./files/pcp.jpeg>] [7
 
 ]
-<files/PCApcp.jpeg, id=286, 1066.98625pt x 353.32pt>
-File: files/PCApcp.jpeg Graphic file (type jpg)
- <use files/PCApcp.jpeg>
-Package pdftex.def Info: files/PCApcp.jpeg used on input line 99.
-(pdftex.def)             Requested size: 320.09834pt x 105.99681pt.
+<files/table.jpeg, id=283, 834.11626pt x 266.9975pt>
+File: files/table.jpeg Graphic file (type jpg)
+ <use files/table.jpeg>
+Package pdftex.def Info: files/table.jpeg used on input line 127.
+(pdftex.def)             Requested size: 316.96747pt x 101.46008pt.
 
-Overfull \hbox (12.80847pt too wide) in paragraph at lines 99--99
-[]  
+Overfull \hbox (9.6776pt too wide) in paragraph at lines 127--127
+ [] 
  []
 
 [8
 
- <./files/PCApcp.jpeg>] [9
+ <./files/table.jpeg>] [9
 
-]
-<files/table.jpeg, id=349, 834.11626pt x 266.9975pt>
-File: files/table.jpeg Graphic file (type jpg)
- <use files/table.jpeg>
-Package pdftex.def Info: files/table.jpeg used on input line 123.
-(pdftex.def)             Requested size: 316.96747pt x 101.46008pt.
+] [10
 
-Overfull \hbox (9.6776pt too wide) in paragraph at lines 123--123
- [] 
- []
+] [11
 
-[10
-
- <./files/table.jpeg>] [11
-
-] [12
+] (./HonsPresentation.bbl) [12
 
 ] [13
-
-] (./HonsPresentation.bbl) [14
-
-] [15
 
 
 ]
@@ -1005,12 +990,12 @@ Overfull \hbox (9.6776pt too wide) in paragraph at lines 123--123
 \tf@snm=\write8
 \openout8 = `HonsPresentation.snm'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 151.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 151.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 155.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 155.
 
 (./HonsPresentation.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 151.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 151.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 155.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 155.
 Package rerunfilecheck Info: File `HonsPresentation.out' has not changed.
 (rerunfilecheck)             Checksum: 43B3328414F80A070228E626F0AD753C;232.
 
@@ -1018,13 +1003,13 @@ Package rerunfilecheck Info: File `HonsPresentation.out' has not changed.
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 1.0pt have occurred.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 151.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 155.
  ) 
 Here is how much of TeX's memory you used:
- 17196 strings out of 493014
- 331188 string characters out of 6133351
- 402534 words of memory out of 5000000
- 20292 multiletter control sequences out of 15000+600000
+ 17183 strings out of 493014
+ 331021 string characters out of 6133351
+ 402532 words of memory out of 5000000
+ 20284 multiletter control sequences out of 15000+600000
  9392 words of font info for 34 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  56i,15n,55p,413b,575s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1035,10 +1020,10 @@ usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><
 /usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb><
 /usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/symbols/msam7.pf
 b>
-Output written on HonsPresentation.pdf (15 pages, 597635 bytes).
+Output written on HonsPresentation.pdf (13 pages, 321750 bytes).
 PDF statistics:
- 578 PDF objects out of 1000 (max. 8388607)
- 533 compressed objects within 6 object streams
- 42 named destinations out of 1000 (max. 500000)
- 98 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 511 PDF objects out of 1000 (max. 8388607)
+ 470 compressed objects within 5 object streams
+ 38 named destinations out of 1000 (max. 500000)
+ 93 words of extra memory for PDF output out of 10000 (max. 10000000)
 

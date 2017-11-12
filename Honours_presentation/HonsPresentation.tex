@@ -66,8 +66,8 @@
 			\end{itemize}
 			\item A focal set of \textbf{R} packages for applying interactive data visualisation: \textbf{plotly}, \textbf{crosstalk} \& \textbf{shiny}.
 			\begin{itemize}
-				\item Ease of installation and application
 				\item Coverage of interactive techniques
+				\item Ease of installation and application
 			\end{itemize}
 		\item The benefits of interactivity justify the effort of teaching interactive tools.
 		\end{itemize}
@@ -84,32 +84,36 @@
 
 	\begin{frame}
 	\frametitle{Leveraging static plots}
-	Parallel coordinates plot (PCP)
+	%Parallel coordinates plot (PCP)
 	\begin{itemize}
 		\item \textbf{Linked brushing} and \textbf{identification} allow fast querying of unusual patterns, groups and/or individuals.
+		\item \textbf{Subset selection} via filtering views alleviates issues with overplotting and colour schemes.
 		\item Interactive \textbf{scaling} to compare and explore the different patterns revealed.
-		\item \textbf{Subset selection} via filtering views alleviates issues with overplotting.
+		\item Further exploration of the data.
+		\begin{itemize}
+			\item Questions are quickly addressed and more questions arise from probing the data with interactive techniques
+		\end{itemize}
 	\end{itemize}
 	\end{frame}
 
-	\begin{frame}
-		\frametitle{Relating multiple views}
-		\href{run:./multiple.html}{Principal components plot and PCP}
-		\includegraphics[scale=0.3]{files/PCApcp.jpeg}
-	\end{frame}
+%	\begin{frame}
+%		\frametitle{Relating multiple views}
+%		\href{run:./multiple.html}{Principal components plot and PCP}
+%		\includegraphics[scale=0.3]{files/PCApcp.jpeg}
+%	\end{frame}
 
-	\begin{frame}
-		\frametitle{Relating multiple views}
-		Principal components plot and PCP
-		\begin{itemize}
-			\item Insights into multivariate data structures gained from individual static plots are extended by \textbf{linked brushing}.
-			\item Applying interactive data visualisation encourages further exploration of the data.
-			\begin{itemize}
-				\item Questions are quickly addressed and more questions arise from probing the data with interactive techniques.
-			\end{itemize}
-			\item Awareness of the strengths and weaknesses of different software allows for efficient application of interactive techniques.
-		\end{itemize}
-	\end{frame}
+%	\begin{frame}
+%		\frametitle{Relating multiple views}
+%		Principal components plot and PCP
+%		\begin{itemize}
+%			\item Insights into multivariate data structures gained from individual static plots are extended by \textbf{linked brushing}.
+%			\item Applying interactive data visualisation encourages further exploration of the data.
+%			\begin{itemize}
+%				\item Questions are quickly addressed and more questions arise from probing the data with interactive techniques.
+%			\end{itemize}
+%			\item Awareness of the strengths and weaknesses of different software allows for efficient application of interactive techniques.
+%		\end{itemize}
+%	\end{frame}
 
 \section{Software}
 \label{sec:software}
@@ -130,9 +134,9 @@
 	\begin{itemize}[<+->]
 		\item Interactive techniques benefit data analysis.
 		\begin{itemize} 
-			\item <.-> Insights beyond static plots.
-			\item <.-> Relate multiple views.
-			\item <.-> Further exploration of structures.
+			\item <.-> Insights beyond static plots
+			%\item <.-> Relate multiple views
+			\item <.-> Further exploration of the data
 		\end{itemize}
 		\item The \textbf{R} packages \textbf{shiny}, \textbf{plotly} and \textbf{crosstalk} enable interactive data visualisation with code-based, open-source software.
 		\item The benefits of applying interactive techniques to data analysis warrant teaching interactive data visualisation to future statisticians.
