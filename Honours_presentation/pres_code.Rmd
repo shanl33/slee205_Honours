@@ -1,0 +1,39 @@
+---
+title: "pres code"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(plotly)
+library(shiny)
+library(tidyr) # For PCs reshaping output for plot
+library(crosstalk)
+#library(tourr) # For rescale function for univariate_minmax
+
+# Load Auckland schoos data
+load("files/akl.RData")
+```
+
+Linked brushing with plotly crosstalk
+
+```{r}
+# Function to transform data frame and produce a static PCP
+ggpcp <- function(df) {
+  # Transform df to a long data frame
+  long <- gather(df, "Qualification", "Achievement", c("L1", "L2", "L3", "UE")) %>%
+    SharedData$new(key=~School, group="ncea.pcp")
+  # Static PCP
+  pcp.static <- ggplot(long, aes(x=Qualification, y=Achievement, 
+                                 colour=Decile, group=School)) +
+    geom_line() +
+    geom_point(size=0.01) +
+    labs(x="Qualification level", y="Achievement rate") 
+  return(pcp.static)
+}
+
+ggpcp(akl) %>%
+  ggplotly() %>%
+    highlight(on="plotly_select", off="plotly_deselect", persistent=T, dynamic=T)
+```
