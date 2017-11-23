@@ -1,0 +1,14 @@
+stop_id, stop_name
+2200,Stop B International Terminal
+2006,Stop A Domestic Terminal 
+8533,Mt Eden Near Three Kings
+8523,909 Mt Eden Rd
+8517,581 Mt Eden Rd
+8513,415 Mt Eden Rd
+8503,97 Mt Eden Rd
+7151,157 Symonds Street (Eden Terrace)
+7149,83 Symonds Street (Grafton)
+7147,25 Symonds Street
+7060, 380 Queen Street
+
+
