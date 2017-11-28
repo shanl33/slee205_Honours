@@ -17,7 +17,7 @@ distance <- data.frame(stop = c("7018", "7047", "7053", "1464", "7060", "7062", 
                                 "8516", "8517", "8524", "8523", "8532", "8533", "2006",
                                 "8410", "8418", "8428", "7063", "8407", "8419", "8431"), 
                        dist = c(0, 0.69, 1.15, 1.15, 2.60, 3.04, 3.04,
-                                3.65, 3.65, 4.1, 4.1, 4.7, 4.7, 6.3, 6.3,
+                                3.6, 3.6, 4.1, 4.1, 4.7, 4.7, 6.3, 6.3,
                                 6.75, 6.75, 7.95, 7.95, 9.15, 9.15, 20,
                                 4.6, 5.7, 7.5, 3.04, 4.6, 5.7, 7.5))
 eden_to_air <- c("Customs St East\n/ Mercure Hotel", "", "64 Hobson St",
@@ -147,7 +147,7 @@ storeRoutes2 <- function(tagNo) {
 }
 
 # Function to create plot
-bus_graphic <- function (df, stops_to_air, air_to_stops, colour_from, colour_to) {
+bus_graphic <- function (df, stops_to_air, air_to_stops, colour_from, colour_to, day) {
   ggplot(df, aes(x=hours, y=dist)) +
     geom_line(aes(group=trip, colour=direction), size=0.8, alpha=0.5) +
     theme_bw() +
@@ -157,16 +157,19 @@ bus_graphic <- function (df, stops_to_air, air_to_stops, colour_from, colour_to)
     scale_x_continuous(name=NULL, breaks=seq(5, 24, 1), minor_breaks=seq(5, 24, 0.25), 
                        limits=c(5, 25), expand=c(0, -1), labels=c(5:11, "MIDI", 1:11, "MINUIT"),
                        sec.axis=sec_axis(trans=~., breaks=derive(), labels=derive())) +
+    labs(caption=paste("La SkyBus Graphique,", day)) +
     theme(panel.grid.minor.y=element_blank(),
           panel.grid.major.y=element_line(colour="grey50", size=0.3),
           axis.text.y.right=element_text(colour=colour_from),
           axis.text.y.left=element_text(colour=colour_to),
-          axis.text.x.top=element_text(margin=margin(t=5, b=5)),
-          axis.text.x.bottom=element_text(margin=margin(t=5, b=5)),
+          axis.text.x.top=element_text(margin=margin(t=0.4, b=0.2, unit="cm")),
+          axis.text.x.bottom=element_text(margin=margin(t=0.2, b=0.2, unit="cm")),
           panel.grid.major.x=element_line(colour="grey50", size=0.3),
           panel.grid.minor.x=element_line(colour="grey60"),
           panel.border=element_blank(),
-          axis.ticks=element_blank())
+          axis.ticks=element_blank(),
+          plot.caption=element_text(family="Times", face="bold.italic" , colour="grey45", 
+                                    margin=margin(t=0.1, b=0.3, unit="cm")))
 }
 
 
@@ -182,6 +185,7 @@ dom_routes <- c(dom_routes, lapply(11:12, function(x) paste0("300", x, "-2017040
 dom170405 <- do.call(rbind, lapply(dom_routes, storeRoutes2))
   
 # Plots
-bus_graphic(eden170406, eden_to_air, air_to_eden, colour_from="red", colour_to="black")
-bus_graphic(eden170406, eden_to_air, air_to_eden, colour_from="black", colour_to="blue")
-bus_graphic(dom170405, dom_to_air, air_to_dom, colour_from="red", colour_to="blue")
+bus_graphic(eden170406, eden_to_air, air_to_eden, colour_from="red", colour_to="black", 
+            day="jeudi 6 avril 2017")
+bus_graphic(dom170405, dom_to_air, air_to_dom, colour_from="red", colour_to="blue",
+            day="mercredi le 5 avril 2017")
