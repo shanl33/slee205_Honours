@@ -36,28 +36,6 @@ air_to_dom <- c("Customs St East", "99 Queen St", "237 Queen St",
                  "380 Queen St", "421 Queen St", "", "",
                 "215 Dominion Rd", "591 Dominion Rd", "993 Dominion Rd", "AKL Airport")
 
-
-# Function to retrieve data for each trip by route ID
-storeRoutes <- function(tagNo) {
-  df <- read.csv(paste0('bus-route-', tagNo, ".csv"), 
-                 col.names = c("trip", "route", "vehicle", "departure", "arrival", "stop_sequence", "stop_id", "timestamp"))
-  d <- df[!duplicated(df), ]
-  # make trip id:
-  d$trip <- gsub("-.*", "", d$trip)
-  d$trip <- as.factor(d$trip)
-  # make route id:
-  d$route <- gsub("-.*", "", d$route)
-  d$time <- as.POSIXct(d[, "timestamp"], origin = "1970-01-01")
-  d$hours <- as.numeric(d$time - trunc(d$time, "days"))
-  d$stop <- as.factor(d$stop_id)
-  # Even route number is 'to airport' and odd is 'from aiport'
-  d$direction <- ifelse(as.integer(d$route)/2==trunc(as.integer(d$route)/2), "to_air", "from_air")
-  d_dist <- merge(d, distance)
-  single_route <- d_dist[, c("trip", "route", "vehicle", "stop_sequence", "stop_id", 
-                             "stop", "dist", "time", "hours", "direction")]
-  return(single_route)
-}
-
 # If multiple timestamps for terminal stops then only retain earliest
 retain_earliest <- function(df_trip, repeated_stop) {
   if (summary(df_trip$stop)[repeated_stop]>1) {
@@ -123,6 +101,7 @@ check_trips <- function(trip_tag, route_df) {
   return(t4)
 }
 
+# Function to retrieve data for each trip by route ID and apply above functions
 storeRoutes2 <- function(tagNo) {
   df <- read.csv(paste0('bus-route-', tagNo, ".csv"), 
                  col.names = c("trip", "route", "vehicle", "departure", "arrival", "stop_sequence", "stop_id", "timestamp"))
@@ -161,9 +140,9 @@ bus_graphic <- function (df, stops_to_air, air_to_stops, colour_from, colour_to,
     theme(panel.grid.minor.y=element_blank(),
           panel.grid.major.y=element_line(colour="grey50", size=0.3),
           axis.text.y.right=element_text(colour=colour_from),
-          axis.text.y.left=element_text(colour=colour_to),
+          axis.text.y=element_text(colour=colour_to),
           axis.text.x.top=element_text(margin=margin(t=0.4, b=0.2, unit="cm")),
-          axis.text.x.bottom=element_text(margin=margin(t=0.2, b=0.2, unit="cm")),
+          axis.text.x=element_text(margin=margin(t=0.2, b=0.2, unit="cm")),
           panel.grid.major.x=element_line(colour="grey50", size=0.3),
           panel.grid.minor.x=element_line(colour="grey60"),
           panel.border=element_blank(),
@@ -176,16 +155,17 @@ bus_graphic <- function (df, stops_to_air, air_to_stops, colour_from, colour_to,
 # 6 possible routes for return trip and different time of day
 # Dates chosen because they produced interesting trips!
 # All SkyBus trips via Mt Eden Rd on Thursday 6th April 2017 
-eden_routes <- lapply(c(1:4, 9), function(x) paste0("3000", x, "-20170406"))
-eden_routes[[6]] <- "30010-20170406"
+eden_routes <- paste0("3000", c(1:4, 9), "-20170406")
+eden_routes[6] <- "30010-20170406"
 eden170406 <- do.call(rbind, lapply(eden_routes, storeRoutes2))
 # All SkyBus trips via Dominion Rd on Wednesday 5th April 2017 
-dom_routes <- lapply(5:8, function(x) paste0("3000", x, "-20170405"))
-dom_routes <- c(dom_routes, lapply(11:12, function(x) paste0("300", x, "-20170405")))
+dom_routes <- paste0("3000", 5:8, "-20170405")
+dom_routes <- c(dom_routes, paste0("300", 11:12, "-20170405"))
 dom170405 <- do.call(rbind, lapply(dom_routes, storeRoutes2))
   
 # Plots
 bus_graphic(eden170406, eden_to_air, air_to_eden, colour_from="red", colour_to="black", 
             day="jeudi 6 avril 2017")
+
 bus_graphic(dom170405, dom_to_air, air_to_dom, colour_from="red", colour_to="blue",
             day="mercredi le 5 avril 2017")
