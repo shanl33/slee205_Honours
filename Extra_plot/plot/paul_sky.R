@@ -155,12 +155,10 @@ bus_graphic <- function (df, stops_to_air, air_to_stops, colour_from, colour_to,
 # 6 possible routes for return trip and different time of day
 # Dates chosen because they produced interesting trips!
 # All SkyBus trips via Mt Eden Rd on Thursday 6th April 2017 
-eden_routes <- paste0("3000", c(1:4, 9), "-20170406")
-eden_routes[6] <- "30010-20170406"
+eden_routes <- sprintf("300%02d-20170406", c(1:4, 9:10))
 eden170406 <- do.call(rbind, lapply(eden_routes, storeRoutes2))
 # All SkyBus trips via Dominion Rd on Wednesday 5th April 2017 
-dom_routes <- paste0("3000", 5:8, "-20170405")
-dom_routes <- c(dom_routes, paste0("300", 11:12, "-20170405"))
+dom_routes <- sprintf("300%02d-20170405", c(5:8, 11:12))
 dom170405 <- do.call(rbind, lapply(dom_routes, storeRoutes2))
   
 # Plots
