@@ -1,0 +1,13 @@
+name: AKLschools_app
+title: AKLschools_app
+username:
+account: shanl33
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 257983
+bundleId: 1181110
+url: https://shanl33.shinyapps.io/AKLschools_app/
+when: 1516263960.41676
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: akl_schools.R|schools.xlsx
