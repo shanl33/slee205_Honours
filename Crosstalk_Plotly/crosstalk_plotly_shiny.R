@@ -1,6 +1,6 @@
 # No interaction occuring.
 devtools::install_github("rstudio/crosstalk")
-devtools::install_github("ropensci/plotly")
+#devtools::install_github("ropensci/plotly")
 library(crosstalk)
 library(shiny)
 library(plotly)
