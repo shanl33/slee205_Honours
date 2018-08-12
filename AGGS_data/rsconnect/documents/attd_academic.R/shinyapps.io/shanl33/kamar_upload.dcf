@@ -1,0 +1,13 @@
+name: kamar_upload
+title: kamar_upload
+username:
+account: shanl33
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 341996
+bundleId: 1370732
+url: https://shanl33.shinyapps.io/kamar_upload/
+when: 1526167620.09177
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: support_files/11LEexample.png|support_files/attd_credits.csv|support_files/working_example.R
