@@ -1,0 +1,13 @@
+name: kamar_ProgAlt
+title: kamar_ProgAlt
+username:
+account: shanl33
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 640271
+bundleId: 1812795
+url: https://shanl33.shinyapps.io/kamar_ProgAlt/
+when: 1547452354.67396
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: kamarRaw.R|NCEA_Level3_ProgressionAlt13MQ.csv|NCEA_Level3_ProgressionAltModified.csv

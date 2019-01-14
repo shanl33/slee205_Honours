@@ -5,8 +5,8 @@ library(gdata)
 library(ggplot2)
 library(plotly)
 
-# Download file
-download.file("https://www.educationcounts.govt.nz/__data/assets/excel_doc/0005/152609/Student-rolls-by-School-2009-2017.xlsx", "schools.xlsx")
+# Download file (link updated Aug 2018)
+download.file("https://www.educationcounts.govt.nz/__data/assets/excel_doc/0012/182001/Time-Series-School-Leavers-NCEA-Level-1-2009-2016.xlsx", "schools.xlsx")
 # Read in sheet with 2016 data only
 schools2016 <- read.xls("schools.xlsx", sheet="2017", skip=3, header=FALSE)
 # Error with xlsx file sheet names "2017" retrieves 2016 data and "2018" retrieves garbage
